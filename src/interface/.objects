@@ -1,0 +1,2 @@
+objs = INIT_load.o INIT.o INIT_QP.o  INIT_parse_K_list.o  \
+       INIT_q_points.o INIT_barriers.o INIT_QP_ctl_load.o INIT_QP_ctl_switch.o
