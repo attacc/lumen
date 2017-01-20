@@ -72,13 +72,11 @@ subroutine el_density_vbands(en,Xk,rho,Val_bands)
    if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
    !
    do is=1,n_sp_pol
-   !
 !$omp parallel do default(shared), private(iv)
      do iv=1,en%nbf
        rho_no_sym(:)=rho_no_sym(:)+real(spin_occ,SP)*Xk%weights(ik)*abs(Val_bands(:,iv,ik,1))**2._SP
      enddo
 !$omp end parallel do
-   ! 
    enddo
    !
  enddo
