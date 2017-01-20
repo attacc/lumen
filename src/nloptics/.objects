@@ -2,4 +2,4 @@ objs = NL_driver.o NL_initialize.o NL_start_and_restart.o el_density_vbands.o NL
        NL_Hamiltonian.o NL_output.o DIP_polarization.o NL_average_operator.o EXC_macroscopic_JGM.o\
        Build_DIP_bz.o NL_databases_IO.o NL_damping.o NL_build_dGamma.o Berry_polarization_NEQ.o\
        Build_W_operator.o Build_Overlaps_det_NEQ.o check_symmetries.o NL_apply_field.o NL_ext_fields.o\
-       V_real_space_to_H.o NL_build_valence_bands.o 
+       V_real_space_to_H.o NL_build_valence_bands.o V_Hartree.o 

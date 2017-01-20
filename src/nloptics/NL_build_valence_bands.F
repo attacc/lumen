@@ -21,28 +21,29 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_build_valence_bands(en,V_bands,Val_bands) 
+subroutine NL_build_valence_bands(en,V_input,Val_bands) 
  !
  ! Construct the density matrix differences dGamma = gamma(t) - gamma(t=0) 
  ! from the time-dependent valence bands
  !
  use pars,        ONLY:SP,cZERO
- use electrons,   ONLY:levels,spin_occ,n_sp_pol
+ use electrons,   ONLY:levels,n_sp_pol
  use nl_optics,   ONLY:NL_bands
  use FFT_m,       ONLY:fft_size
- use wrapper_omp, ONLY:Vstar_dot_V_omp
  use QP_m,        ONLY:QP_nk
+ use wave_func,   ONLY:WF
  use parallel_m,  ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX
+ !
  implicit none
  !
  type(levels), intent(in)  :: en
- complex(SP),  intent(in)  :: V_bands(NL_bands(2),en%nbf,QP_nk,n_sp_pol)
+ complex(SP),  intent(in)  :: V_input(NL_bands(2),en%nbf,QP_nk,n_sp_pol)
  complex(SP),  intent(out) :: Val_bands(fft_size,en%nbf,QP_nk,n_sp_pol)
  !
  ! Work Space
  !
- integer :: i1,i2
- integer :: ik
+ integer :: ib,iv,is
+ integer :: ik,i_wf
  !
  Val_bands=cZERO
  !
@@ -50,8 +51,21 @@ subroutine NL_build_valence_bands(en,V_bands,Val_bands)
    !
    if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
    !
+   do ib=NL_bands(1),NL_bands(2)
+     !
+     i_wf=WF%index(ib,ik,1)
+!$omp parallel do default(shared), private(iv)
+     do iv=1,en%nbf
+         Val_bands(:,iv,ik,1)=Val_bands(:,iv,ik,1)+V_input(ib,iv,ik,1)*WF%c(:,i_wf)
+     enddo
+!$omp end parallel do
+     !
+   enddo
+   !
  enddo
  !
- call PP_redux_wait(Val_bands,COMM=PAR_COM_Xk_ibz_INDEX%COMM )
+ do is=1,n_sp_pol
+   call PP_redux_wait(Val_bands(:,:,:,is),COMM=PAR_COM_Xk_ibz_INDEX%COMM )
+ enddo
  !
 end subroutine NL_build_valence_bands

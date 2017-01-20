@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston,
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine el_density_vbands(en,Xk,rho,V_input,lowest_band)
+subroutine el_density_vbands(en,Xk,rho,Val_bands)
  !
  !Electronic density.
  !
@@ -44,7 +44,7 @@ subroutine el_density_vbands(en,Xk,rho,V_input,lowest_band)
  !
  !
  use pars,          ONLY:SP,cZERO,rZERO
- use electrons,     ONLY:levels,n_sp_pol,spin_occ,n_spin,n_spinor
+ use electrons,     ONLY:levels,n_sp_pol,spin_occ,n_spin
  use R_lattice,     ONLY:bz_samp
  use D_lattice,     ONLY:nsym,i_time_rev
  use FFT_m,         ONLY:fft_size,fft_rot_r
@@ -57,14 +57,12 @@ subroutine el_density_vbands(en,Xk,rho,V_input,lowest_band)
  type(bz_samp),intent(in)  :: Xk
  type(levels), intent(in)  :: en       
  real(SP),     intent(out) :: rho(fft_size)
- integer,      intent(in)  :: lowest_band
- complex(SP),  intent(in)  :: V_input(NL_bands(2),en%nbf,QP_nk,n_sp_pol)
+ complex(SP),  intent(in)  :: Val_bands(fft_size,en%nbf,QP_nk,n_sp_pol)
  !
  ! Work Space 
  !
- integer     :: i1,ib,iv,ik,i_spin,rho_syms,i_wf,ir
+ integer     :: i1,iv,ik,is,rho_syms,ir
  real(SP)    :: rho_no_sym(fft_size)
- complex(SP) :: Val_bands(fft_size,en%nbf,n_spin)
  !
  rho=rZERO
  rho_no_sym=rZERO
@@ -73,51 +71,15 @@ subroutine el_density_vbands(en,Xk,rho,V_input,lowest_band)
    !  
    if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
    !
-   Val_bands=cZERO
+   do is=1,n_sp_pol
    !
-   do ib=lowest_band,NL_bands(2)
-     !
-     i_wf=WF%index(ib,ik,1)
+!$omp parallel do default(shared), private(iv)
      do iv=1,en%nbf
-!$omp parallel do default(shared), private(ir)
-       do ir=1,fft_size
-         Val_bands(ir,iv,1)=Val_bands(ir,iv,1)+V_input(ib,iv,ik,1)*WF%c(ir,i_wf)
-       enddo
-!$omp end parallel do
+       rho_no_sym(:)=rho_no_sym(:)+real(spin_occ,SP)*Xk%weights(ik)*abs(Val_bands(:,iv,ik,1))**2._SP
      enddo
-     !
-     if(n_spinor>1) then
-       !    
-       i_wf=WF%index(ib,ik,2)
-       !
-       do iv=1,en%nbf
-!$omp parallel do default(shared), private(ir)
-         do ir=1,fft_size
-           Val_bands(ir,iv,2)=Val_bands(ir,iv,2)+V_input(ib,iv,ik,1)*WF%c(ir,i_wf)
-         enddo
 !$omp end parallel do
-       enddo
-       !
-     endif
-     !
+   ! 
    enddo
-   !
-   do iv=1,en%nbf
-!$omp parallel do default(shared), private(ir)
-     do ir=1,fft_size
-       rho_no_sym(ir)=rho_no_sym(ir)+real(spin_occ,SP)*Xk%weights(ik)*abs(Val_bands(ir,iv,1))**2._SP
-     enddo
-!$omp end parallel do
-   enddo
-   if(n_spinor>1) then
-     do iv=1,en%nbf
-!$omp parallel do default(shared), private(ir)
-       do ir=1,fft_size
-         rho_no_sym(ir)=rho_no_sym(ir)+real(spin_occ,SP)*Xk%weights(ik)*abs(Val_bands(ir,iv,2))**2._SP
-       enddo
-!$omp end parallel do
-     enddo
-   endif
    !
  enddo
  !
