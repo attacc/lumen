@@ -34,27 +34,6 @@ integer function io_out_of_date(ID)
  !
  io_out_of_date=IO_OUTDATED_DB
  !
- ! Global revision check (mostly based on io_header)
- !===================================================
- !
- if (.not.ver_is_gt_or_eq(ID,(/3,0,15/))) return
- !
- ! DB specific
- !=============
- !
- REF_rev=5380
- if (index(io_file(ID),'RT_carriers')/=0.and..not.ver_is_gt_or_eq(ID,revision=REF_rev)) return
- if (index(io_file(ID),'RT_JPSM')/=0.and..not.ver_is_gt_or_eq(ID,revision=REF_rev)) return
- if (index(io_file(ID),'RT_REF')/=0.and..not.ver_is_gt_or_eq(ID,revision=REF_rev)) return
- if (index(io_file(ID),'RT_G')/=0.and..not.ver_is_gt_or_eq(ID,revision=REF_rev)) return
- !
- REF_ver=(/3,2,1/)
- if (index(io_file(ID),'elph_gkkp')/=0.and..not.ver_is_gt_or_eq(ID,REF_ver)) return
- if (index(io_file(ID),'elph_gFsq')/=0.and..not.ver_is_gt_or_eq(ID,REF_ver)) return
- !
- ! No error => Clean return
- !==========================
- !
  io_out_of_date=0
  !
 end function
