@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston,
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine el_density_vbands(en,Xk,rho,Val_bands)
+subroutine el_density_vbands(en,Xk,rho,VAL_BANDS)
  !
  !Electronic density.
  !
@@ -57,7 +57,7 @@ subroutine el_density_vbands(en,Xk,rho,Val_bands)
  type(bz_samp),intent(in)  :: Xk
  type(levels), intent(in)  :: en       
  real(SP),     intent(out) :: rho(fft_size)
- complex(SP),  intent(in)  :: Val_bands(fft_size,en%nbf,QP_nk,n_sp_pol)
+ complex(SP),  intent(in)  :: VAL_BANDS(fft_size,en%nbf,QP_nk,n_sp_pol)
  !
  ! Work Space 
  !
@@ -74,7 +74,7 @@ subroutine el_density_vbands(en,Xk,rho,Val_bands)
    do is=1,n_sp_pol
 !$omp parallel do default(shared), private(iv)
      do iv=1,en%nbf
-       rho_no_sym(:)=rho_no_sym(:)+real(spin_occ,SP)*Xk%weights(ik)*abs(Val_bands(:,iv,ik,1))**2._SP
+       rho_no_sym(:)=rho_no_sym(:)+real(spin_occ,SP)*Xk%weights(ik)*abs(VAL_BANDS(:,iv,ik,1))**2._SP
      enddo
 !$omp end parallel do
    enddo

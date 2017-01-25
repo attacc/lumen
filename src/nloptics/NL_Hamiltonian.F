@@ -40,7 +40,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  use nl_optics,      ONLY:Correlation,V_xc_0,full_rho,IPA,E_full,LRC,JGM,LRCW,l_use_DIPOLES,NL_LRC_alpha,   &
 &                         NL_initial_P,E_tot,E_ext,E_ks,E_xc_0,I_relax,Alpha_ED,dG,eval_dG, & 
 &                         V_hartree_ne,V_xc_ne,rho_n,Hk,eval_DFT,eval_HARTREE,rho_reference,NL_bands,&
-&                         Ho_plus_Sigma,NL_P,Phase_LifeTime,NL_nbands,Val_bands
+&                         Ho_plus_Sigma,NL_P,Phase_LifeTime,NL_nbands,VAL_BANDS
  use global_XC,      ONLY:WF_kind,WF_xc_functional 
  use parallel_m,     ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu
  use IO_m,           ONLY:IO_and_Messaging_switch
@@ -63,9 +63,9 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  !
  if(eval_HARTREE .or.  eval_DFT) then
    !      
-   call NL_build_valence_bands(E,V_bands,Val_bands) 
+   call NL_build_valence_bands(E,V_bands,VAL_BANDS) 
    !
-   call el_density_vbands(E,k,rho_n,Val_bands)
+   call el_density_vbands(E,k,rho_n,VAL_BANDS)
    !
  endif
  !

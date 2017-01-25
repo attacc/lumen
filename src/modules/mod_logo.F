@@ -68,6 +68,7 @@ module LOGO
      !
      character(schlen) :: comment(3),ch,MPI_string,OMP_string
      integer           :: max_length,i1,left_space,iA,ic
+     integer           :: n_logos,n_logos_stderr
      !
      ! Get version and revision
      !
@@ -90,9 +91,12 @@ module LOGO
      !
      comment(3)='http://www.yambo-code.org'
      !
+     n_logos       =1
+     n_logos_stderr=1
+     !
      if (ID_logo<0) then
-       ID_logo=pickup_a_random(10._SP)
-       ID_logo_stderr=10+pickup_a_random(6._SP)
+       ID_logo=pickup_a_random(float(n_logos))
+       ID_logo_stderr=n_logos+pickup_a_random(float(n_logos_stderr))
        if (ID_logo==0) ID_logo=1
        if (ID_logo_stderr==0) ID_logo_stderr=1
      endif
@@ -104,164 +108,24 @@ module LOGO
      !
      select case(i1)
        case(1)
-         logo_line( 1)='                                                        '
-         logo_line( 2)=' __  __   ________   ___ __ __    _______   ______      '
-         logo_line( 3)='/_/S/_/S /_______/S /__//_//_/S /_______/S /_____/S     '
-         logo_line( 4)='S S S S SS::: _  S SS::S| S| S SS::: _  S SS:::_ S S    '
-         logo_line( 5)=' S:S_S S SS::(_)  S SS:.      S SS::(_)  S/_S:S S S S   '
-         logo_line( 6)='  S::::_S/ S:: __  S SS:.S-/S  S SS::  _  S SS:S S S S  '
-         logo_line( 7)='    S::S S  S:.S S  S SS. S  S  S SS::(_)  S SS:S_S S S '
-         logo_line( 8)='     S__S/   S__S/S__S/ S__S/ S__S/ S_______S/ S_____S/ '
-         logo_line( 9)='                                                        '
+         logo_line( 1)='                                                      '
+         logo_line( 2)='//$$        /$$       /$$       $$ /$$$$$$$   $$    $$'
+         logo_line( 3)='| $$       //$$    $$| $$$    /$$$| $$       /$$$$  $$'
+         logo_line( 4)='| $$       | $$    $$| $$$$  /$$$$| $$      | $$$$$ $$'
+         logo_line( 5)='| $$       | $$    $$| $$ $$/$$ $$| $$$$$$$ | $$ $$$$$'
+         logo_line( 6)='| $$       | $$    $$| $$  $$$| $$| $$      | $$   $$$'
+         logo_line( 7)='| $$       | $$    $$| $$S  $ | $$| $$      | $$    $$'
+         logo_line( 8)='| $$$$$$$  | $$$$$$$$| $$     | $$| $$$$$$$/| $$    $$'
+         logo_line( 9)='|______/   |________/|__/     |__/|_______/  S__/  S_/'
        case(2)
-         logo_line( 1)='                                                         '
-         logo_line( 2)=' ____  ____     _       ____    ____  ______      ___    '
-         logo_line( 3)='|_  _||_  _|   / S     |_   S  /   _||_   _ S   ."   `.  '
-         logo_line( 4)='  S S  / /    / _ S      |   S/   |    | |_) | /  .-.  S '
-         logo_line( 5)='   S S/ /    / ___ S     | |S  /| |    |  __". | |   | | '
-         logo_line( 6)='   _|  |_  _/ /   S S_  _| |_S/_| |_  _| |__) |S  `-"  / '
-         logo_line( 7)='  |______||____| |____||_____||_____||_______/  `.___."  '
-         logo_line( 8)='                                                         '
-         logo_line( 9)='                                                         '
-       case(3)
-         logo_line( 1)='                                                       '
-         logo_line( 2)='  __   __     _        __  __       ____      U  ___  u'
-         logo_line( 3)='  S S / / U  /"S  U u |" S/ "| u U | __") u    S/"_ S/ '
-         logo_line( 4)='   S V /   S/ _ S/   S| |S/| |/   S|  _ S/     | | | | '
-         logo_line( 5)='  U_|"|_u  / ___ S    | |  | |     | |_) | .-,_| |_| | '
-         logo_line( 6)='    |_|   /_/   S_S   |_|  |_|     |____/   S_)-S___/  '
-         logo_line( 7)='.-,//|(_   SS    >>  <<,-,,-.     _|| SS_        SS    '
-         logo_line( 8)=' S_) (__) (__)  (__)  (./  S.)   (__) (__)      (__)   '
-         logo_line( 9)='                                                       '
-       case(4)
-         logo_line( 1)='                                                       '
-         logo_line( 2)='                                                       '
-         logo_line( 3)='Y88b    /   e           e    e      888~~S    ,88~-_   '
-         logo_line( 4)=' Y88b  /   d8b         d8b  d8b     888   |  d888   S  '
-         logo_line( 5)='  Y88b/   /Y88b       d888bdY88b    888 _/  88888    | '
-         logo_line( 6)='   Y8Y   /  Y88b     / Y88Y Y888b   888  S  88888    | '
-         logo_line( 7)='    Y   /____Y88b   /   YY   Y888b  888   |  Y888   /  '
-         logo_line( 8)='   /   /      Y88b /          Y888b 888__/    `88_-~   '
-         logo_line( 9)='                                                       '
-       case(5)
-         logo_line( 1)='                                                       '
-         logo_line( 2)=' **    **    **     ****     ****  ******     *******  '
-         logo_line( 3)='//**  **    ****   /**/**   **/** /*////**   **/////** '
-         logo_line( 4)=' //****    **//**  /**//** ** /** /*   /**  **     //**'
-         logo_line( 5)='  //**    **  //** /** //***  /** /******  /**      /**'
-         logo_line( 6)='   /**   **********/**  //*   /** /*//// **/**      /**'
-         logo_line( 7)='   /**  /**//////**/**   /    /** /*    /**//**     ** '
-         logo_line( 8)='   /**  /**     /**/**        /** /*******  //*******  '
-         logo_line( 9)='   //   //      // //         //  ///////    ///////   '
-       case(6)
-         logo_line( 1)='                                                       '
-         logo_line( 2)=':::   :::   :::     ::::    ::::  :::::::::   ::::::::  '
-         logo_line( 3)=':+:   :+: :+: :+:   +:+:+: :+:+:+ :+:    :+: :+:    :+: '
-         logo_line( 4)=' +:+ +:+ +:+   +:+  +:+ +:+:+ +:+ +:+    +:+ +:+    +:+ '
-         logo_line( 5)='  +#++: +#++:++#++: +#+  +:+  +#+ +#++:++#+  +#+    +:+ '
-         logo_line( 6)='   +#+  +#+     +#+ +#+       +#+ +#+    +#+ +#+    +#+ '
-         logo_line( 7)='   #+#  #+#     #+# #+#       #+# #+#    #+# #+#    #+# '
-         logo_line( 8)='   ###  ###     ### ###       ### #########   ########  '
-         logo_line( 9)='                                                       '
-       case(7)
-         logo_line( 1)='                                                       '
-         logo_line( 2)=' /$$     /$$ /$$$$$$  /$$      /$$ /$$$$$$$   /$$$$$$ '
-         logo_line( 3)='|  $$   /$$//$$__  $$| $$$    /$$$| $$__  $$ /$$__  $$'
-         logo_line( 4)=' S  $$ /$$/| $$  S $$| $$$$  /$$$$| $$  S $$| $$  S $$'
-         logo_line( 5)='  S  $$$$/ | $$$$$$$$| $$ $$/$$ $$| $$$$$$$ | $$  | $$'
-         logo_line( 6)='   S  $$/  | $$__  $$| $$  $$$| $$| $$__  $$| $$  | $$'
-         logo_line( 7)='    | $$   | $$  | $$| $$S  $ | $$| $$  S $$| $$  | $$'
-         logo_line( 8)='    | $$   | $$  | $$| $$ S/  | $$| $$$$$$$/|  $$$$$$/'
-         logo_line( 9)='    |__/   |__/  |__/|__/     |__/|_______/  S______/ '
-       case(8)
-         logo_line( 1)=' __      __   ______   __       __  _______    ______  '
-         logo_line( 2)='|  S    /  S /      S |  S     /  S|       S  /      S '
-         logo_line( 3)=' S$$S  /  $$|  $$$$$$S| $$S   /  $$| $$$$$$$S|  $$$$$$S'
-         logo_line( 4)='  S$$S/  $$ | $$__| $$| $$$S /  $$$| $$__/ $$| $$  | $$'
-         logo_line( 5)='   S$$  $$  | $$    $$| $$$$S  $$$$| $$    $$| $$  | $$'
-         logo_line( 6)='    S$$$$   | $$$$$$$$| $$S$$ $$ $$| $$$$$$$S| $$  | $$'
-         logo_line( 7)='    | $$    | $$  | $$| $$ S$$$| $$| $$__/ $$| $$__/ $$'
-         logo_line( 8)='    | $$    | $$  | $$| $$  S$ | $$| $$    $$ S$$    $$'
-         logo_line( 9)='     S$$     S$$   S$$ S$$      S$$ S$$$$$$$   S$$$$$$ '
-       case(9)
-         logo_line( 1)='                                                          '
-         logo_line( 2)='ooooo   oooo ..     ooo        ooo ooooooooo.    .oooo.   '
-         logo_line( 3)=' `88.   .8" .88.    `88.       .88 `88"   `Y8b  dP"  `Yb  '
-         logo_line( 4)='  `88. .8" .8"88.    888b     d"88  88     888 88      88 '
-         logo_line( 5)='   `88.8" .8" `88.   8 Y88. .P  88  88oooo888" 88      88 '
-         logo_line( 6)='    `88" .88ooo888.  8  `888"   88  88    `88b 88      88 '
-         logo_line( 7)='     88 .8"     `88. 8    Y     88  88    .88P `8b    d8" '
-         logo_line( 8)='    o88o88o      888o8          88 o88bood8P"   `Ybod8P"  '
-         logo_line( 9)='                                                          '
-       case(10)
-         logo_line( 1)='                                                          '
-         logo_line( 2)='____    ____    ___      .___  ___.  .______     ______   '
-         logo_line( 3)='S   S  /   /   /   S     |   S/   |  |   _  S   /  __  S  '
-         logo_line( 4)=' S   S/   /   /  ^  S    |  S  /  |  |  |_)  | |  |  |  | '
-         logo_line( 5)='  S_    _/   /  /_S  S   |  |S/|  |  |   _  <  |  |  |  | '
-         logo_line( 6)='    |  |    /  _____  S  |  |  |  |  |  |_)  | |  `--"  | '
-         logo_line( 7)='    |__|   /__/     S__S |__|  |__|  |______/   S______/  '
-         logo_line( 8)='                                                          '
-         logo_line( 9)='                                                          '
-       case(11)
-         logo_line( 1)='                                     '
-         logo_line( 2)=' ___ __  _____  __ __  _____   _____ '
-         logo_line( 3)='|   Y  ||  _  ||  Y  ||  _  S |  _  |'
-         logo_line( 4)='|   |  ||. |  ||.    ||. |  / |. |  |'
-         logo_line( 5)=' S_  _/ |. _  ||.S_/ ||. _  S |. |  |'
-         logo_line( 6)='  |: |  |: |  ||: |  ||: |   S|: |  |'
-         logo_line( 7)='  |::|  |:.|:.||:.|:.||::.   /|::.  |'
-         logo_line( 8)='  `--"  `-- --"`-- --"`-----" `-----"'
-         logo_line( 9)='                                     '
-       case(12)
-         logo_line( 1)='                                                  '
-         logo_line( 2)='                                                  '
-         logo_line( 3)='_|      _|   _|_|   _|      _|  _|_|_|     _|_|   '
-         logo_line( 4)='  _|  _|   _|    _| _|_|  _|_| _|    _| _|    _|  '
-         logo_line( 5)='    _|     _|_|_|_| _|  _|  _| _|_|_|   _|    _|  '
-         logo_line( 6)='    _|     _|    _| _|      _| _|    _| _|    _|  '
-         logo_line( 7)='    _|     _|    _| _|      _| _|_|_|     _|_|    '
-         logo_line( 8)='                                                  '
-         logo_line( 9)='                                                  '
-       case(13)
-         logo_line( 1)='                                   '
-         logo_line( 2)='  __ __  ____ ___ ___ ____   ___   '
-         logo_line( 3)=' |  |  |/    |   |   |    S /   S  '
-         logo_line( 4)=' |  |  |  o  | _   _ |  o  )     | '
-         logo_line( 5)=' |  ~  |     |  S_/  |     |  O  | '
-         logo_line( 6)=' |___, |  _  |   |   |  O  |     | '
-         logo_line( 7)=' |     |  |  |   |   |     |     | '
-         logo_line( 8)=' |____/|__|__|___|___|_____|S___/  '
-         logo_line( 9)='                                   '
-       case(14)
-         logo_line( 1)='                                              '
-         logo_line( 2)=' __    __ ______           ____     _____     '
-         logo_line( 3)='/S S  /S SS  _  S  /"S_/`S/S  _`S /S  __`S    '
-         logo_line( 4)='S `S`SS/"/ S SLS S/S      S S SLS S S S/S S   '
-         logo_line( 5)=' `S `S /" S S  __ S S S__S S S  _ <" S S S S  '
-         logo_line( 6)='   `S S S  S S S/S S S S_/S S S SLS S S S_S S '
-         logo_line( 7)='     S S_S  S S_S S_S S_SS S_S S____/S S_____S'
-         logo_line( 8)='      S/_/   S/_/S/_/S/_/ S/_/S/___/  S/_____/'
-         logo_line( 9)='                                             '
-       case(15)
          logo_line( 1)='                                             '
-         logo_line( 2)=' __   __  _______  __   __  _______  _______ '
-         logo_line( 3)='|  | |  ||   _   ||  |_|  ||  _    ||       |'
-         logo_line( 4)='|  |_|  ||  |_|  ||       || |_|   ||   _   |'
-         logo_line( 5)='|       ||       ||       ||       ||  | |  |'
-         logo_line( 6)='|_     _||       ||       ||  _   | |  |_|  |'
-         logo_line( 7)='  |   |  |   _   || ||_|| || |_|   ||       |'
-         logo_line( 8)='  |___|  |__| |__||_|   |_||_______||_______|'
-         logo_line( 9)='                                             '
-       case(16)
-         logo_line( 1)='                                             '
-         logo_line( 2)='   ___      ___      ___      ___      ___   '
-         logo_line( 3)='  /S__S    /S  S    /S__S    /S  S    /S  S  '
-         logo_line( 4)=' |::L__L  /::S  S  /::L_L_  /::S  S  /::S  S '
-         logo_line( 5)=' |:::S__S/::S:S__S/:/L:S__S/::S:S__S/:/S:S__S'
-         logo_line( 6)=' /:;;/__/S/S::/  /S/_/:/  /S:S::/  /S:S/:/  /'
-         logo_line( 7)=' S/__/     /:/  /   /:/  /  S::/  /  S::/  / '
-         logo_line( 8)='           S/__/    S/__/    S/__/    S/__/  '
+         logo_line( 2)=' __      _     _  __   __  _______         _ '
+         logo_line( 3)='|  |    | |   | ||  |_|  ||  _____||\     | |'
+         logo_line( 4)='|  |    | |   | ||       || |      | \    | |'
+         logo_line( 5)='|  |    | |   | ||       || |____  |\ \   | |'
+         logo_line( 6)='|  |    | |   | ||       ||  ____| | \ \  | |'
+         logo_line( 7)='|  |__  | |___| || ||_|| || |_____ | |\ \ | |'
+         logo_line( 8)='|_____| |_______||_|   |_||_______|| | \____|'
          logo_line( 9)='                                             '
      end select
      !
