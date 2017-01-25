@@ -33,7 +33,7 @@ integer function variables_BS(ID,local_description,X)
 &                        BS_n_g_exch,BS_n_g_W,BS_eh_en,BS_eh_win,BS_W_is_diagonal,&
 &                        BS_K_is_ALDA,BS_cpl_K_exchange,&
 &                        BS_cpl_K_corr
- use IO_m,          ONLY: io_elemental,io_status,ver_is_gt_or_eq
+ use IO_m,          ONLY: io_elemental,io_status
  implicit none
  !
  integer            ::ID
@@ -48,8 +48,7 @@ integer function variables_BS(ID,local_description,X)
  !
  ! PARS1
  !
- var_size=29
- if (ver_is_gt_or_eq(ID,(/3,0,9/))) var_size=30
+ var_size=30
  !
  i_local_desc=1
  local_description=' '
@@ -84,24 +83,13 @@ integer function variables_BS(ID,local_description,X)
 &     DESCRIPTION=local_description(i_local_desc))
  i_local_desc=i_local_desc+1
  !
- if (ver_is_gt_or_eq(ID,revision=4888)) then
-   call io_elemental(ID,DB_L0=cpl_corr_disk,&
-&       VAR="    |Correlation        [cpl]:",L0=BS_cpl_K_corr,CHECK=.true.,OP=(/"=="/),&
-&       DESCRIPTION=local_description(i_local_desc))
-   i_local_desc=i_local_desc+1
-   call io_elemental(ID,DB_L0=td_hf_disk,&
-&       VAR="    |W interaction is bare   :",L0=l_td_hf,CHECK=.true.,OP=(/"=="/),&
-&       DESCRIPTION=local_description(i_local_desc))
- else
-   call io_elemental(ID,DB_L0=td_hf_disk,&
-&       VAR="    |W interaction is bare   :",L0=l_td_hf,CHECK=.true.,OP=(/"=="/),&
-&       DESCRIPTION=local_description(i_local_desc))
-   i_local_desc=i_local_desc+1
-   call io_elemental(ID,DB_L0=cpl_corr_disk,&
-&       VAR="    |Correlation        [cpl]:",L0=BS_cpl_K_corr,CHECK=.true.,OP=(/"=="/),&
-&       DESCRIPTION=local_description(i_local_desc))
- endif
- !
+ call io_elemental(ID,DB_L0=cpl_corr_disk,&
+&     VAR="    |Correlation        [cpl]:",L0=BS_cpl_K_corr,CHECK=.true.,OP=(/"=="/),&
+&     DESCRIPTION=local_description(i_local_desc))
+ i_local_desc=i_local_desc+1
+ call io_elemental(ID,DB_L0=td_hf_disk,&
+&     VAR="    |W interaction is bare   :",L0=l_td_hf,CHECK=.true.,OP=(/"=="/),&
+&     DESCRIPTION=local_description(i_local_desc))
  i_local_desc=i_local_desc+1
  call io_elemental(ID,&
 &     VAR="    |ALDA kernel in R-space  :",L0=BS_K_is_ALDA,CHECK=.true.,OP=(/"=="/),&
@@ -165,35 +153,23 @@ integer function variables_BS(ID,local_description,X)
 &         VAR="    |[r,Vnl] included        :",L0=X%Vnl_included,WARN=.true.,OP=(/"=="/),&
 &         DESCRIPTION=local_description(i_local_desc))
      !
-     if (ver_is_gt_or_eq(ID,(/3,0,9/)).and..not.ver_is_gt_or_eq(ID,revision=626)) then
-       !
-       ! v 3.0.8: Inclusion of %long_gauge 
-       !
-       i_local_desc=i_local_desc+1
-       call io_elemental(ID,&
-&           VAR="    |Longitudinal Gauge      :",L0=local_long_gauge,&
-&           DESCRIPTION=local_description(i_local_desc))
-       !
-     endif
-     !
+     i_local_desc=i_local_desc+1
+     call io_elemental(ID,&
+&        VAR="    |Longitudinal Gauge      :",L0=local_long_gauge,&
+&        DESCRIPTION=local_description(i_local_desc))
      i_local_desc=i_local_desc+1
      call io_elemental(ID,&
 &         VAR="    |Field direction         :",R1=X%q0,CHECK=.true.,OP=(/"==","==","=="/),&
 &         DESCRIPTION=local_description(i_local_desc))
      call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
      !
-     if (ver_is_gt_or_eq(ID,(/3,0,11/))) then
-       !
-       ! v 3.0.11: Inclusion of cut_geometry
-       !
-       call io_elemental(ID,VAR="W_Cutoff",VAR_SZ=1,CH0="",MENU=0)
-       i_local_desc=i_local_desc+1
-       call io_elemental(ID,&
-&           VAR="    |Coulomb Cutoff          :",CH0=cut_geometry,CHECK=.true.,OP=(/"=="/),&
-&           DESCRIPTION=local_description(i_local_desc))
-       i_local_desc=i_local_desc+1
-       call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
-     endif
+     call io_elemental(ID,VAR="W_Cutoff",VAR_SZ=1,CH0="",MENU=0)
+     i_local_desc=i_local_desc+1
+     call io_elemental(ID,&
+&         VAR="    |Coulomb Cutoff          :",CH0=cut_geometry,CHECK=.true.,OP=(/"=="/),&
+&         DESCRIPTION=local_description(i_local_desc))
+     i_local_desc=i_local_desc+1
+     call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
      !
      ! W_TDDFT_KERNEL
      !

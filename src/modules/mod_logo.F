@@ -95,8 +95,8 @@ module LOGO
      n_logos_stderr=1
      !
      if (ID_logo<0) then
-       ID_logo=pickup_a_random(float(n_logos))
-       ID_logo_stderr=n_logos+pickup_a_random(float(n_logos_stderr))
+       ID_logo=pickup_a_random(dble(n_logos))
+       ID_logo_stderr=n_logos+pickup_a_random(dble(n_logos_stderr))
        if (ID_logo==0) ID_logo=1
        if (ID_logo_stderr==0) ID_logo_stderr=1
      endif

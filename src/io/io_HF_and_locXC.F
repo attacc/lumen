@@ -30,7 +30,7 @@ integer function io_HF_and_locXC(ID)
 &                         QP_table,QP_state
  use IO_m,           ONLY:io_connect,io_disconnect,io_sec,io_header,io_HF,frag_HF,&
 &                         io_elemental,io_status,io_bulk,read_is_on,IO_NOT_ALLOWED,&
-&                         write_is_on,io_mode,DUMP,ver_is_gt_or_eq,IO_INCOMPATIBLE_VAR
+&                         write_is_on,io_mode,DUMP,IO_INCOMPATIBLE_VAR
 #if defined _TIMING
  use timing_m,       ONLY:timing
 #endif
@@ -78,31 +78,14 @@ integer function io_HF_and_locXC(ID)
    call io_elemental(ID,I0=QP_ng_Sx,&
 &       VAR=' Exchange RL vectors             :',CHECK=.true.,OP=(/"=="/))
    !
-   if (ver_is_gt_or_eq(ID,revision=498)) then
-     call io_elemental(ID,I0=n_met_bands,VAR=' Exchange summation bands        :',CHECK=.true.,OP=(/"=="/))
-   else
-     call io_elemental(ID,I1=bands,&
-&         VAR=' Exchange summation bands        :',CHECK=.true.,OP=(/"==","=="/))
-   endif
+   call io_elemental(ID,I0=n_met_bands,VAR=' Exchange summation bands        :',CHECK=.true.,OP=(/"=="/))
    !
    call io_elemental(ID,I0=RIM_ng,&
 &       VAR=' RIM RL components               :',CHECK=.true.,OP=(/"=="/))
    call io_elemental(ID,I0=RIM_n_rand_pts,&
 &       VAR=' RIM random points               :',CHECK=.true.,OP=(/"=="/))
    !
-   if (ver_is_gt_or_eq(ID,(/3,0,15/))) then
-     call io_elemental(ID,VAR="",VAR_SZ=0)
-   else
-     call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
-     !
-     ! xc Functional
-     !
-     call io_elemental(ID,VAR='XC_FUNCTIONAL',CH0="",VAR_SZ=1,MENU=0)
-     call io_elemental(ID,CH0=QP_xc_FUNCTIONAL,&
-&         VAR=' xc Functional                   :',CHECK=.true.,OP=(/"=="/))
-     !
-     call io_elemental(ID,VAR="",VAR_SZ=0)
-   endif
+   call io_elemental(ID,VAR="",VAR_SZ=0)
    !
    io_HF_and_locXC=io_status(ID)
    if (io_HF_and_locXC/=0) goto 1

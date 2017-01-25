@@ -31,8 +31,7 @@ integer function io_Double_Grid(E,Xk,ID)
  use R_lattice,      ONLY:nXkbz,bz_samp
  use memory_m,       ONLY:mem_est
  use IO_m,           ONLY:io_connect,io_disconnect,io_elemental,read_is_on,&
-&                         io_bulk,io_header,ver_is_gt_or_eq,file_is_present,write_is_on,&
-&                         IO_OUTDATED_DB
+&                         io_bulk,io_header,file_is_present,write_is_on
  implicit none
  !
  type(levels) :: E
@@ -61,8 +60,6 @@ integer function io_Double_Grid(E,Xk,ID)
  if (io_Double_Grid/=0) goto 1
  !
  io_Double_Grid=io_header(ID)
- !
- if (.not.ver_is_gt_or_eq(ID,revision=3560)) io_Double_Grid=IO_OUTDATED_DB
  !
  if (io_Double_Grid/=0) goto 1
  !

@@ -40,7 +40,7 @@ integer function io_DB1(E,k,ID)
  use IO_m,             ONLY:io_connect, io_disconnect, io_sec,variable_is_found, &
 &                           io_elemental, io_status, io_bulk,read_is_on,&
 &                           serial_number,io_serial_number,io_code_revision,&
-&                           DUMP,io_mode,write_is_on,io_code_version,ver_is_gt_or_eq
+&                           DUMP,io_mode,write_is_on,io_code_version
  use QP_m,             ONLY:QP_nk,QP_nb,QP_n_G_bands
  use BS,               ONLY:BS_bands
  use xc_functionals,   ONLY:GS_xc_KIND,GS_xc_FUNCTIONAL,GS_exx_FRACTION,GS_exx_SCREENING
@@ -155,12 +155,6 @@ integer function io_DB1(E,k,ID)
    call io_elemental(ID, I0=GS_xc_FUNCTIONAL)
    call io_elemental(ID, VAR="",VAR_SZ=0,MENU=0) 
    !
-   !=------------ DIMENSIONS END -----------------=
-   !
-   ! Check for old databases not compatible with libxc
-   !
-   if (.not.ver_is_gt_or_eq(ID,(/3,2,2/))) call compatibility_message( )
-   !
    ! Wavefunction G-vector components
    !---------------------------------
    !
@@ -169,54 +163,39 @@ integer function io_DB1(E,k,ID)
    ! Note the difference between wf_ncx, wf_nc_k and wf_ng. In PW in general
    ! wf_ng = maxval(wf_igk) > wf_ncx
    !
-   if (ver_is_gt_or_eq(ID,(/3,0,3/))) then
-     !
-     call io_elemental(ID, VAR="WF_G_COMPONENTS",VAR_SZ=1,MENU=0)
-     call io_elemental(ID,I0=wf_ng,CHECK=.true.,OP=(/"=="/),&
+   call io_elemental(ID, VAR="WF_G_COMPONENTS",VAR_SZ=1,MENU=0)
+   call io_elemental(ID,I0=wf_ng,CHECK=.true.,OP=(/"=="/),&
 &                      VAR=' WF G-vectors                    :')
-   endif
    !
    ! Atomic data
    !
-   if (ver_is_gt_or_eq(ID,(/3,0,4/))) then 
-     call io_elemental(ID, VAR="MAX_ATOMS",VAR_SZ=1,MENU=0)
-     call io_elemental(ID,I0=n_atoms_species_max,   CHECK=.true.,OP=(/"=="/),&
-&                      VAR=' Max atoms/species               :')
-     !
-     call io_elemental(ID, VAR="number_of_atom_species",VAR_SZ=1,MENU=0)
-     call io_elemental(ID,I0=n_atomic_species,CHECK=.true.,OP=(/"=="/),&
+   call io_elemental(ID, VAR="MAX_ATOMS",VAR_SZ=1,MENU=0)
+   call io_elemental(ID,I0=n_atoms_species_max,   CHECK=.true.,OP=(/"=="/),&
+&                    VAR=' Max atoms/species               :')
+   !
+   call io_elemental(ID, VAR="number_of_atom_species",VAR_SZ=1,MENU=0)
+   call io_elemental(ID,I0=n_atomic_species,CHECK=.true.,OP=(/"=="/),&
 &                      VAR=' No. of atom species             :')
-   endif
    !
    ! Hybrids stuff
    !	
    if (var_err==1) then
      !
-     if (ver_is_gt_or_eq(ID,revision=2962)) then
-         call io_elemental(ID, VAR="EXX_FRACTION",VAR_SZ=1,MENU=0)
-         call io_elemental(ID,R0=GS_exx_FRACTION,   CHECK=.true.,OP=(/"=="/),&
+     call io_elemental(ID, VAR="EXX_FRACTION",VAR_SZ=1,MENU=0)
+     call io_elemental(ID,R0=GS_exx_FRACTION,   CHECK=.true.,OP=(/"=="/),&
 &                             VAR=' Exact exchange fraction in XC   :')
-     endif
-     if (ver_is_gt_or_eq(ID,revision=3997)) then
-         call io_elemental(ID, VAR="EXX_SCREENING",VAR_SZ=1,MENU=0)
-         call io_elemental(ID,R0=GS_exx_SCREENING,   CHECK=.true.,OP=(/"=="/),&
+     call io_elemental(ID, VAR="EXX_SCREENING",VAR_SZ=1,MENU=0)
+     call io_elemental(ID,R0=GS_exx_SCREENING,   CHECK=.true.,OP=(/"=="/),&
 &                                VAR=' Exact exchange screening in XC  :')
-     endif
      !
    endif
    !
-   if (ver_is_gt_or_eq(ID,revision=1240).and.ver_is_gt_or_eq(ID,(/3,2,5/))) then
-     call io_elemental(ID, VAR="mag_syms",VAR_SZ=1,MENU=0)
-     call io_elemental(ID, L0=mag_syms,VAR=' Magnetic symmetries             : ')
-   endif
+   call io_elemental(ID, VAR="mag_syms",VAR_SZ=1,MENU=0)
+   call io_elemental(ID, L0=mag_syms,VAR=' Magnetic symmetries             : ')
    !
-   if (ver_is_gt_or_eq(ID,revision=4351)) then
-     call io_elemental(ID, VAR="GPL_REVISION",VAR_SZ=1,MENU=0)
-     if (write_is_on(ID)) code_revision_local=code_GPL_revision
-     call io_elemental(ID,DB_I0=io_code_revision(ID,2),I0=code_revision_local)
-   else
-     io_code_revision(ID,2)=code_GPL_revision
-   endif
+   call io_elemental(ID, VAR="GPL_REVISION",VAR_SZ=1,MENU=0)
+   if (write_is_on(ID)) code_revision_local=code_GPL_revision
+   call io_elemental(ID,DB_I0=io_code_revision(ID,2),I0=code_revision_local)
    !
    call io_elemental(ID, VAR="",VAR_SZ=0,MENU=MENU)
    MENU=0
@@ -242,7 +221,6 @@ integer function io_DB1(E,k,ID)
      nel=default_nel
      !
      ng_closed=ng_vec
-     if (.not.ver_is_gt_or_eq(ID,(/3,0,3/))) wf_ng=wf_ncx
      !
      call setup_global_XC('preset',GS_xc_KIND,xc_functional=GS_xc_functional,perturbation=EXT_NONE,&
                           exx_fraction=GS_exx_FRACTION,exx_screening=GS_exx_SCREENING)
@@ -270,15 +248,12 @@ integer function io_DB1(E,k,ID)
 &               (/size(g_vec),size(k%pt),size(dl_sop),size(wf_nc_k),size(wf_igk)/),&
 &               (/SP,        SP,        SP,           IP,         IP/), quiet=.TRUE. )
    !
-   if (ver_is_gt_or_eq(ID,(/3,0,4/))) then 
-     allocate(n_atoms_species(n_atomic_species))
-     allocate(Z_species(n_atomic_species))
-     allocate(atom_pos(3,n_atoms_species_max,n_atomic_species))
-     call mem_est("n_atoms_species atom_pos Z_species",&
+   allocate(n_atoms_species(n_atomic_species))
+   allocate(Z_species(n_atomic_species))
+   allocate(atom_pos(3,n_atoms_species_max,n_atomic_species))
+   call mem_est("n_atoms_species atom_pos Z_species",&
 &                 (/n_atomic_species,size(atom_pos),n_atomic_species/),&
 &                 (/IP,SP,IP/))
-     !
-   endif
    !
  endif
  !
@@ -292,17 +267,14 @@ integer function io_DB1(E,k,ID)
  !
  ! Atoms
  !
- if (ver_is_gt_or_eq(ID,(/3,0,4/))) then 
-   call io_bulk(ID,VAR="N_ATOMS",VAR_SZ=(/n_atomic_species/))
-   call io_bulk(ID,I1=n_atoms_species)
-   call io_bulk(ID,VAR="ATOM_POS",VAR_SZ=shape(atom_pos))
-   call io_bulk(ID,R3=atom_pos)
-   call io_bulk(ID,VAR="atomic_numbers",VAR_SZ=(/n_atomic_species/))
-   call io_bulk(ID,I1=Z_species)
-   !
-   if (io_mode(ID)==DUMP.or.write_is_on(ID))  n_atoms=sum(n_atoms_species) 
-   !
- endif
+ call io_bulk(ID,VAR="N_ATOMS",VAR_SZ=(/n_atomic_species/))
+ call io_bulk(ID,I1=n_atoms_species)
+ call io_bulk(ID,VAR="ATOM_POS",VAR_SZ=shape(atom_pos))
+ call io_bulk(ID,R3=atom_pos)
+ call io_bulk(ID,VAR="atomic_numbers",VAR_SZ=(/n_atomic_species/))
+ call io_bulk(ID,I1=Z_species)
+ !
+ if (io_mode(ID)==DUMP.or.write_is_on(ID))  n_atoms=sum(n_atoms_species) 
  !
  ! Symmetry
  !

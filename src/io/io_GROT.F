@@ -30,7 +30,7 @@ integer function io_GROT(io_db)
  use R_lattice,      ONLY:n_g_shells,ng_closed,ng_in_shell,E_of_shell,g_rot,&
 &                         minus_G
  use IO_m,           ONLY:io_connect,io_disconnect,io_elemental,read_is_on,&
-&                         io_status,io_bulk,io_header,io_sec,ver_is_gt_or_eq
+&                         io_status,io_bulk,io_header,io_sec
  implicit none
  integer :: io_db,nsym_db
  !
@@ -39,11 +39,6 @@ integer function io_GROT(io_db)
  !
  io_GROT=io_header(io_db,IMPOSE_SN=.true.)
  if (io_GROT/=0) goto 1
- !
- if (.not.ver_is_gt_or_eq(io_db,revision=955).and.inv_index<0) then
-   io_GROT=-1 
-   goto 1
- endif
  !
  if (any((/io_sec(io_db,:)==1/))) then
    call io_elemental(io_db,VAR="PARS",VAR_SZ=3,MENU=0)
@@ -71,7 +66,7 @@ integer function io_GROT(io_db)
  call io_bulk(io_db,VAR="GROT",VAR_SZ=(/nsym_db,ng_closed/))
  call io_bulk(io_db,I2=g_rot(:,:ng_closed))
  !
- if (ver_is_gt_or_eq(io_db,revision=955).and.inv_index<0) then
+ if (inv_index<0) then
    call io_bulk(io_db,VAR="minusG",VAR_SZ=(/ng_closed/))
    call io_bulk(io_db,I1=minus_G(:ng_closed))
  endif

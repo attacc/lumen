@@ -30,7 +30,7 @@ subroutine io_elemental(ID,VAR,VAR_SZ,CHECK,WARN,OP,I0,DB_I0,I1,DB_I1,&
  use drivers, ONLY:list_dbs
  use com,     ONLY:msg
  use stderr,  ONLY:string_pack,intc,real2ch
- use IO_m,    ONLY:write_is_on,io_unit,netcdf_call,io_netcdf_var,ver_is_gt_or_eq,&
+ use IO_m,    ONLY:write_is_on,io_unit,netcdf_call,io_netcdf_var,&
 &                  netcdf_dim,io_rec_pos,read_is_on,io_mode,VERIFY,&
 &                  io_status,DUMP,REP,LOG,io_com,io_file,&
 &                  io_code_version,io_serial_number,io_code_revision,IO_INCOMPATIBLE_VAR
@@ -82,13 +82,8 @@ subroutine io_elemental(ID,VAR,VAR_SZ,CHECK,WARN,OP,I0,DB_I0,I1,DB_I1,&
 &                         nf90_char,(/netcdf_dim(ID,schlen),&
 &                         netcdf_dim(ID,VAR_SZ)/),io_netcdf_var(ID)))
        else
-         if (ver_is_gt_or_eq(ID,revision=723)) then 
-           call netcdf_call(nf90_def_var(io_unit(ID),VAR,&
+         call netcdf_call(nf90_def_var(io_unit(ID),VAR,&
 &                         nf90_SP,netcdf_dim(ID,VAR_SZ),io_netcdf_var(ID)))
-         else
-           call netcdf_call(nf90_def_var(io_unit(ID),VAR,&
-&                         nf90_real,netcdf_dim(ID,VAR_SZ),io_netcdf_var(ID)))
-         endif
        endif
        call netcdf_call(nf90_enddef(io_unit(ID))) 
        ch=string_pack("[WR",trim(io_file(ID)),"]",&

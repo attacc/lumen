@@ -29,7 +29,7 @@ integer function io_WF(ID,wf)
  use R_lattice,        ONLY:nkibz
  use wave_func,        ONLY:wf_ncx,wf_nb_io,wf_nb_io_groups
  use IO_m,             ONLY:io_connect, io_disconnect, io_sec, &
-&                           io_bulk,io_header,ver_is_gt_or_eq,&
+&                           io_bulk,io_header,&
 &                           RD_CL_IF_END,RD_CL,io_action,io_fragment,&
 &                           io_elemental,frag_WF
 #if defined _TIMING
@@ -70,14 +70,12 @@ integer function io_WF(ID,wf)
    !
    io_WF=io_header(ID,IMPOSE_SN=.true.,FRAG=frag_WF)
    !
-   if (ver_is_gt_or_eq(ID,(/3,1,1/))) then
-     call io_elemental(ID, VAR="BAND_GROUPS",VAR_SZ=2,MENU=0)
-     call io_elemental(ID,VAR=&
-&         ' Bands in each block             :',I0=wf_nb_io)
-     call io_elemental(ID,VAR=&
-&         ' Blocks                          :',I0=wf_nb_io_groups)
-     call io_elemental(ID,VAR="",VAR_SZ=0)
-   endif
+   call io_elemental(ID, VAR="BAND_GROUPS",VAR_SZ=2,MENU=0)
+   call io_elemental(ID,VAR=&
+&       ' Bands in each block             :',I0=wf_nb_io)
+   call io_elemental(ID,VAR=&
+&       ' Blocks                          :',I0=wf_nb_io_groups)
+   call io_elemental(ID,VAR="",VAR_SZ=0)
    !
    if (io_WF/=0) goto 1
    !
@@ -85,47 +83,26 @@ integer function io_WF(ID,wf)
  !
  if (ik==0) goto 1
  !
- if (ver_is_gt_or_eq(ID,(/3,1,1/))) then
-   !
-   !##################################################################
-   ! BANDS BLOCKS (andrea 21/4/2008) VERSION >= 3.1.1
-   !##################################################################
-   !
-   ! Manage RD_CL_IF_END
-   !
-   if (io_action(ID)==RD_CL_IF_END.and.(ik==nkibz.and.ib_grp==wf_nb_io_groups)) io_action(ID)=RD_CL
-   !
-   ! Fragmentation
-   !
-   call io_fragment(ID,i_fragment=ik,j_fragment=ib_grp)
-   !
-   VAR_NAME="WF_REAL_COMPONENTS_@_K"//trim(intc(ik))//"_BAND_GRP_"//trim(intc(ib_grp))
-   call io_bulk(ID,VAR=trim(VAR_NAME),VAR_SZ=(/wf_nb_io,wf_ncx,n_spin/))
-   call io_bulk(ID,R3=wf(1,:,:,:))
-   !
-   VAR_NAME="WF_IM_COMPONENTS_@_K"//trim(intc(ik))//"_BAND_GRP_"//trim(intc(ib_grp))
-   call io_bulk(ID,VAR=trim(VAR_NAME),VAR_SZ=(/wf_nb_io,wf_ncx,n_spin/))
-   call io_bulk(ID,R3=wf(2,:,:,:))
-   !
- else
-   !
-   ! Manage RD_CL_IF_END
-   !
-   if (io_action(ID)==RD_CL_IF_END.and.ik==nkibz) io_action(ID)=RD_CL
-   !
-   ! Fragmentation
-   !
-   call io_fragment(ID,i_fragment=ik)
-   !
-   write (VAR_NAME,'(a,i6.6)') 'WF_IK_RE_',ik
-   call io_bulk(ID,VAR=trim(VAR_NAME),VAR_SZ=(/n_bands,wf_ncx,n_spin/))
-   call io_bulk(ID,R3=wf(1,:,:,:))
-   !
-   write (VAR_NAME,'(a,i6.6)') 'WF_IK_IM_',ik
-   call io_bulk(ID,VAR=trim(VAR_NAME),VAR_SZ=(/n_bands,wf_ncx,n_spin/))
-   call io_bulk(ID,R3=wf(2,:,:,:))
-   !
- endif
+ !
+ !##################################################################
+ ! BANDS BLOCKS (andrea 21/4/2008) VERSION >= 3.1.1
+ !##################################################################
+ !
+ ! Manage RD_CL_IF_END
+ !
+ if (io_action(ID)==RD_CL_IF_END.and.(ik==nkibz.and.ib_grp==wf_nb_io_groups)) io_action(ID)=RD_CL
+ !
+ ! Fragmentation
+ !
+ call io_fragment(ID,i_fragment=ik,j_fragment=ib_grp)
+  !
+ VAR_NAME="WF_REAL_COMPONENTS_@_K"//trim(intc(ik))//"_BAND_GRP_"//trim(intc(ib_grp))
+ call io_bulk(ID,VAR=trim(VAR_NAME),VAR_SZ=(/wf_nb_io,wf_ncx,n_spin/))
+ call io_bulk(ID,R3=wf(1,:,:,:))
+ !
+ VAR_NAME="WF_IM_COMPONENTS_@_K"//trim(intc(ik))//"_BAND_GRP_"//trim(intc(ib_grp))
+ call io_bulk(ID,VAR=trim(VAR_NAME),VAR_SZ=(/wf_nb_io,wf_ncx,n_spin/))
+ call io_bulk(ID,R3=wf(2,:,:,:))
  !
 1 call io_disconnect(ID=ID)
  !

@@ -40,8 +40,7 @@ integer function io_header(ID,QPTS,R_LATT,WF,IMPOSE_SN,T_EL,KPTS,D_LATT,XC_KIND,
  use IO_m,          ONLY:io_elemental,io_bulk,io_code_version,io_status,&
 &                        read_is_on,write_is_on,serial_number,variable_is_found,&
 &                        io_serial_number,io_file,io_com,io_mode,&
-&                        DUMP,VERIFY,NONE,ver_is_gt_or_eq,&
-&                        db_alat,io_code_revision,read_is_on
+&                        DUMP,VERIFY,NONE,db_alat,io_code_revision,read_is_on
  use zeros,         ONLY:define_zeros
  use global_XC,     ONLY:G_E_xc_string,X_E_xc_string,K_E_xc_string,loaded_WF_xc_string,&
 &                        G_WF_xc_string,X_WF_xc_string,K_WF_xc_string
@@ -83,7 +82,7 @@ integer function io_header(ID,QPTS,R_LATT,WF,IMPOSE_SN,T_EL,KPTS,D_LATT,XC_KIND,
  call io_elemental(ID,DB_I0=io_code_revision(ID,1),I0=code_revision)
  call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
  !
- if (ver_is_gt_or_eq(ID,revision=4350).and.(variable_is_found(ID,"HEAD_GPL_REVISION")==1)) then
+ if (variable_is_found(ID,"HEAD_GPL_REVISION")==1) then
    call io_elemental(ID,VAR="HEAD_GPL_REVISION",VAR_SZ=1,MENU=0)
    call io_elemental(ID,DB_I0=io_code_revision(ID,2),I0=code_GPL_revision)
    call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)

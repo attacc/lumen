@@ -26,7 +26,7 @@ integer function variables_X(ID,local_description,X)
  use pars,          ONLY:schlen,lchlen,SP,cI
  use units,         ONLY:HA2EV
  use X_m,           ONLY:X_t,use_X_DbGd,X_DbGd_nkpts,n_X_descs
- use IO_m,          ONLY:io_elemental,io_status,ver_is_gt_or_eq,read_is_on
+ use IO_m,          ONLY:io_elemental,io_status,read_is_on
  implicit none
  !
  integer            ::ID
@@ -42,8 +42,7 @@ integer function variables_X(ID,local_description,X)
  !
  i_local_desc=0
  local_description=' '
- X_label=' '
- if (ver_is_gt_or_eq(ID,revision=955)) X_label="X_"
+ X_label="X_"
  !
  ! PARS_1
  !
@@ -70,35 +69,30 @@ integer function variables_X(ID,local_description,X)
 &     VAR=" X Time ordering        :",CH0=X%ordering,CHECK=.true.,&
 &     DESCRIPTION=local_description(i_local_desc))
  call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
- if (ver_is_gt_or_eq(ID,(/3,0,5/))) then
-   !
-   ! TDDFT_KERNEL
-   !
-   call io_elemental(ID,VAR=trim(X_label)//"TDDFT_KERNEL",VAR_SZ=1,CH0="",MENU=0)
-   i_local_desc=i_local_desc+1
-   call io_elemental(ID,&
-&     VAR=" X xc-Kernel            :",CH0=X%f_xc,CHECK=.true.,&
-&     DESCRIPTION=local_description(i_local_desc))
-   call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
-   !
-   ! DRUDE
-   !
-   call io_elemental(ID,VAR=trim(X_label)//"DRUDE",VAR_SZ=2,MENU=0)
-   Wd_disk=(/real(X%Wd),aimag(X%Wd)/)
-   i_local_desc=i_local_desc+1
-   call io_elemental(ID,UNIT=HA2EV,&
-&     VAR=" X Drude frequency      :",R1=Wd_disk,CHECK=.true.,OP=(/"==","=="/),&
-&     DESCRIPTION=local_description(i_local_desc))
-   call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
-   X%Wd=Wd_disk(1)+cI*Wd_disk(2)
-   !
- endif
+ !
+ ! TDDFT_KERNEL
+ !
+ call io_elemental(ID,VAR=trim(X_label)//"TDDFT_KERNEL",VAR_SZ=1,CH0="",MENU=0)
+ i_local_desc=i_local_desc+1
+ call io_elemental(ID,&
+&   VAR=" X xc-Kernel            :",CH0=X%f_xc,CHECK=.true.,&
+&   DESCRIPTION=local_description(i_local_desc))
+ call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
+ !
+ ! DRUDE
+ !
+ call io_elemental(ID,VAR=trim(X_label)//"DRUDE",VAR_SZ=2,MENU=0)
+ Wd_disk=(/real(X%Wd),aimag(X%Wd)/)
+ i_local_desc=i_local_desc+1
+ call io_elemental(ID,UNIT=HA2EV,&
+&   VAR=" X Drude frequency      :",R1=Wd_disk,CHECK=.true.,OP=(/"==","=="/),&
+&   DESCRIPTION=local_description(i_local_desc))
+ call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
+ X%Wd=Wd_disk(1)+cI*Wd_disk(2)
  !
  ! PARS_3
  !
- sec_size=6
- if (ver_is_gt_or_eq(ID,(/3,0,1/))) sec_size=8
- if (ver_is_gt_or_eq(ID,(/3,0,9/))) sec_size=9
+ sec_size=9
  call io_elemental(ID,VAR=trim(X_label)//"PARS_3",VAR_SZ=sec_size,MENU=0)
  i_local_desc=i_local_desc+1
  call io_elemental(ID,&
@@ -113,27 +107,23 @@ integer function variables_X(ID,local_description,X)
 &     VAR=" [r,Vnl] included       :",L0=X%Vnl_included,WARN=.true.,OP=(/"=="/),&
 &     DESCRIPTION=local_description(i_local_desc))
  !
- if (.not.ver_is_gt_or_eq(ID,(/3,0,9/)).and.read_is_on(ID)) then
-   i_local_desc=i_local_desc+1
-   call io_elemental(ID,VAR=" Longitudinal Gauge     :",L0=local_long_gauge,&
-&     DESCRIPTION=local_description(i_local_desc))
- endif
+ i_local_desc=i_local_desc+1
+ call io_elemental(ID,VAR=" Longitudinal Gauge     :",L0=local_long_gauge,&
+&   DESCRIPTION=local_description(i_local_desc))
  !
  i_local_desc=i_local_desc+1
  call io_elemental(ID,&
 &     VAR=" Field direction        :",R1=X%q0,CHECK=.true.,OP=(/"==","==","=="/),&
 &     DESCRIPTION=local_description(i_local_desc))
  !
- if (ver_is_gt_or_eq(ID,(/3,0,1/))) then
-   i_local_desc=i_local_desc+1
-   call io_elemental(ID,&
-&       VAR=" BZ energy Double Grid  :",L0=use_X_DbGd,WARN=.true.,OP=(/"=="/),&
-&     DESCRIPTION=local_description(i_local_desc))
-   i_local_desc=i_local_desc+1
-   call io_elemental(ID,&
-&       VAR=" BZ energy DbGd points  :",I0=X_DbGd_nkpts,WARN=.true.,OP=(/"=="/),&
-&     DESCRIPTION=local_description(i_local_desc))
- endif
+ i_local_desc=i_local_desc+1
+ call io_elemental(ID,&
+&   VAR=" BZ energy Double Grid  :",L0=use_X_DbGd,WARN=.true.,OP=(/"=="/),&
+&   DESCRIPTION=local_description(i_local_desc))
+ i_local_desc=i_local_desc+1
+ call io_elemental(ID,&
+&     VAR=" BZ energy DbGd points  :",I0=X_DbGd_nkpts,WARN=.true.,OP=(/"=="/),&
+&   DESCRIPTION=local_description(i_local_desc))
  !
  n_X_descs=i_local_desc
  !
