@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_build_valence_bands(en,V_input,Val_bands) 
+subroutine NL_build_valence_bands(en,V_input,VAL_BANDS,lowest_band) 
  !
  ! Construct the density matrix differences dGamma = gamma(t) - gamma(t=0) 
  ! from the time-dependent valence bands
@@ -37,13 +37,13 @@ subroutine NL_build_valence_bands(en,V_input,Val_bands)
  implicit none
  !
  type(levels), intent(in)  :: en
+ integer,      intent(in)  :: lowest_band
  complex(SP),  intent(in)  :: V_input(NL_bands(2),en%nbf,QP_nk,n_sp_pol)
- complex(SP),  intent(out) :: Val_bands(fft_size,en%nbf,QP_nk,n_sp_pol)
+ complex(SP),  intent(out) :: VAL_BANDS(fft_size,en%nbf,QP_nk,n_sp_pol)
  !
  ! Work Space
  !
- integer :: ib,iv,is
- integer :: ik,i_wf
+ integer :: ib,iv,is,ir,ik,i_wf
  !
  Val_bands=cZERO
  !
@@ -51,15 +51,19 @@ subroutine NL_build_valence_bands(en,V_input,Val_bands)
    !
    if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
    !
-   do ib=NL_bands(1),NL_bands(2)
-     !
-     i_wf=WF%index(ib,ik,1)
+   do is=1,n_sp_pol
+     do ib=lowest_band,NL_bands(2)
+       !
+       i_wf=WF%index(ib,ik,is)
+       do iv=1,en%nbf
 !$omp parallel do default(shared), private(iv)
-     do iv=1,en%nbf
-         Val_bands(:,iv,ik,1)=Val_bands(:,iv,ik,1)+V_input(ib,iv,ik,1)*WF%c(:,i_wf)
-     enddo
+         do ir=1,fft_size
+           Val_bands(ir,iv,ik,is)=Val_bands(ir,iv,ik,is)+V_input(ib,iv,ik,is)*WF%c(ir,i_wf)
+         enddo
 !$omp end parallel do
-     !
+       enddo
+       !
+     enddo
    enddo
    !
  enddo

@@ -71,13 +71,15 @@ subroutine el_density_vbands(en,Xk,rho,VAL_BANDS)
    !  
    if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
    !
-   do is=1,n_sp_pol
-!$omp parallel do default(shared), private(iv)
-     do iv=1,en%nbf
-       rho_no_sym(:)=rho_no_sym(:)+real(spin_occ,SP)*Xk%weights(ik)*abs(VAL_BANDS(:,iv,ik,1))**2._SP
+!$omp parallel do default(shared), private(ir,is,iv)
+   do ir=1,fft_size
+     do is=1,n_sp_pol
+       do iv=1,en%nbf
+         rho_no_sym(ir)=rho_no_sym(ir)+real(spin_occ,SP)*Xk%weights(ik)*abs(VAL_BANDS(ir,iv,ik,is))**2._SP
+       enddo
      enddo
-!$omp end parallel do
    enddo
+!$omp end parallel do
    !
  enddo
  !
@@ -87,13 +89,13 @@ subroutine el_density_vbands(en,Xk,rho,VAL_BANDS)
  !
  rho_syms=nsym/(i_time_rev+1)
  !
- do i1=1,rho_syms
-!$omp parallel do default(shared), private(ir)
-   do ir=1,fft_size
+!$omp parallel do default(shared), private(ir,i1)
+ do ir=1,fft_size
+   do i1=1,rho_syms
      rho(ir)=rho(ir)+real(rho_no_sym(fft_rot_r(ir,i1)),SP)/real(nsym,SP)
    enddo
-!$omp end parallel do
  enddo
+!$omp end parallel do
  !
 !$omp parallel do default(shared), private(ir)
  do ir=1,fft_size

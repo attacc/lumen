@@ -89,7 +89,7 @@ module LOGO
 #endif
      comment(2)=trim(MPI_string)//trim(OMP_string)//" Build"
      !
-     comment(3)='http://www.yambo-code.org'
+     comment(3)='(based on Yambo 4.1.2)'
      !
      n_logos       =1
      n_logos_stderr=1

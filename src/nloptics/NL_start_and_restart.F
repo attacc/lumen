@@ -44,7 +44,7 @@ subroutine NL_start_and_restart(E,k,X)
  use parallel_m,     ONLY:master_cpu
  use nl_optics,      ONLY:Correlation,IPA,E_full,full_rho,V_bands,TDDFT,n_freqs_todo,NL_LRC_alpha,Alpha_ED,NL_bands,  &
 &                         V_xc_0,NL_initial_P,l_use_DIPOLES,n_frequencies,freqs_done,JGM,E_xc_0,I_relax,l_use_DIPOLES,&
-&                         NL_P,E_full,E_bare,Hk,rho_n,full_rho,rho_reference,V_hartree_ne,V_xc_ne
+&                         NL_P,E_full,E_bare,Hk,rho_n,full_rho,rho_reference,V_hartree_ne,V_xc_ne,VAL_BANDS
  use IO_m,           ONLY:OP_RD_CL,io_control,NONE,file_is_present,VERIFY
  use parallel_m,     ONLY:PAR_IND_freqs,PP_redux_wait
  use stderr,         ONLY:intc
@@ -77,8 +77,12 @@ subroutine NL_start_and_restart(E,k,X)
  !
  if(Correlation/=IPA) then
    !  
-   call el_density_vbands(E,k,full_rho,V_bands,1)
-   call el_density_vbands(E,k,rho_reference,V_bands,NL_bands(1))
+   call NL_build_valence_bands(E,V_bands,VAL_BANDS,1)
+   call el_density_vbands(E,k,full_rho,VAL_BANDS)
+   !
+   call NL_build_valence_bands(E,V_bands,VAL_BANDS,NL_bands(1))
+   call el_density_vbands(E,k,rho_reference,VAL_BANDS)
+   !
    rho_n=full_rho
    !
  endif

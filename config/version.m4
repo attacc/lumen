@@ -1,7 +1,7 @@
-AC_INIT(Yambo, 4.1.2 r.13988 h.2301fce , yambo@yambo-code.org)
-SVERSION="4"
-SSUBVERSION="1"
-SPATCHLEVEL="2"
+AC_INIT(Lumen, 1.0.0 r.13988 h.2301fce , yambo@yambo-code.org)
+SVERSION="1"
+SSUBVERSION="0"
+SPATCHLEVEL="0"
 SREVISION="14024"
 SHASH="e924029"
 AC_SUBST(SVERSION)

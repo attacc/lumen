@@ -63,7 +63,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  !
  if(eval_HARTREE .or.  eval_DFT) then
    !      
-   call NL_build_valence_bands(E,V_bands,VAL_BANDS) 
+   call NL_build_valence_bands(E,V_bands,VAL_BANDS,NL_bands(1)) 
    !
    call el_density_vbands(E,k,rho_n,VAL_BANDS)
    !

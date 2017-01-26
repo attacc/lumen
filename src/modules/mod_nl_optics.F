@@ -75,7 +75,7 @@ module nl_optics
  complex(SP), allocatable :: V_bands(:,:,:,:) 
  !
  ! Time-dependent Valence bands in real-space
- complex(SP), allocatable :: Val_bands(:,:,:,:)
+ complex(SP), allocatable :: VAL_BANDS(:,:,:,:)
  !
  complex(SP), allocatable :: dG(:,:,:) 
  !
@@ -188,8 +188,8 @@ module nl_optics
      allocate(V_bands(1:NL_bands(2),en%nbf,QP_nk,n_sp_pol))
      call mem_est("V_bands",(/size(V_bands)/),(/2*SP/))
      !
-     allocate(Val_bands(fft_size,en%nbf,QP_nk,n_sp_pol))
-     call mem_est("Val_bands",(/size(Val_bands)/),(/2*SP/))
+     allocate(VAL_BANDS(fft_size,en%nbf,QP_nk,n_sp_pol))
+     call mem_est("Val_bands",(/size(VAL_BANDS)/),(/2*SP/))
      !
      allocate(rho_reference(fft_size))
      call mem_est("rho_reference",(/fft_size/),(/SP/))
@@ -261,7 +261,7 @@ module nl_optics
      deallocate(V_bands)
      call mem_est("V_bands")
      !
-     deallocate(Val_bands)
+     deallocate(VAL_BANDS)
      call mem_est("Val_bands")
      !
      if(allocated(rho_n)) then

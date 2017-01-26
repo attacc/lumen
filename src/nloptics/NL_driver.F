@@ -42,7 +42,7 @@ subroutine NL_driver(E,X,k,q)
 &                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_step
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
- use parallel_m,     ONLY:PAR_IND_WF_k,PAR_IND_WF_b,PAR_IND_freqs,PAR_IND_freqs_ID
+ use parallel_m,     ONLY:PAR_IND_WF_k,PAR_IND_freqs,PAR_IND_freqs_ID
  !
  implicit none
  !
@@ -126,7 +126,7 @@ subroutine NL_driver(E,X,k,q)
  ! ===================================
  call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
  call PARALLEL_global_indexes(E,k,q,"Non_Linear",RESET=.FALSE.,X=X(1))
- call PARALLEL_WF_distribute(K_index=PAR_IND_WF_k,B_index=PAR_IND_WF_b,CLEAN_UP=.TRUE.)
+ call PARALLEL_WF_distribute(K_index=PAR_IND_WF_k,CLEAN_UP=.TRUE.)
  call PARALLEL_WF_index( )
  !
  ! WFs loading
