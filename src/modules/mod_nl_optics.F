@@ -204,7 +204,7 @@ module nl_optics
        call mem_est("V_xc_0",(/fft_size,n_spin/),(/SP/))
      endif          
      !
-     if(Correlation==SEX.or.Correlation==HF) then
+     if(Correlation==LSEX) then
        allocate(dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
        call mem_est("dG",(/size(dG)/),(/2*SP/))
        allocate(Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
@@ -314,7 +314,7 @@ module nl_optics
      deallocate(E_tot_t,E_ext_t,E_ks_t)
      call mem_est("E_tot_t E_ext_t E_ks_t")
      !
-     if(Correlation==SEX.or.Correlation==HF) then
+     if(Correlation==LSEX) then
        deallocate(dG)
        call mem_est("dG")
        deallocate(Vnl_xc)
