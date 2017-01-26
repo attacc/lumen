@@ -95,8 +95,8 @@ module LOGO
      n_logos_stderr=1
      !
      if (ID_logo<0) then
-       ID_logo=pickup_a_random(dble(n_logos))
-       ID_logo_stderr=n_logos+pickup_a_random(dble(n_logos_stderr))
+       ID_logo=pickup_a_random(real(n_logos,SP))
+       ID_logo_stderr=n_logos+pickup_a_random(real(n_logos_stderr,SP))
        if (ID_logo==0) ID_logo=1
        if (ID_logo_stderr==0) ID_logo_stderr=1
      endif
@@ -120,12 +120,12 @@ module LOGO
        case(2)
          logo_line( 1)='                                             '
          logo_line( 2)=' __      _     _  __   __  _______         _ '
-         logo_line( 3)='|  |    | |   | ||  |_|  ||  _____||\     | |'
-         logo_line( 4)='|  |    | |   | ||       || |      | \    | |'
-         logo_line( 5)='|  |    | |   | ||       || |____  |\ \   | |'
-         logo_line( 6)='|  |    | |   | ||       ||  ____| | \ \  | |'
-         logo_line( 7)='|  |__  | |___| || ||_|| || |_____ | |\ \ | |'
-         logo_line( 8)='|_____| |_______||_|   |_||_______|| | \____|'
+         logo_line( 3)='|  |    | |   | ||  |_|  ||  _____||\\     | |'
+         logo_line( 4)='|  |    | |   | ||       || |      | \\    | |'
+         logo_line( 5)='|  |    | |   | ||       || |____  |\\ \\   | |'
+         logo_line( 6)='|  |    | |   | ||       ||  ____| | \\ \\  | |'
+         logo_line( 7)='|  |__  | |___| || ||_|| || |_____ | |\\ \\ | |'
+         logo_line( 8)='|_____| |_______||_|   |_||_______|| | \\____|'
          logo_line( 9)='                                             '
      end select
      !
