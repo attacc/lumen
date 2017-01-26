@@ -106,6 +106,17 @@ subroutine DIPOLE_build_covariants(Xen,Xk,X)
    !
    call DIPOLE_overlaps(Xk,X)
    !
+ else
+   !
+   ! Overlaps already calculated, just load them
+   !
+   do ik=1,Xk%nbz
+     do i_sp_pol=1,n_sp_pol
+       call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1+ik+(i_sp_pol-1)*Xk%nbz/),ID=ID)
+       io_err=io_err+io_Overlaps(X,ID)
+     enddo
+   enddo
+   !
  endif
  !
  idir_not_done(:)= (k_map%max_kdir(:)==1)
