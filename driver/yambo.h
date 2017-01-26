@@ -25,9 +25,9 @@
  Driver declaration
 */
 #if defined _FORTRAN_US
- int yambo_driver
+ int lumen_driver
 #else
- int yambo_driver_
+ int lumen_driver_
 #endif
  (int *, int *,int *,int *,int *,int *,int *,int *,
   char *rnstr2, char *inf, char *id, char *od, char *com_dir, char *js,

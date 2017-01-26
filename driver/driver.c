@@ -276,7 +276,7 @@ int main(int argc, char *argv[])
    Running the Fortran YAMBO driver 
  ===========================================================================
  */
- F90_FUNC(yambo_driver,YAMBO_DRIVER)(
+ F90_FUNC(lumen_driver,YAMBO_DRIVER)(
          &np,&pid,&lni,&iif,&iid,&iod,&icd,&ijs,rnstr2,inf,id,od,com_dir,js,lni,iif,iid,iod,icd,ijs);
 #endif
 #if defined _YPP_MAIN
@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
     system(edit_line);
   }
   else { 
-   fprintf(stderr," \n%s %s %s\n\n","yambo: input file",inf,"created");
+   fprintf(stderr," \n%s %s %s\n\n","lumen: input file",inf,"created");
    exit (0);
   }
  };
@@ -344,10 +344,10 @@ int main(int argc, char *argv[])
  if ( iif < 0 ) 
  {
   if (pid==0 && iif == -1) {
-   fprintf(stderr," \n%s\n\n","yambo: cannot access CORE database (SAVE/*db1 and/or SAVE/*wf)");
+   fprintf(stderr," \n%s\n\n","lumen: cannot access CORE database (SAVE/*db1 and/or SAVE/*wf)");
   };
   if (pid==0 && iif == -2) {
-   fprintf(stderr," \n%s\n\n","yambo: invalid command line options and/or build");
+   fprintf(stderr," \n%s\n\n","lumen: invalid command line options and/or build");
   };
 #if defined _MPI
   if (mpi_init==0 && np>1) { MPI_Abort(MPI_COMM_WORLD,1); };

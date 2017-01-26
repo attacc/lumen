@@ -21,14 +21,9 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-integer function yambo_driver(np,pid,lnstr,iinf,iind,iod,icd,ijs,instr,inf,ind,od,com_dir,js)
+integer function lumen_driver(np,pid,lnstr,iinf,iind,iod,icd,ijs,instr,inf,ind,od,com_dir,js)
  !
- !Y88b    /   e           e    e      888~~'    ,88~-_   
- ! Y88b  /   d8b         d8b  d8b     888   |  d888   '  
- !  Y88b/   /Y88b       d888bdY88b    888 _/  88888    | 
- !   Y8Y   /  Y88b     / Y88Y Y888b   888  '  88888    | 
- !    Y   /____Y88b   /   YY   Y888b  888   |  Y888   /  
- !   /   /      Y88b /          Y888b 888__/    `88_-~   
+ ! LUMEN (derived from Yambo 4.1.2)
  !
  use drivers,       ONLY:l_HF_and_locXC,l_sc_run,l_eval_collisions,l_real_time,&
 &                        l_optics,l_chi,l_em1s,l_ppa,l_cohsex,l_bss,l_bse,l_em1d,&
@@ -93,7 +88,7 @@ integer function yambo_driver(np,pid,lnstr,iinf,iind,iod,icd,ijs,instr,inf,ind,o
  ! INPUT FILE PARSING
  !====================
  !
- yambo_driver=0
+ lumen_driver=0
  !
  ! iinf=0 => No error message from driver.c 
  !
@@ -211,29 +206,12 @@ integer function yambo_driver(np,pid,lnstr,iinf,iind,iod,icd,ijs,instr,inf,ind,o
    if (.not.l_ppa) call K_driver(Xen,Ken,Xk,q,X(2),Xw(2))
  endif
  !
- !
- if (l_sc_run) then
-   !
-   ! SC
-   !====
-   !
-   !
- endif
- !
  if (l_nl_optics) then
    !
    ! Non-linear optics
    !==================
    !
    call NL_driver(en,X(:2),k,q)
-   !
-   !
- endif
- !
- if (l_real_time) then
-   !
-   ! REAL-TIME
-   !==========
    !
    !
  endif
