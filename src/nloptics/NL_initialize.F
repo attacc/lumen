@@ -164,6 +164,10 @@ subroutine NL_initialize(E,k,q)
     case('JGM')
         Correlation=JGM
         eval_HARTREE =.true.
+    case('LSEX')
+        Correlation=LSEX
+        eval_HARTREE =.true.
+        eval_dG      =.true.
     case default
         call error("Unknow correlation in the response function")
  end select

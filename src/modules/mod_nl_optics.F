@@ -113,8 +113,7 @@ module nl_optics
  integer, parameter :: LRC    = 4
  integer, parameter :: JGM    = 5
  integer, parameter :: LRCW   = 6
- integer, parameter :: HF     = 7
- integer, parameter :: SEX    = 8
+ integer, parameter :: LSEX   = 7
  !
  logical :: eval_dG
  logical :: eval_HARTREE
