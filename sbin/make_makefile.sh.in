@@ -81,7 +81,7 @@ fi
 llibinclude="\$(netcdf_idir)"
 #
 case $target in
-  yambo*)
+  lumen*)
    llibs="$llibs \$(lfftqe) \$(lscalapack) \$(llapack) \$(lblacs) \$(lblas)"
    llibs="$llibs \$(lnetcdf) \$(llibxc) -lslatec -llocal \$(lfft) -lm $llmpi"
    linclude="$linclude \$(netcdf_idir)"

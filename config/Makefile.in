@@ -115,7 +115,7 @@ get_extlibs:
 # 
 lumen: libs
 	@+LIBS2DO="$(MAIN_LIBS)"; XPATH="src"; VPATH="$(topdir)/src"; $(mksrc)
-	@+X2DO="yambo"; XPATH="driver"; VPATH="$(topdir)/driver"; XLIBS="$(MAIN_LIBS)"; $(mkx)
+	@+X2DO="lumen"; XPATH="driver"; VPATH="$(topdir)/driver"; XLIBS="$(MAIN_LIBS)"; $(mkx)
 #
 # Interfaces #
 #

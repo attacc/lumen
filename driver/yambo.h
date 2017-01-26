@@ -76,5 +76,5 @@
   {"nloptics","u","Non-linear spectroscopy",0,0,0,0,0},  
   {NULL,NULL,NULL,0,0,0,0,0}
  };
- char *tool="yambo";
+ char *tool="lumen";
  char *tdesc="A shiny pot of fun and happiness [C.D.Hogan]";
