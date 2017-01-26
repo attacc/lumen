@@ -496,7 +496,7 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  NL_tot_time   =  -1._SP*FS2AUT
  NL_step       = 0.010*FS2AUT
  NL_bands      = (/0,0/)
- Integrator_name='INVINT'
+ Integrator_name='CRANKNIC'
  Verbosity_name='low'
  NL_correlation="IPA"
  NL_er         =(/0.2_SP,8._SP/)/HA2EV

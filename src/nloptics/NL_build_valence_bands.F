@@ -56,7 +56,7 @@ subroutine NL_build_valence_bands(en,V_input,VAL_BANDS,lowest_band)
        !
        i_wf=WF%index(ib,ik,is)
        do iv=1,en%nbf
-!$omp parallel do default(shared), private(iv)
+!$omp parallel do default(shared), private(ir)
          do ir=1,fft_size
            Val_bands(ir,iv,ik,is)=Val_bands(ir,iv,ik,is)+V_input(ib,iv,ik,is)*WF%c(ir,i_wf)
          enddo
