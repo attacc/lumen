@@ -2,7 +2,7 @@
 !        Copyright (C) 2000-2016 the YAMBO team
 !              http://www.yambo-code.org
 !
-! Authors (see AUTHORS file for details): AM
+! Authors (see AUTHORS file for details): AM CA
 !
 ! This file is distributed under the terms of the GNU
 ! General Public License. You can redistribute it and/or
@@ -134,11 +134,13 @@ subroutine V_real_space_to_H(ik,V,H,WF,V_kind)
  !
  ! ... and symmetrize
  !
+!$omp parallel do default(shared), private(ib,ibp)
  do ib=NL_bands(1),NL_bands(2)
    H(ib,ib,:)=real(H(ib,ib,:),SP)
    do ibp=1,ib-1
      H(ib,ibp,:)=conjg(H(ibp,ib,:))
    enddo
  enddo
+!$omp end parallel do
  !
 end subroutine 
