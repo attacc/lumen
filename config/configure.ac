@@ -120,10 +120,10 @@ if test x"$enable_keep_extlibs" = "xyes"; then enable_keep_extlibs="yes"; touch 
 AC_SUBST(enable_keep_extlibs)
 # ============================================================================
 # DP
-AC_ARG_ENABLE(dp, AC_HELP_STRING([--enable-dp], [Double-precision build. Default is no.]))
+AC_ARG_ENABLE(dp, AC_HELP_STRING([--enable-sp], [Single-precision build. Default is no.]))
 dp_cpp=""
-if test x"$enable_dp" = "x"; then enable_dp="no"; fi
-if test x"$enable_dp" = "xyes"; then dp_cpp="-D_DOUBLE"; fi
+if test x"$enable_sp" = "x";    then dp_cpp="-D_DOUBLE"; enable_dp="yes"; fi
+if test x"$enable_sp" = "xyes"; then enable_dp="no"; fi
 AC_SUBST(enable_dp)
 AC_SUBST(dp_cpp)
 # ============================================================================
