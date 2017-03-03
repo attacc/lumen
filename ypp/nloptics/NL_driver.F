@@ -210,8 +210,8 @@ subroutine NL_driver(en)
     ! For testing purpose
     !
     if(trim(NL_response%damping) /= "NONE") then
-       call NL_damp_it(NL_response%damping,NL_response%damp_factor,&
-&                 NL_P(NL_response%i_T_range(1):NL_response%i_T_range(2),i_Probe,:),3)
+       call NL_damp_it(NL_response%damping,NL_response%damp_factor,3,&
+&                 NL_P(NL_response%i_T_range(1):NL_response%i_T_range(2),i_Probe,1:3))
     endif
     !
     call NL_linear_response(en)

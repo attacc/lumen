@@ -53,7 +53,7 @@ subroutine NL_linear_response(en)
  complex(SP), allocatable :: EELS(:,:),EPS(:,:),freqs(:)
  complex(DP), allocatable :: Pol_w(:,:),Pol_t(:,:),E_w(:,:),E_t(:,:)
  !
- call section("=",'Optics')
+ ! call section("=",'Optics')
  !=========================
  !
  i_Probe=1
@@ -116,9 +116,9 @@ subroutine NL_linear_response(en)
    enddo
    !
    if(trim(NL_response%damping) == "NONE".and.l_force_min_damp) then
-     call NL_damp_it("LORENTZIAN",NL_response%Field_damp_factor,E_t(:,i_field),1)
+     call NL_damp_it("LORENTZIAN",NL_response%Field_damp_factor,1,E_t(:,i_field))
    else
-     call NL_damp_it(NL_response%damping,NL_response%damp_factor,   E_t(:,i_field),1)
+     call NL_damp_it(NL_response%damping,NL_response%damp_factor,1,E_t(:,i_field))
    endif
    !
    FT_title=' E#1'
