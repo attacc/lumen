@@ -38,6 +38,7 @@ subroutine NL_linear_response(en)
  use fields,         ONLY:Efield,small_a_frequency,small_a
  use functions,      ONLY:theta_function
  use parser_m,       ONLY:parser
+ use units,          ONLY:AUT2FS
  use com,            ONLY:error,msg
  !
  implicit none
@@ -116,9 +117,9 @@ subroutine NL_linear_response(en)
    enddo
    !
    if(trim(NL_response%damping) == "NONE".and.l_force_min_damp) then
-     call NL_damp_it("LORENTZIAN",NL_response%Field_damp_factor,1,E_t(:,i_field))
+     call NL_Cdamp_it("LORENTZIAN",NL_response%Field_damp_factor,E_t(:,i_field),1)
    else
-     call NL_damp_it(NL_response%damping,NL_response%damp_factor,1,E_t(:,i_field))
+     call NL_Cdamp_it(NL_response%damping,NL_response%damp_factor,E_t(:,i_field),1)
    endif
    !
    FT_title=' E#1'
@@ -214,8 +215,10 @@ subroutine NL_linear_response(en)
      !
      ! Work Space
      !
-     character(schlen) :: eps_file_name,eels_file_name,efield_file_name
+     character(schlen) :: eps_file_name,eels_file_name,efield_file_name, &
+&                         pol_file_name
      character(schlen) :: headings(11)
+     integer           :: i_t
      !
      call set_real_printed_length(f_length=15,g_length=15)
      !
@@ -242,7 +245,6 @@ subroutine NL_linear_response(en)
      call msg('o '//trim(efield_file_name),'#')
      call msg('o '//trim(efield_file_name),'#',headings(1:7),INDENT=0,USE_TABS=.TRUE.)
      call msg('o '//trim(efield_file_name),'#')
-
      !
      do i_w = 1, NL_response%W_n_steps
       !
@@ -265,6 +267,28 @@ subroutine NL_linear_response(en)
       call msg('o '//trim(eels_file_name),'',outdata(1:7),USE_TABS=.TRUE.)
       !
     enddo
+    !
+    if(trim(NL_response%damping) /= "NONE") then
+       !     
+       pol_file_name   ="YPP-damped_polarization"
+       !
+       headings(1)="TimeE [fs]"
+       !
+       call of_open_close(pol_file_name,'ot')
+       headings(2:4)=(/'Pol_x','Pol_y','Pol_z'/)
+       call msg('o '//trim(pol_file_name),'#')
+       call msg('o '//trim(pol_file_name),'#',headings(1:4),INDENT=0,USE_TABS=.TRUE.)
+       call msg('o '//trim(pol_file_name),'#')
+       !
+       do i_t = NL_response%i_T_range(1),NL_response%i_T_range(2)
+         outdata(1)=(i_t-1.0)*NL_step*AUT2FS
+         outdata(2:4)=(/ NL_P_t(i_t,1), NL_P_t(i_t,2),NL_P_t(i_t,3) /)
+         call msg('o '//trim(pol_file_name),'',outdata(1:7),USE_TABS=.TRUE.)
+       enddo
+       !
+       call of_open_close(pol_file_name)
+       !
+    endif
     !
     call of_open_close(eps_file_name)
     call of_open_close(eels_file_name)

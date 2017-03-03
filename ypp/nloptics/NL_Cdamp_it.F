@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_damp_it(damp_type,damp_factor,lda,ft)
+subroutine NL_Cdamp_it(damp_type,damp_factor,ft,lda)
  !
  use YPP_non_linear, ONLY:NL_response
  use pars,           ONLY:SP,DP
@@ -56,5 +56,5 @@ subroutine NL_damp_it(damp_type,damp_factor,lda,ft)
  !
  forall(i_l=1:lda)  ft(:,i_l)=ft(:,i_l)*damp_function(:)
  !
-end subroutine NL_damp_it
+end subroutine NL_Cdamp_it
 
