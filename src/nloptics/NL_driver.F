@@ -55,7 +55,7 @@ subroutine NL_driver(E,X,k,q)
  ! 
  ! Work Space
  !
- integer           :: i_f,i1,NL_bands1_save
+ integer           :: i_f,i1,NL_bands1_save,N_frequency_save
  real(SP)          :: Time
  integer, external :: eval_G_minus_G
  !
@@ -86,9 +86,11 @@ subroutine NL_driver(E,X,k,q)
  !
  ! Parallelization
  ! =======================
- NL_bands1_save=NL_bands(1)
- NL_bands(1)   =1
- X(1)%ib       =(/1,NL_bands(2)/)
+ NL_bands1_save  =NL_bands(1)
+ NL_bands(1)     =1
+ X(1)%ib         =(/1,NL_bands(2)/)
+ N_frequency_save=n_frequencies
+ n_frequencies   =1
  call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
  call PARALLEL_global_indexes(E,k,q,"Non_Linear",RESET=.FALSE.,X=X(1))
  call PARALLEL_WF_distribute(CLEAN_UP=.TRUE.)
@@ -124,6 +126,8 @@ subroutine NL_driver(E,X,k,q)
  !
  ! Non_Linear parallization
  ! ===================================
+ X(1)%ib       =(/NL_bands(1),NL_bands(2)/)
+ n_frequencies =N_frequency_save
  call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
  call PARALLEL_global_indexes(E,k,q,"Non_Linear",RESET=.FALSE.,X=X(1))
  call PARALLEL_WF_distribute(K_index=PAR_IND_WF_k,CLEAN_UP=.TRUE.)

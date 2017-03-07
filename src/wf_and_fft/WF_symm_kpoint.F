@@ -44,10 +44,13 @@ subroutine WF_symm_kpoint(b_to_load,ikbz,Xk,WF_k_out)
  !
  WF_k_out=cZERO
  !
+ write(*,*) ' inside ',is
  if(is==idt_index) then
    !  
    do ib=b_to_load(1),b_to_load(2)
      do i_spin=1,n_spin
+       write(*,*) ' index wf ',ib,ik,i_spin
+       write(*,*) associated(WF%index)
        iwf=WF%index(ib,ik,i_spin)
        WF_k_out(:,ib,i_spin)=WF%c(:,iwf)
      enddo

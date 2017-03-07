@@ -228,12 +228,14 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
       !
     endif
     !
+    write(*,*) ' passo qui ',ncpu_f,ncpu_k
     CPU_structure(i_PAR_structure)%ROLE(1)="w"
     CPU_structure(i_PAR_structure)%CPU(1)=ncpu_f
     CPU_structure(i_PAR_structure)%ROLE(2)="k"
     CPU_structure(i_PAR_structure)%CPU(2)=ncpu_k
     CPU_structure(i_PAR_structure)%N_chains=2
     !
+    stop
    end subroutine
    !
 end subroutine

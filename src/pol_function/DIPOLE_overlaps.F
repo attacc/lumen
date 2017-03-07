@@ -31,7 +31,7 @@ subroutine DIPOLE_overlaps(Xk,X)
  use electrons,    ONLY:levels,n_spinor,n_sp_pol,n_spin
  use wrapper_omp,  ONLY:Vstar_dot_V_omp
  use wave_func,    ONLY:wf_ng
- use parallel_m,   ONLY:PAR_COM_Xk_ibz_INDEX,PP_redux_wait,PAR_IND_Xk_bz,PAR_IND_Xk_bz_ID
+ use parallel_m,   ONLY:PAR_COM_Xk_ibz_INDEX,PP_redux_wait,PAR_IND_Xk_bz,PAR_IND_Xk_bz_ID,myid
  use IO_m,         ONLY:IO_and_Messaging_switch
  !
  implicit none
@@ -68,7 +68,9 @@ subroutine DIPOLE_overlaps(Xk,X)
    ik = Xk%sstar(ikbz,1)
    is = Xk%sstar(ikbz,2)
    !
+   write(*,*) 'pass qui ',ikbz,myid
    call WF_symm_kpoint((/1,X%ib(2)/),ikbz,Xk,WF_symm)
+   write(*,*) 'passata qui ',ikbz,myid
    !  
    call WF_shift_kpoint((/1,X%ib(2)/),ikbz,WF_shifts(ikbz,:),Xk,WF_symm,WF_ik)
    !
