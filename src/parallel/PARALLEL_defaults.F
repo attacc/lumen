@@ -55,6 +55,8 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
  !
  call DEFAULT_action("check")
  !
+ write(*,*) ' passo qui ',PARALLEL_CPU_used(1:2)
+ write(*,*) ' passo qui ',product(CPU_s) 
  if (product(CPU_s)==ncpu) return
  !
  call PARALLEL_live_message('CPU structure provided for the '//trim(ENVIRONMENT)//&

@@ -560,11 +560,12 @@ module parallel_m
      if (present(imode)) then
        if (imode==1) omode=MPI_LOR
        if (imode==2) omode=MPI_LAND
+       if (imode==3) omode=mpi_lor
+       if (imode==4) omode=mpi_land
      else
        omode=MPI_LOR
      endif
      dimensions=shape(array)
-     if( any(dimensions<1) ) return
      dimension=product(dimensions)
      allocate(larray(dimension))
      larray=.FALSE.

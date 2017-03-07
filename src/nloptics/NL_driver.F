@@ -42,7 +42,7 @@ subroutine NL_driver(E,X,k,q)
 &                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_step
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
- use parallel_m,     ONLY:PAR_IND_WF_k,PAR_IND_freqs,PAR_IND_freqs_ID
+ use parallel_m,     ONLY:PAR_IND_WF_k,PAR_IND_freqs,PAR_IND_freqs_ID,CPU_structure
  !
  implicit none
  !
