@@ -670,6 +670,9 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    !
    allocate(PAR_Xk_ibz_index(Xk%nibz))
    call Build_up_index(PAR_IND_Xk_ibz,Xk%nibz,PAR_Xk_ibz_index,PAR_Xk_nibz)
+   !
+   ! Dipoles
+   !
    call PAR_INDEX_copy(PAR_IND_Xk_ibz,PAR_IND_DIPk_ibz)
    !
    ! Define the Xk_bz indeces for BZ parallelization
@@ -679,12 +682,6 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 &                                                         PAR_IND_Xk_bz, PAR_IND_Xk_bz_ID,&
 &                                                         PAR_Xk_bz_index,PAR_Xk_nbz)
 
-   !
-   ! Dipoles
-   !
-   allocate(PAR_DIPk_ibz_index(Xk%nibz))
-   call Build_up_index(PAR_IND_DIPk_ibz,Xk%nibz,PAR_DIPk_ibz_index,PAR_DIPk_nibz)
-   !
    ! Overlap indeces for WF distribution
    !
    call PAR_INDEX_copy(PAR_IND_DIPk_ibz,PAR_IND_OVLP_ibz)

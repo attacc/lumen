@@ -68,9 +68,7 @@ subroutine DIPOLE_overlaps(Xk,X)
    ik = Xk%sstar(ikbz,1)
    is = Xk%sstar(ikbz,2)
    !
-   write(*,*) 'pass qui ',ikbz,myid
    call WF_symm_kpoint((/1,X%ib(2)/),ikbz,Xk,WF_symm)
-   write(*,*) 'passata qui ',ikbz,myid
    !  
    call WF_shift_kpoint((/1,X%ib(2)/),ikbz,WF_shifts(ikbz,:),Xk,WF_symm,WF_ik)
    !

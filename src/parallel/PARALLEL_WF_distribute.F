@@ -129,5 +129,4 @@ subroutine PARALLEL_WF_distribute(B_index,Bp_index,K_index,B_and_K_index,&
    !
  endif
  !
- !
 end subroutine

@@ -93,8 +93,6 @@ subroutine NL_driver(E,X,k,q)
  n_frequencies   =1
  call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
  call PARALLEL_global_indexes(E,k,q,"Non_Linear",RESET=.FALSE.,X=X(1))
- call PARALLEL_WF_distribute(CLEAN_UP=.TRUE.)
- call PARALLEL_WF_index( )
  !
  ! Dipoles
  !=========
