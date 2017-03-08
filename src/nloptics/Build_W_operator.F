@@ -31,14 +31,14 @@ subroutine Build_W_operator(V_bands,en,Xk,A_input,ik,i_sp,Hk)
  use electrons,      ONLY:levels,n_sp_pol
  use electric,       ONLY:Sm1_plus,Sm1_minus,l_force_SndOrd
  use QP_m,           ONLY:QP_nk
- use nl_optics,      ONLY:NL_bands
+ use nl_optics,      ONLY:NL_bands,NL_nbands
  use R_lattice,      ONLY:bz_samp,k_map
  use D_lattice,      ONLY:a
  use vec_operate,    ONLY:k_periodic_idx
  use matrix_operate, ONLY:hermitian
  use fields,         ONLY:gauge_field
  use X_m,            ONLY:DIP_S
- use wrapper,        ONLY:M_by_V
+ use wrapper,        ONLY:M_by_V,Vstar_dot_V
  !
  implicit none
  !
@@ -143,11 +143,12 @@ subroutine Build_W_operator(V_bands,en,Xk,A_input,ik,i_sp,Hk)
        !
        ! W(i,j) = \sum_m V*(m,i) * [\tilde Vp(m,j) - \tilde Vm(m,j) ]
        !
-!$omp parallel do default(shared), private(i2,i1)
-       do i2=NL_bands(1),NL_bands(2)
-         do i1=NL_bands(1),NL_bands(2)
-           Wop(i1,i2,istep)=sum(conjg(V_bands(i2,1:en%nbf,ik,i_sp))*delta_tV_bnd(1:en%nbf,i1))
-         enddo
+       Wop(:,:,istep)=cZERO
+!$omp parallel do default(shared), private(iv1), reduction(+:Wop)
+       do iv1=1,en%nbf
+         call ZGERC(NL_nbands,NL_nbands,cONE,delta_tV_bnd(iv1,NL_bands(1):),1, &
+&           V_bands(NL_bands(1):,iv1,ik,i_sp),1,Wop(NL_bands(1):,NL_bands(1):,istep),NL_nbands)
+
        enddo
 !$omp end parallel do
        !
