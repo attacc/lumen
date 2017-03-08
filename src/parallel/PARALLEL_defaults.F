@@ -232,6 +232,7 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
     CPU_structure(i_PAR_structure)%CPU(1)=ncpu_f
     CPU_structure(i_PAR_structure)%ROLE(2)="k"
     CPU_structure(i_PAR_structure)%CPU(2)=ncpu_k
+    !
     CPU_structure(i_PAR_structure)%N_chains=2
     !
    end subroutine

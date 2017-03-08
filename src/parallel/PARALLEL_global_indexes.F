@@ -306,8 +306,6 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 #endif
  endif
  !
- if (ENVIRONMENT=="Non_Linear") n_bands=(/NL_bands(1),NL_bands(2)/)
- !
  ! QP states
  !-----------
  if (ENVIRONMENT=="Self_Energy"                     ) QP_range=QP_n_states
@@ -316,7 +314,11 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  ! Frequencies
  !------------
  !
- if (ENVIRONMENT=="Non_Linear") n_freqs =n_frequencies
+ if (ENVIRONMENT=="Non_Linear") then 
+   n_freqs =n_frequencies
+   n_bands=(/NL_bands(1),NL_bands(2)/)
+ endif
+ !
  !
  !==========
  ! DEFAULTS

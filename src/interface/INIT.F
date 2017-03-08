@@ -814,7 +814,7 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
        l_rim=runlevel_is_on('rim_cut')
        l_col_cut=runlevel_is_on('rim_cut')
        l_cohsex=runlevel_is_on('cohsex')
-       l_nl_optics=runlevel_is_on('nloptics')
+       l_nl_optics=runlevel_is_on('nlinear')
        ! 
 #if defined _SCALAPACK
        l_slk_test =runlevel_is_on('slktest')

@@ -73,7 +73,7 @@
   {"corrtp", "c","Correlation [opt=e(lectrons)/p(honons)/b(oth)]",0,0,1,0,0},    
   {"ElPhHam","f","Electron-Phonon Hamiltonian",0,0,0,0,0},    
 #endif
-  {"nloptics","u","Non-linear spectroscopy",0,0,0,0,0},  
+  {"nlinear","u","Non-linear spectroscopy",0,0,0,0,0},  
   {NULL,NULL,NULL,0,0,0,0,0}
  };
  char *tool="lumen";

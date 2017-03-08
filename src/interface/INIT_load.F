@@ -100,7 +100,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  call it('r',defs,'life',    '[R GW] GoWo Quasiparticle lifetimes')
  call it('r',defs,'rim_cut', '[R RIM CUT] Coulomb potential')
  call it('r',defs,'cohsex',  '[R Xp] COlumb Hole Screened EXchange')
- call it('r',defs,'nloptics',   '[R NL] Non-linear optics') 
+ call it('r',defs,'nlinear', '[R NL] Non-linear optics') 
  !
  !
 #if defined _ELPH 
@@ -356,6 +356,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
        if (i_s==5) possible_fields='(q,qp,b)'  ! SE
        if (i_s==6) possible_fields='(k,b,q,qp)'! RT
        if (i_s==7) possible_fields='(p,d) '    ! SLK
+       if (i_s==8) possible_fields='(w,k) '    ! NL
        !
        if (len_trim(CPU_structure(i_s)%Short_Description)==0) cycle
        name=trim(CPU_structure(i_s)%Short_Description)//"_CPU"

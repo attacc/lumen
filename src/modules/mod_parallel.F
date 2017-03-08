@@ -135,6 +135,7 @@ module parallel_m
 #if defined _SCALAPACK
  !      if (i_s==7) possible_fields='  '        ! SLK test
 #endif
+ !      if (i_s==8) possible_fields='(w,k)'     ! Non-linear
  !
  integer,parameter   :: n_CPU_str_max=20
  type(CPU_stru),SAVE :: CPU_structure(n_CPU_str_max)
