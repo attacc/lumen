@@ -83,7 +83,6 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
        call M_by_M('C','N',NL_bands(2),en%nbf,NL_bands(2),cONE,DIP_S(:,:,id+(istep-1)*3,ikm,i_sp),&
 &                          NL_bands(2),V_bands(:,:,ikm_ibz,i_sp),NL_bands(2),cZERO,V_tmp,NL_bands(2))
          !
-!$omp parallel do default(shared), private(i2,V_tmp)
        do i2=1,en%nbf
          !
 !         call M_by_V('C',NL_bands(2),NL_bands(2),cONE,DIP_S(:,:,id+(istep-1)*3,ikm,i_sp),&
@@ -92,7 +91,6 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
          call M_by_V('C',NL_bands(2),en%nbf,cONE,V_bands(:,:,ik_ibz,i_sp),&
 &                        NL_bands(2),V_tmp(:,i2),1,cZERO,Sm1_minus(:,i2,id+(istep-1)*3),1)
        enddo
-!$omp end parallel do
        !
        call LINEAR_ALGEBRA_driver(INV,Sm1_minus(:,:,id+(istep-1)*3),lib_in=USE_LK)
        !
@@ -105,7 +103,6 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
        !
        ikp_ibz=Xk%sstar(ikp,1)
        !
-!$omp parallel do default(shared), private(i2,V_tmp)
        do i2=1,en%nbf
          call M_by_V('N',NL_bands(2),NL_bands(2),cONE,DIP_S(:,:,id+(istep-1)*3,ikbz,i_sp),&
 &                        NL_bands(2),V_bands(:,i2,ikp_ibz,i_sp),1,cZERO,V_tmp(:,i2),1)
@@ -113,7 +110,6 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
          call M_by_V('C',NL_bands(2),en%nbf,cONE,V_bands(:,:,ik_ibz,i_sp),&
 &                      NL_bands(2),V_tmp(:,i2),1,cZERO,Sm1_plus(:,i2,id+(istep-1)*3),1)
        enddo
-!$omp end parallel do
        !
        call LINEAR_ALGEBRA_driver(INV,Sm1_plus(:,:,id+(istep-1)*3),lib_in=USE_LK,det=S_det(id+(istep-1)*3))
        !
