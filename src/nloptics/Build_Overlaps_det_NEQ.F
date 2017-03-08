@@ -30,7 +30,7 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
  use R_lattice,      ONLY:k_map,bz_samp
  use vec_operate,    ONLY:k_periodic_idx
  use X_m,            ONLY:DIP_S
- use wrapper    ,    ONLY:M_by_V,M_by_M
+ use wrapper_omp,    ONLY:M_by_M_omp
  use linear_algebra, ONLY:INV,USE_LK,LINEAR_ALGEBRA_driver
  use matrix_operate, ONLY:hermitian
  use QP_m,           ONLY:QP_nk
@@ -80,10 +80,10 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
        !
        ikm_ibz=Xk%sstar(ikm,1)
        !
-       call M_by_M('C','N',NL_bands(2),en%nbf,NL_bands(2),cONE,DIP_S(:,:,id+(istep-1)*3,ikm,i_sp),&
+       call M_by_M_omp('C','N',NL_bands(2),en%nbf,NL_bands(2),cONE,DIP_S(:,:,id+(istep-1)*3,ikm,i_sp),&
 &                          NL_bands(2),V_bands(:,:,ikm_ibz,i_sp),NL_bands(2),cZERO,V_tmp,NL_bands(2))
        !
-       call M_by_M('C','N',en%nbf,en%nbf,NL_bands(2),cONE,V_bands(:,:,ik_ibz,i_sp),&
+       call M_by_M_omp('C','N',en%nbf,en%nbf,NL_bands(2),cONE,V_bands(:,:,ik_ibz,i_sp),&
 &                      NL_bands(2),V_tmp,NL_bands(2),cZERO,Sm1_minus(:,:,id+(istep-1)*3),en%nbf)
        !
        call LINEAR_ALGEBRA_driver(INV,Sm1_minus(:,:,id+(istep-1)*3),lib_in=USE_LK)
@@ -97,10 +97,10 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
        !
        ikp_ibz=Xk%sstar(ikp,1)
        !
-       call M_by_M('N','N',NL_bands(2),en%nbf,NL_bands(2),cONE,DIP_S(:,:,id+(istep-1)*3,ikbz,i_sp),&
+       call M_by_M_omp('N','N',NL_bands(2),en%nbf,NL_bands(2),cONE,DIP_S(:,:,id+(istep-1)*3,ikbz,i_sp),&
 &                  NL_bands(2),V_bands(:,:,ikp_ibz,i_sp),NL_bands(2),cZERO,V_tmp(:,:),NL_bands(2))
        !
-       call M_by_M('C','N',en%nbf,en%nbf,NL_bands(2),cONE,V_bands(:,:,ik_ibz,i_sp),&
+       call M_by_M_omp('C','N',en%nbf,en%nbf,NL_bands(2),cONE,V_bands(:,:,ik_ibz,i_sp),&
 &                      NL_bands(2),V_tmp,NL_bands(2),cZERO,Sm1_plus(:,:,id+(istep-1)*3),en%nbf)
        !
        call LINEAR_ALGEBRA_driver(INV,Sm1_plus(:,:,id+(istep-1)*3),lib_in=USE_LK,det=S_det(id+(istep-1)*3))

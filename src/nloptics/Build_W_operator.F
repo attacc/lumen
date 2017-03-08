@@ -38,7 +38,6 @@ subroutine Build_W_operator(V_bands,en,Xk,A_input,ik,i_sp,Hk)
  use matrix_operate, ONLY:hermitian
  use fields,         ONLY:gauge_field
  use X_m,            ONLY:DIP_S
- use wrapper,        ONLY:M_by_V
  use wrapper_omp,    ONLY:M_by_M_omp
  !
  implicit none
