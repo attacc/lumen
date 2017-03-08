@@ -119,9 +119,9 @@ subroutine Build_W_operator(V_bands,en,Xk,A_input,ik,i_sp,Hk)
 !$omp parallel do default(shared), private(im)
        do im=1,en%nbf
          !
-         call M_by_V('N',NL_bands(2),NL_bands(2),cONE,  &
-&           DIP_S(1:NL_bands(2),1:NL_bands(2),id_red+(istep-1)*3,ikbz,i_sp),NL_bands(2), &
-&           V_bands(1:NL_bands(2),im,ikp_ibz,i_sp),1,cZERO,tmp_Vp(:,im),1)          
+         call M_by_V('N',NL_bands(2),NL_nbands,cONE,  &
+&           DIP_S(1:NL_bands(2),NL_bands(1):NL_bands(2),id_red+(istep-1)*3,ikbz,i_sp),NL_bands(2), &
+&           V_bands(NL_bands(1):NL_bands(2),im,ikp_ibz,i_sp),1,cZERO,tmp_Vp(:,im),1)          
          call M_by_V('C',NL_bands(2),NL_bands(2),cONE,  &
 &           DIP_S(1:NL_bands(2),1:NL_bands(2),id_red+(istep-1)*3,ikm ,i_sp),NL_bands(2), &
 &           V_bands(1:NL_bands(2),im,ikm_ibz,i_sp),1,cZERO,tmp_Vm(:,im),1)
