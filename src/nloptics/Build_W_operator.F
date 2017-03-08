@@ -38,7 +38,8 @@ subroutine Build_W_operator(V_bands,en,Xk,A_input,ik,i_sp,Hk)
  use matrix_operate, ONLY:hermitian
  use fields,         ONLY:gauge_field
  use X_m,            ONLY:DIP_S
- use wrapper,        ONLY:M_by_V,Vstar_dot_V
+ use wrapper,        ONLY:M_by_V
+ use wrapper_omp,    ONLY:M_by_M_omp
  !
  implicit none
  !
@@ -116,18 +117,13 @@ subroutine Build_W_operator(V_bands,en,Xk,A_input,ik,i_sp,Hk)
        ! ===========================================
        ! where \tilde V(k+delta,n,:) = \sum_m \tilde S^-1(k,k+delta)_{m,n} * Vp(m,:)
        ! 
-!$omp parallel do default(shared), private(im)
-       do im=1,en%nbf
-         !
-         call M_by_V('N',NL_nbands,NL_bands(2),cONE,  &
-&        DIP_S(NL_bands(1):NL_bands(2),1:NL_bands(2),id_red+(istep-1)*3,ikbz,i_sp),NL_nbands, &
-&           V_bands(1:NL_bands(2),im,ikp_ibz,i_sp),1,cZERO,tmp_Vp(NL_bands(1):,im),1)          
-         call M_by_V('C',NL_bands(2),NL_nbands,cONE,  &
-&           DIP_S(1:NL_bands(2),NL_bands(1):NL_bands(2),id_red+(istep-1)*3,ikm ,i_sp),NL_bands(2), &
-&           V_bands(1:NL_bands(2),im,ikm_ibz,i_sp),1,cZERO,tmp_Vm(NL_bands(1):,im),1)
-         ! 
-       enddo
-!$omp end parallel do
+       call M_by_M_omp('N','N',NL_nbands,en%nbf,NL_bands(2),cONE,  &
+&        DIP_S(NL_bands(1):,:,id_red+(istep-1)*3,ikbz,i_sp),NL_nbands, &
+&        V_bands(:,:,ikp_ibz,i_sp),NL_bands(2),cZERO,tmp_Vp(NL_bands(1):,:),NL_nbands)     
+       !
+       call M_by_M_omp('C','N',NL_nbands,en%nbf,NL_bands(2),cONE,  &
+&           DIP_S(:,NL_bands(1):,id_red+(istep-1)*3,ikm ,i_sp),NL_bands(2), &
+&           V_bands(:,:,ikm_ibz,i_sp),NL_bands(2),cZERO,tmp_Vm(NL_bands(1):,:),NL_nbands)
        !
        ! Build \tilde V(k+delta) - \tilde V(k-delta)
        ! ===========================================
