@@ -30,7 +30,7 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
  use R_lattice,      ONLY:k_map,bz_samp
  use vec_operate,    ONLY:k_periodic_idx
  use X_m,            ONLY:DIP_S
- use wrapper    ,    ONLY:M_by_V
+ use wrapper    ,    ONLY:M_by_V,M_by_M
  use linear_algebra, ONLY:INV,USE_LK,LINEAR_ALGEBRA_driver
  use matrix_operate, ONLY:hermitian
  use QP_m,           ONLY:QP_nk
@@ -52,7 +52,7 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
  !
  integer     :: i2,idx(3),id,ikp,ikm
  integer     :: ikm_ibz,ikp_ibz,ik_ibz,max_step,istep
- complex(SP) :: V_tmp(NL_bands(2))
+ complex(SP) :: V_tmp(NL_bands(2),en%nbf)
  !
  S_det    =cZERO
  Sm1_plus =cZERO
@@ -80,14 +80,17 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
        !
        ikm_ibz=Xk%sstar(ikm,1)
        !
+       call M_by_M('C','N',NL_bands(2),en%nbf,NL_bands(2),cONE,DIP_S(:,:,id+(istep-1)*3,ikm,i_sp),&
+&                          NL_bands(2),V_bands(:,:,ikm_ibz,i_sp),NL_bands(2),cZERO,V_tmp,NL_bands(2))
+         !
 !$omp parallel do default(shared), private(i2,V_tmp)
        do i2=1,en%nbf
          !
-         call M_by_V('C',NL_bands(2),NL_bands(2),cONE,DIP_S(:,:,id+(istep-1)*3,ikm,i_sp),&
-&                        NL_bands(2),V_bands(:,i2,ikm_ibz,i_sp),1,cZERO,V_tmp,1)
+!         call M_by_V('C',NL_bands(2),NL_bands(2),cONE,DIP_S(:,:,id+(istep-1)*3,ikm,i_sp),&
+!&                        NL_bands(2),V_bands(:,i2,ikm_ibz,i_sp),1,cZERO,V_tmp(:,i2),1)
          !
          call M_by_V('C',NL_bands(2),en%nbf,cONE,V_bands(:,:,ik_ibz,i_sp),&
-&                        NL_bands(2),V_tmp,1,cZERO,Sm1_minus(:,i2,id+(istep-1)*3),1)
+&                        NL_bands(2),V_tmp(:,i2),1,cZERO,Sm1_minus(:,i2,id+(istep-1)*3),1)
        enddo
 !$omp end parallel do
        !
@@ -105,10 +108,10 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
 !$omp parallel do default(shared), private(i2,V_tmp)
        do i2=1,en%nbf
          call M_by_V('N',NL_bands(2),NL_bands(2),cONE,DIP_S(:,:,id+(istep-1)*3,ikbz,i_sp),&
-&                        NL_bands(2),V_bands(:,i2,ikp_ibz,i_sp),1,cZERO,V_tmp,1)
+&                        NL_bands(2),V_bands(:,i2,ikp_ibz,i_sp),1,cZERO,V_tmp(:,i2),1)
          !
          call M_by_V('C',NL_bands(2),en%nbf,cONE,V_bands(:,:,ik_ibz,i_sp),&
-&                      NL_bands(2),V_tmp,1,cZERO,Sm1_plus(:,i2,id+(istep-1)*3),1)
+&                      NL_bands(2),V_tmp(:,i2),1,cZERO,Sm1_plus(:,i2,id+(istep-1)*3),1)
        enddo
 !$omp end parallel do
        !
