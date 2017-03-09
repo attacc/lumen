@@ -28,7 +28,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  use linear_algebra,ONLY:INV
  use parallel_m,    ONLY:PP_indexes,PP_indexes_reset,PAR_Xk_ibz_index,PAR_Xk_nibz,PAR_Xk_nbz,&
 &                        PAR_Xk_bz_index,PARALLEL_n_structures_active,ncpu,CPU_structure,master_cpu,&
-&                        PAR_Q_index,PAR_nQ,PAR_n_B_mat_elements,&
+&                        PAR_Q_index,PAR_nQ,PAR_n_B_mat_elements,myid,&
 &                        PAR_B_mat_index,PAR_nQP,PAR_QP_index,PAR_INDEX_copy,&
 &                        MPI_comm,PAR_DIPk_ibz_index,PAR_DIPk_nibz,COMM_copy,n_WF_bands_to_load,&
 &                        PAR_n_Bp_mat_elements,PAR_Bp_mat_index,PAR_PLASMA_index,&
@@ -667,6 +667,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    ! K-points
    !
    call PARALLEL_index(PAR_IND_Xk_ibz,(/Xk%nibz/),COMM=PAR_COM_Xk_ibz_INDEX)
+   write(*,*) 'passo qui ',myd,PAR_IND_Xk_ibz%n_of_elements(myid+1)
    PAR_IND_Xk_ibz_ID=PAR_COM_Xk_ibz_INDEX%CPU_id
    PAR_Xk_nibz=PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1)
    !
