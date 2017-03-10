@@ -667,7 +667,6 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    ! K-points
    !
    call PARALLEL_index(PAR_IND_Xk_ibz,(/Xk%nibz/),COMM=PAR_COM_Xk_ibz_INDEX)
-   write(*,*) 'passo qui ',myd,PAR_IND_Xk_ibz%n_of_elements(myid+1)
    PAR_IND_Xk_ibz_ID=PAR_COM_Xk_ibz_INDEX%CPU_id
    PAR_Xk_nibz=PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1)
    !
