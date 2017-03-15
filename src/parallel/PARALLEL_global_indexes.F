@@ -701,12 +701,12 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    call PARALLEL_live_message("H(ibz)",ENVIRONMENT=ENVIRONMENT,&
 &           LOADED=PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1),TOTAL=Xk%nibz,&
 &           NCPU=PAR_COM_Xk_ibz_INDEX%n_CPU)
-   !
-   ! Copy to WF
-   !
-   call PAR_INDEX_copy(PAR_IND_OVLP_ibz,PAR_IND_WF_k)
-   call COMM_copy(PAR_COM_Xk_ibz_INDEX,PAR_COM_WF_k_INDEX)
-   PAR_IND_WF_k_ID=PAR_COM_WF_k_INDEX%CPU_id
+!   !
+!   ! Copy to WF
+!   !
+!   call PAR_INDEX_copy(PAR_IND_OVLP_ibz,PAR_IND_WF_k)
+!   call COMM_copy(PAR_COM_Xk_ibz_INDEX,PAR_COM_WF_k_INDEX)
+!   PAR_IND_WF_k_ID=PAR_COM_WF_k_INDEX%CPU_id
    !
    ! Build QP indexes
    !

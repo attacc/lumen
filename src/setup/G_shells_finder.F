@@ -104,7 +104,8 @@ subroutine G_shells_finder()
  !
  call PARALLEL_index(px,(/n_g_shells/))
  !
- if (ng_closed>1) call live_timing('Shells finder',px%n_of_elements(myid+1))
+ if (ng_closed>1.and.px%n_of_elements(myid+1)>0) &
+    & call live_timing('Shells finder',px%n_of_elements(myid+1))
  !==========================================================================
  !
  do i_m=2,n_g_shells
@@ -149,7 +150,7 @@ subroutine G_shells_finder()
    !
  enddo
  !
- if (ng_closed>1) call live_timing(steps=1)
+ if (ng_closed>1.and.px%n_of_elements(myid+1)>0) call live_timing()
  !
  call PP_redux_wait(g_rot)
  call PP_redux_wait(E_of_shell_TMP)
