@@ -644,7 +644,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  if (ENVIRONMENT=="Non_Linear") then
    !=================================
    !
-   CALL PARALLEL_structure(3,(/"w ","k "/))
+   CALL PARALLEL_structure(2,(/"w ","k "/))
    !
    call PARALLEL_assign_chains_and_COMMs(2,ROLE=(/"w ","k "/),  &
 &                                  COMM_index_1=PAR_COM_freqs_INDEX, &
@@ -698,7 +698,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    !
    ! Copy to WF
    !
-   call PAR_INDEX_copy(PAR_IND_Xk_ibz,PAR_IND_WF_k)
+   call PAR_INDEX_copy(PAR_IND_OVLP_ibz,PAR_IND_WF_k)
    call COMM_copy(PAR_COM_Xk_ibz_INDEX,PAR_COM_WF_k_INDEX)
    PAR_IND_WF_k_ID=PAR_COM_WF_k_INDEX%CPU_id
    !
