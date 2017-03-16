@@ -211,6 +211,7 @@ subroutine NL_driver(E,X,k,q)
  contains
    !
    subroutine setup_DIPOLES_parallelization()
+     use nl_optics,        ONLY:eval_OVERLAPS
      implicit none
      !
      ! Set bands between 1 and NL_bands(2)
@@ -224,6 +225,7 @@ subroutine NL_driver(E,X,k,q)
      !
      N_frequency_save=n_frequencies
      n_frequencies   =1
+     eval_OVERLAPS   =.TRUE.
      !
      call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
      call PARALLEL_global_indexes(E,k,q,"Non_Linear",RESET=.FALSE.,X=X(1))
@@ -231,6 +233,7 @@ subroutine NL_driver(E,X,k,q)
    end subroutine setup_DIPOLES_parallelization
    !
    subroutine setup_NL_parallelization
+     use nl_optics,        ONLY:eval_OVERLAPS
      implicit none
      !
      ! Restore original number of bands
@@ -241,6 +244,7 @@ subroutine NL_driver(E,X,k,q)
      ! Parallelization on frequencies turned on
      !
      n_frequencies =N_frequency_save
+     eval_OVERLAPS   =.FALSE.
      !
      call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
      call PARALLEL_global_indexes(E,k,q,"Non_Linear",RESET=.FALSE.,X=X(1))

@@ -87,7 +87,8 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  use zeros,      ONLY:zero_norm,k_iku_zero,k_rlu_zero,G_iku_zero,zero_dfl
  use xc_functionals,  ONLY:GS_xc_FUNCTIONAL,GS_xc_KIND,GS_exx_FRACTION,GS_exx_SCREENING 
  use nl_optics,  ONLY:NL_correlation,NL_er,n_frequencies,NL_damping,NL_LRC_alpha, &
-&                     Integrator_name,NL_tot_time,NL_bands,Verbosity_name,NL_step
+&                     Integrator_name,NL_tot_time,NL_bands,Verbosity_name,NL_step, &
+&                     eval_OVERLAPS
  use fields,     ONLY:Efield,Efield_reset,n_ext_fields_max,n_ext_fields,A_vecpot_reset,   &
 &                     A_vecpot,A_vecpot_previous,A_ind,A_ind_previous,A_ext
   
@@ -496,6 +497,7 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  NL_tot_time   =  -1._SP*FS2AUT
  NL_step       = 0.010*FS2AUT
  NL_bands      = (/0,0/)
+ eval_OVERLAPS = .FALSE.
  Integrator_name='INVINT'
  Verbosity_name='low'
  NL_correlation="IPA"

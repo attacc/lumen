@@ -118,6 +118,7 @@ module nl_optics
  logical :: eval_dG
  logical :: eval_HARTREE
  logical :: eval_DFT
+ logical :: eval_OVERLAPS
  !
  ! Non-linear spectra parameters
  !

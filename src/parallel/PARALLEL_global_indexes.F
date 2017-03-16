@@ -77,7 +77,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 #if defined _SCALAPACK
  use SLK_m,         ONLY:SLK_COM_INDEX,SLK_COM_A2A
 #endif
- use nl_optics,     ONLY:NL_bands,n_frequencies
+ use nl_optics,     ONLY:NL_bands,n_frequencies,eval_OVERLAPS
  use electrons,     ONLY:levels
  use stderr,        ONLY:intc
  use R_lattice,     ONLY:bz_samp,nqibz,nqbz
@@ -316,7 +316,11 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  !
  if (ENVIRONMENT=="Non_Linear") then 
    n_freqs =n_frequencies
-   n_bands=(/NL_bands(1),NL_bands(2)/)
+   if(eval_OVERLAPS) then
+      n_bands=(/1,NL_bands(2)/)
+   else
+      n_bands=(/NL_bands(1),NL_bands(2)/)
+   endif
  endif
  !
  !
@@ -644,7 +648,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  if (ENVIRONMENT=="Non_Linear") then
    !=================================
    !
-   CALL PARALLEL_structure(3,(/"w ","k "/))
+   CALL PARALLEL_structure(2,(/"w ","k "/))
    !
    call PARALLEL_assign_chains_and_COMMs(2,ROLE=(/"w ","k "/),  &
 &                                  COMM_index_1=PAR_COM_freqs_INDEX, &
@@ -689,18 +693,20 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    ! Overlap indeces for WF distribution
    !
    call PAR_INDEX_copy(PAR_IND_DIPk_ibz,PAR_IND_OVLP_ibz)
-   call PARALLEL_add_Q_to_K_list("overlaps",PAR_IND_Xk_bz,PAR_IND_Xk_bz_ID,PAR_IND_OVLP_ibz,PAR_IND_Xk_ibz_ID,&
+   if(eval_OVERLAPS) then
+     call PARALLEL_add_Q_to_K_list("overlaps",PAR_IND_Xk_bz,PAR_IND_Xk_bz_ID,PAR_IND_OVLP_ibz,PAR_IND_Xk_ibz_ID,&
 &                                PAR_IND_Q,PAR_COM_Xk_ibz_INDEX,Q_range,Xk,q)
+   endif
    !
    call PARALLEL_live_message("H(ibz)",ENVIRONMENT=ENVIRONMENT,&
 &           LOADED=PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1),TOTAL=Xk%nibz,&
 &           NCPU=PAR_COM_Xk_ibz_INDEX%n_CPU)
-   !
-   ! Copy to WF
-   !
-   call PAR_INDEX_copy(PAR_IND_Xk_ibz,PAR_IND_WF_k)
-   call COMM_copy(PAR_COM_Xk_ibz_INDEX,PAR_COM_WF_k_INDEX)
-   PAR_IND_WF_k_ID=PAR_COM_WF_k_INDEX%CPU_id
+!   !
+!   ! Copy to WF
+!   !
+!   call PAR_INDEX_copy(PAR_IND_OVLP_ibz,PAR_IND_WF_k)
+!   call COMM_copy(PAR_COM_Xk_ibz_INDEX,PAR_COM_WF_k_INDEX)
+!   PAR_IND_WF_k_ID=PAR_COM_WF_k_INDEX%CPU_id
    !
    ! Build QP indexes
    !
