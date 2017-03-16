@@ -116,7 +116,7 @@ subroutine NL_initialize(E,k,q)
  !
  if(NL_tot_time<=0._SP) then
    !
-   ! Run lenght is 6*Phase_lifeTime + 4 fs for response analysis
+   ! Run lenght is 6*Phase_lifeTime + sampling time
    !
    if(NL_damping<zero_dfl) call error(" Error damping=0 and NLtime<0!! ") 
    !
