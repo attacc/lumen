@@ -932,7 +932,10 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
      endif
      if (l_HF_and_locXC.or.l_gw0.or.l_cohsex.or.l_sc_run) n_threads_SE=n_threads
      if (l_real_time)                                     n_threads_RT=n_threads
-     if (l_nl_optics)                                     n_threads_NL=n_threads
+     if (l_nl_optics) then
+        n_threads_NL =n_threads
+        n_threads_DIP=n_threads
+     endif
 #endif
      !
    end subroutine before_infile_write_setup 
