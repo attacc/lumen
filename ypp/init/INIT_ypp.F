@@ -45,7 +45,7 @@ subroutine INIT_ypp(E,instr,lnstr,FINALIZE)
  use electrons,      ONLY:n_spin,n_spinor,levels
  use parallel_m,     ONLY:master_cpu,PP_redux_wait
  use LIVE_t,         ONLY:what_is_running
- use nl_optics,      ONLY:NL_damping,n_frequencies
+ use nl_optics,      ONLY:NL_damping,n_frequencies,NL_step
  use IO_m,           ONLY:DUMP,NONE,OP_RD_CL,io_control
 #if defined _YPP_ELPH
  use YPP_ELPH
@@ -95,7 +95,7 @@ subroutine INIT_ypp(E,instr,lnstr,FINALIZE)
    ! one is interested in the non-linear response
    ! and set the correct energy range
    if(trim(Efield(1)%ef_name)/="DELTA".and.NL_damping/=0._SP.and.n_frequencies/=1) then
-     NL_response%T_range(:)=(/2._SP/NL_damping*5._SP,-FS2AUT/)
+     NL_response%T_range(:)=(/2._SP/NL_damping*5._SP+NL_step,-FS2AUT/)
      X_Order=4
    else
      X_Order=1

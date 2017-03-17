@@ -95,27 +95,6 @@ subroutine NL_driver(en)
  !
  NL_tot_time    =real(NL_steps,SP)*NL_step
  !
- if(Efield_probe%ef_name=='SIN'.or.Efield_probe%ef_name=='SOFTSIN'.or.Efield_probe%ef_name=='ANTIRES') then
-   !        
-   ! Time Initialization for periodic probes
-   !
-   W_step         =minval(Probe_frequency) ! smaller frequency
-   T_period       =EtoT(W_step)            ! largest period
-   !
-   ! Check if the time for dephasing is enought
-  
-   if(NL_response%T_range(1)<=2._SP/NL_damping*5._SP) &
-&     call warning('Dephasing time too short, set initial time >= '//trim(real2ch(2._SP/NL_damping*5._SP*AUT2FS))//' fs')
-   !
-   ! Check if total simulation time is long enough for analysis  
-   !
-   if((NL_response%T_range(2) - NL_response%T_range(1))<T_period) &
-&     call warning(' Simulation time not long enough. Period is'//trim(real2ch(T_period*AUT2FS))//' fs')
-   !
- endif
- !
- call msg('s',':: Field type    :', trim(Efield_probe%ef_name))
- !
  ! Integer time range
  !
  if(NL_response%T_range(1)>0._SP) then
@@ -132,6 +111,26 @@ subroutine NL_driver(en)
    NL_response%T_range(2)  =(NL_steps-1)*NL_step
  endif
  !
+ if(Efield_probe%ef_name=='SIN'.or.Efield_probe%ef_name=='SOFTSIN'.or.Efield_probe%ef_name=='ANTIRES') then
+   !        
+   ! Time Initialization for periodic probes
+   !
+   W_step         =minval(Probe_frequency) ! smaller frequency
+   T_period       =EtoT(W_step)            ! largest period
+   !
+   ! Check if the time for dephasing is enought
+   ! 
+   if(NL_response%T_range(1)<=2._SP/NL_damping*5._SP) &
+&     call warning('Dephasing time too short, set initial time >= '//trim(real2ch(2._SP/NL_damping*5._SP*AUT2FS))//' fs')
+   !
+   ! Check if total simulation time is long enough for analysis  
+   !
+   if((NL_response%T_range(2) - NL_response%T_range(1))<T_period) &
+&     call warning(' Simulation time not long enough. Period is'//trim(real2ch(T_period*AUT2FS))//' fs')
+   !
+ endif
+ !
+ call msg('s','[NL] Field type    :', trim(Efield_probe%ef_name))
  call msg('s','[NL] Integer time range :',NL_response%i_T_range)
  call msg('s','[NL] Time range :',NL_response%T_range*AUT2FS)
  !
@@ -181,7 +180,7 @@ subroutine NL_driver(en)
      call live_timing()
      !
      NL_response%T_range=time_range_save
-     NL_response%T_range=i_time_range_save
+     NL_response%i_T_range=i_time_range_save
      !
      ! Calculate Susceptibilities from X_effective
      !
