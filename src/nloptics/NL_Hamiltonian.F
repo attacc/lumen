@@ -70,8 +70,6 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  endif
  !
  if(eval_HARTREE) call V_Hartree(rho_n-rho_reference,V_hartree_ne)
-! write(*,*) 'passo qui ',V_hartree_ne(1:10,1)
-! V_hartree_ne=0._SP
  !
  ! I reconstruct the full density if necessary because both TDDFT 
  ! and JGM are not linear in rho_n and require the full density

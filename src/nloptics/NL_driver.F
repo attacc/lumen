@@ -102,6 +102,8 @@ subroutine NL_driver(E,X,k,q)
    if(load_Overlaps()/=0) call DIPOLE_driver(E,k,X(1),X(1)%q0)
  endif
  !
+ call check_non_periodic()
+ !
  NL_bands(1)=NL_bands1_save
  !
  ! Free memory: qindx_* and unused DIPOLES
@@ -318,5 +320,25 @@ subroutine NL_driver(E,X,k,q)
      call QP_state_table_setup(E)
      !
    end subroutine QP_setup
+   !
+   subroutine check_non_periodic()
+    use R_lattice,      ONLY:k_map
+    use D_lattice,      ONLY:a
+    use com,            ONLY:error
+    use fields,         ONLY:Efield
+    use zeros,          ONLY:zero_norm
+    implicit none
+    !
+    integer :: id_red
+    !
+    if(all(k_map%max_kdir/=1)) return
+    !
+    do id_red=1,3
+      if(k_map%max_kdir(id_red)/=1) cycle
+      if(abs(sum(a(id_red,:)*Efield(1)%versor(:)))>zero_norm) &
+          call error(" Non-periodic directions not implemented yet ! ")
+    enddo
+    !
+   end subroutine check_non_periodic
    !
 end subroutine NL_driver
