@@ -72,7 +72,7 @@ MAIN_LIBS    = $(BASIC_LIBS) coulomb bz_ops qp_control setup \
 # YPP
 #
 YPP_LIBS        = modules interpolate init qp plotting electrons excitons symmetries k-points bits nloptics
-YPPPH_LIBS      = modules interpolate init qp plotting electrons elph excitons symmetries k-points bits 
+YPPPH_LIBS      = modules interpolate init qp plotting electrons elph excitons symmetries k-points bits nloptics 
 #
 YPP_MAIN_LIBS      = $(BASIC_LIBS) coulomb bz_ops qp_control setup interface tddft pol_function bse
 #
