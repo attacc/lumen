@@ -206,9 +206,10 @@ module nl_optics
        call mem_est("V_xc_0",(/fft_size,n_spin/),(/SP/))
        allocate(V_xc(fft_size,n_spin))
        call mem_est("V_xc",(/fft_size,n_spin/),(/SP/))
-       allocate(V_xc_ne(fft_size,n_spin))
-       call mem_est('V_xc_ne',(/size(V_xc_ne)/),(/SP/))
      endif          
+     !
+     allocate(V_xc_ne(fft_size,n_spin))
+     call mem_est('V_xc_ne',(/size(V_xc_ne)/),(/SP/))
      !
      if(Correlation==LSEX) then
        allocate(dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
@@ -300,10 +301,8 @@ module nl_optics
        call mem_est("V_xc")
      endif
      !
-     if(allocated(V_xc_ne)) then
-       deallocate(V_xc_ne)
-       call mem_est("V_xc_ne")
-     endif
+     deallocate(V_xc_ne)
+     call mem_est("V_xc_ne")
      !
      if(allocated(V_hartree_ne)) then
        deallocate(V_hartree_ne)
