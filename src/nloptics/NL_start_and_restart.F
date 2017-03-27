@@ -67,7 +67,7 @@ subroutine NL_start_and_restart(E,k,X)
  !==================================
  rho_reference     =rZERO
  if(allocated(full_rho)) full_rho=rZERO
- V_xc_ne           =rZERO
+ V_xc_ne =rZERO
  V_hartree_ne      =rZERO
  Hk                =cZERO
  I_relax           =cZERO

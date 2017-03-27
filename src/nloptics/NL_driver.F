@@ -42,7 +42,7 @@ subroutine NL_driver(E,X,k,q)
 &                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_step
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
- use parallel_m,     ONLY:PAR_IND_WF_k,PAR_IND_freqs,PAR_IND_freqs_ID,CPU_structure
+ use parallel_m,     ONLY:PAR_IND_freqs,PAR_IND_freqs_ID,CPU_structure
  !
  implicit none
  !
@@ -101,6 +101,8 @@ subroutine NL_driver(E,X,k,q)
  else
    if(load_Overlaps()/=0) call DIPOLE_driver(E,k,X(1),X(1)%q0)
  endif
+ !
+ call check_non_periodic()
  !
  NL_bands(1)=NL_bands1_save
  !
@@ -233,6 +235,7 @@ subroutine NL_driver(E,X,k,q)
    end subroutine setup_DIPOLES_parallelization
    !
    subroutine setup_NL_parallelization
+     use parallel_m,       ONLY:PAR_IND_Xk_ibz
      use nl_optics,        ONLY:eval_OVERLAPS
      implicit none
      !
@@ -248,7 +251,7 @@ subroutine NL_driver(E,X,k,q)
      !
      call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
      call PARALLEL_global_indexes(E,k,q,"Non_Linear",RESET=.FALSE.,X=X(1))
-     call PARALLEL_WF_distribute(K_index=PAR_IND_WF_k,CLEAN_UP=.TRUE.)
+     call PARALLEL_WF_distribute(K_index=PAR_IND_Xk_ibz,CLEAN_UP=.TRUE.)
      call PARALLEL_WF_index( )
      !
    end subroutine setup_NL_parallelization
@@ -317,5 +320,25 @@ subroutine NL_driver(E,X,k,q)
      call QP_state_table_setup(E)
      !
    end subroutine QP_setup
+   !
+   subroutine check_non_periodic()
+    use R_lattice,      ONLY:k_map
+    use D_lattice,      ONLY:a
+    use com,            ONLY:error
+    use fields,         ONLY:Efield
+    use zeros,          ONLY:zero_norm
+    implicit none
+    !
+    integer :: id_red
+    !
+    if(all(k_map%max_kdir/=1)) return
+    !
+    do id_red=1,3
+      if(k_map%max_kdir(id_red)/=1) cycle
+      if(abs(sum(a(id_red,:)*Efield(1)%versor(:)))>zero_norm) &
+          call error(" Non-periodic directions not implemented yet ! ")
+    enddo
+    !
+   end subroutine check_non_periodic
    !
 end subroutine NL_driver

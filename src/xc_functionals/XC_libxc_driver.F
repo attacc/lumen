@@ -33,6 +33,8 @@ subroutine XC_libxc_driver(en,Xk,FUNCTIONAL,ORDER,EXX_FRACTION,EXX_SCREENING)
  use D_lattice,      ONLY:DL_vol, alat
  use electrons,      ONLY:levels,n_spin,n_spinor
  use FFT_m,          ONLY:fft_size
+ use drivers,        ONLY:l_nl_optics
+ use nl_optics,      ONLY:rho_n
  use wrapper,        ONLY:real_V_dot_V
  use xc_functionals, ONLY:E_xc,F_xc,magn,V_xc,xc_setup_hyb,&
 &                         XC_LDA_C_KP,xc_fnctl_t,xc_setup_fnctl
@@ -94,8 +96,13 @@ subroutine XC_libxc_driver(en,Xk,FUNCTIONAL,ORDER,EXX_FRACTION,EXX_SCREENING)
  ! Electronic/spin density 
  !==========================
  !
+ if(l_nl_optics) then
+   rho=rho_n
+ else
    call el_density_and_current(en,Xk,rho=rho)
-   if (n_spin> 1) call el_magnetization(en,Xk,magn)
+ endif
+ !
+ if (n_spin> 1) call el_magnetization(en,Xk,magn)
  !
  if(n_spin==1) spin_rho_SP(:,1)=rho(:)
  if(n_spin> 1) then

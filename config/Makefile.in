@@ -72,11 +72,12 @@ MAIN_LIBS    = $(BASIC_LIBS) coulomb bz_ops qp_control setup \
 # YPP
 #
 YPP_LIBS        = modules interpolate init qp plotting electrons excitons symmetries k-points bits nloptics
-YPPPH_LIBS      = modules interpolate init qp plotting electrons elph excitons symmetries k-points bits 
+YPPPH_LIBS      = modules interpolate init qp plotting electrons elph excitons symmetries k-points bits nloptics 
 #
 YPP_MAIN_LIBS      = $(BASIC_LIBS) coulomb bz_ops qp_control setup interface tddft pol_function bse
 #
-EXE      = $(TARGETS)
+PROJECTS = lumen_ph ypp_ph
+EXE      = $(TARGETS) $(PROJECTS)
 #
 nothing: 
 	@$(make_message)
@@ -117,6 +118,13 @@ lumen: libs
 	@+LIBS2DO="$(MAIN_LIBS)"; XPATH="src"; VPATH="$(topdir)/src"; $(mksrc)
 	@+X2DO="lumen"; XPATH="driver"; VPATH="$(topdir)/driver"; XLIBS="$(MAIN_LIBS)"; $(mkx)
 #
+# PROJECTS #
+# 
+lumen_ph: libs
+	@+LIBS2DO="$(MAIN_LIBS)"; XPATH="src"; VPATH="$(topdir)/src"; ADF="-D_ELPH"; $(mksrc)
+	@+X2DO="lumen_ph"; XPATH="driver"; VPATH="$(topdir)/driver"; XLIBS="$(MAIN_LIBS)"; ADF="-D_ELPH"; $(mkx)
+
+#
 # Interfaces #
 #
 interfaces: libs
@@ -136,6 +144,12 @@ ypp: libs
 	@+LIBS2DO="$(YPP_MAIN_LIBS)"; XPATH="src" ; VPATH="$(topdir)/src" ; $(mksrc)
 	@+LIBS2DO="$(YPP_LIBS)"; XPATH="ypp" ; VPATH="$(topdir)/ypp" ; $(mk_ypp_src)
 	@+X2DO="ypp" ;XPATH="driver"; VPATH="$(topdir)/driver" ; XLIBS="$(YPP_MAIN_LIBS)"; X_ypp_LIBS="$(YPP_LIBS)"; $(mk_ypp_x)
+
+ypp_ph: libs
+	@LIBS2DO="$(YPP_MAIN_LIBS)"; XPATH="src"; VPATH="$(topdir)/src"; ADF="-D_ELPH"; $(mksrc)
+	@LIBS2DO="$(YPPPH_LIBS)"; XPATH="ypp"; VPATH="$(topdir)/ypp";  ADF="-D_YPP_ELPH"; $(mk_ypp_src)
+	@X2DO="ypp_ph"; XPATH="driver"; VPATH="$(topdir)/driver"; XLIBS="$(YPP_MAIN_LIBS)"; \
+	X_ypp_LIBS="$(YPPPH_LIBS) elph"; ADF="-D_YPP_ELPH"; $(mk_ypp_x)
 #
 clean_fast: 
 	@$(objects_clean)

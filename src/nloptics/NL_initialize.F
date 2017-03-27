@@ -108,7 +108,7 @@ subroutine NL_initialize(E,k,q)
  !
  ! Important in the Time-dependent Schrodinger Eq.
  ! the Phase_LifeTime is 1/2 of the one used in the 
- ! Non-Equilibrium Green's Function
+ ! Non-Equilibrium Green Functions
  !
  Phase_LifeTime=2._SP/NL_damping
  !

@@ -171,6 +171,7 @@ module nl_optics
      use R_lattice,      ONLY:nXkbz
      use QP_m,           ONLY:QP_nk
      use electric,       ONLY:ELECTRIC_alloc
+     use xc_functionals, ONLY:V_xc
      !
      implicit none
      !
@@ -203,7 +204,12 @@ module nl_optics
      if(Correlation==TDDFT.or.Correlation==JGM) then
        allocate(V_xc_0(fft_size,n_spin))
        call mem_est("V_xc_0",(/fft_size,n_spin/),(/SP/))
+       allocate(V_xc(fft_size,n_spin))
+       call mem_est("V_xc",(/fft_size,n_spin/),(/SP/))
      endif          
+     !
+     allocate(V_xc_ne(fft_size,n_spin))
+     call mem_est('V_xc_ne',(/size(V_xc_ne)/),(/SP/))
      !
      if(Correlation==LSEX) then
        allocate(dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
@@ -234,9 +240,6 @@ module nl_optics
      allocate(E_tot_t(NL_steps,3),E_ext_t(NL_steps,3),E_ks_t(NL_steps,3))
      call mem_est("E_tot_t E_ext_t",(/size(E_tot_t),size(E_ext_t),size(E_ks_t)/))
      !
-     allocate(V_xc_ne(fft_size,n_spin))
-     call mem_est('V_xc_ne',(/size(V_xc_ne)/),(/SP/))
-     !
      allocate(V_hartree_ne(fft_size,n_spin))
      call mem_est("Hartree_Potential",(/size(V_hartree_ne)/))
      !
@@ -246,6 +249,7 @@ module nl_optics
      !
      use memory_m,       ONLY:mem_est
      use electric,       ONLY:ELECTRIC_free
+     use xc_functionals, ONLY:V_xc
      !
      implicit none
      !
@@ -292,10 +296,13 @@ module nl_optics
        call mem_est("V_xc_0")
      endif
      !
-     if(allocated(V_xc_ne)) then
-       deallocate(V_xc_ne)
-       call mem_est("V_xc_ne")
+     if(allocated(V_xc)) then
+       deallocate(V_xc)
+       call mem_est("V_xc")
      endif
+     !
+     deallocate(V_xc_ne)
+     call mem_est("V_xc_ne")
      !
      if(allocated(V_hartree_ne)) then
        deallocate(V_hartree_ne)
