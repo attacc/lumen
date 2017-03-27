@@ -264,7 +264,11 @@ module vec_operate
     integer,        intent(in) :: idx(3)
     integer                    :: k_periodic_idx(3)
     !
-    k_periodic_idx(:)=modulo(idx(:)-1,k_map%max_kdir(:)) + 1
+    where (idx>0)
+      k_periodic_idx=modulo(idx-1,k_map%max_kdir) + 1
+    elsewhere
+      k_periodic_idx=modulo(idx,k_map%max_kdir) + 1
+    endwhere
     !
    end function
    !
