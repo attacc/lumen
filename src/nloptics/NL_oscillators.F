@@ -31,7 +31,8 @@ subroutine NL_oscillators(q,k,en)
  use R_lattice,           ONLY:bz_samp,qindx_S
  use electrons,           ONLY:levels
  use QP_m,                ONLY:QP_nk
- use collision,           ONLY:elemental_collision,elemental_collision_free
+ use collision,           ONLY:elemental_collision,elemental_collision_free, &
+&                              elemental_collision_alloc         
  use parallel_m,          ONLY:PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID
 
  !
@@ -44,12 +45,14 @@ subroutine NL_oscillators(q,k,en)
  !
  type(elemental_collision)            :: isc 
  integer :: i_k,i_m,i_n,i_q,iqbz,i_kmq_G0,iqs,i_kmq,i_kmq_s,i_k_s
- integer :: i_k_sp,i_kmq_sp,iqibz
+ integer :: i_k_sp,i_kmq_sp,iqibz,ig
  !
  call elemental_collision_free(isc)
  !
  isc%iqref =0
  isc%ngrho =100  ! only G=1 is required for local-SEX
+ !
+ call elemental_collision_alloc(isc,NG=isc%ngrho,TITLE="OSC")
  !
  call live_timing('[NL] Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
  !
@@ -74,7 +77,12 @@ subroutine NL_oscillators(q,k,en)
      do i_m=NL_bands(1),NL_bands(2)
        isc%is  =(/i_n,i_k,i_k_s,i_k_sp/)
        isc%os  =(/i_m,i_kmq,i_kmq_s,i_kmq_sp/)
-       call scatter_Bamp(isc)            
+   !    call scatter_Bamp(isc)            
+       if(i_n==3.and.i_k==1) then
+         do ig=1,isc%ngrho
+           write(100+i_m,*) abs(isc%rhotw(ig))
+         enddo
+       endif
      enddo
    enddo
    !
@@ -85,5 +93,6 @@ subroutine NL_oscillators(q,k,en)
  enddo
  !
  call live_timing()
+ stop
  !
 end subroutine NL_oscillators

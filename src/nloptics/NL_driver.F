@@ -101,7 +101,7 @@ subroutine NL_driver(E,X,k,q)
  ! Evaluate Oscillators for LSEX
  !
  if(Correlation==LSEX) then
-   call WF_load(WF,wf_ng,1,(/NL_bands(1),NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
+   call WF_load(WF,wf_ng,1,(/NL_bands(1),NL_bands(2)/),(/1,k%nibz/),space='G',title='-NL')  
    call NL_oscillators(q,k,E)
    call WF_free()
  endif
