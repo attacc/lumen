@@ -26,11 +26,14 @@ subroutine NL_oscillators(q,k,en)
  ! Evaluate oscillators for the Local-SEX
  !
  use nl_optics,           ONLY:NL_bands
+ use LIVE_t,              ONLY:live_timing
  use pars,                ONLY:SP,cZERO
  use R_lattice,           ONLY:bz_samp,qindx_S
  use electrons,           ONLY:levels
  use QP_m,                ONLY:QP_nk
  use collision,           ONLY:elemental_collision,elemental_collision_free
+ use parallel_m,          ONLY:PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID
+
  !
  implicit none
  !
@@ -47,6 +50,8 @@ subroutine NL_oscillators(q,k,en)
  !
  isc%iqref =0
  isc%ngrho =100  ! only G=1 is required for local-SEX
+ !
+ call live_timing('[NL] Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
  !
  do i_k=1,QP_nk
    do iqbz=1,q%nbz
@@ -74,7 +79,11 @@ subroutine NL_oscillators(q,k,en)
    enddo
    !
    enddo
+   !
+   call live_timing(steps=1)
+   !
  enddo
- stop
+ !
+ call live_timing()
  !
 end subroutine NL_oscillators

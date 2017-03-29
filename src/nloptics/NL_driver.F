@@ -35,7 +35,6 @@ subroutine NL_driver(E,X,k,q)
  use memory_m,       ONLY:mem_est
  use fields,         ONLY:Efield
  use QP_CTL_m,       ONLY:QP_apply
- use R_lattice,      ONLY:qindx_S
  use nl_optics,      ONLY:n_frequencies,Correlation,IPA,NL_alloc,NL_free,V_bands,NL_bands, &
 &                         NL_estep,NL_er,Integrator,l_use_DIPOLES,NL_P_t,  &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,freqs_done,n_freqs_todo, &
@@ -73,13 +72,6 @@ subroutine NL_driver(E,X,k,q)
  !=========
  call NL_initialize(E,k,q)
  !
- ! Deallocate qindx_S (used only in previous subroutine)
- ! ========================
- if(allocated(qindx_S)) then
-   deallocate(qindx_S)
-   call mem_est("qindx_S")
- endif
- !
  ! QP dimensions
  !================
  call QP_setup(E)
@@ -105,6 +97,14 @@ subroutine NL_driver(E,X,k,q)
  call check_non_periodic()
  !
  NL_bands(1)=NL_bands1_save
+ !
+ ! Evaluate Oscillators for LSEX
+ !
+ if(Correlation==LSEX) then
+   call WF_load(WF,wf_ng,1,(/NL_bands(1),NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
+   call NL_oscillators(q,k,E)
+   call WF_free()
+ endif
  !
  ! Free memory: qindx_* and unused DIPOLES
  ! =====================================================
@@ -138,10 +138,6 @@ subroutine NL_driver(E,X,k,q)
  ! Generate DIPOLES in all the BZ if required
  !===================
  if(l_use_DIPOLES) call Build_DIP_bz(k,E,X)
- !
- if(Correlation==LSEX) then
-   call NL_oscillators(q,k,E)
- endif
  !
  ! Initialization
  ! ==================
