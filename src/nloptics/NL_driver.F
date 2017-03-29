@@ -39,7 +39,7 @@ subroutine NL_driver(E,X,k,q)
  use nl_optics,      ONLY:n_frequencies,Correlation,IPA,NL_alloc,NL_free,V_bands,NL_bands, &
 &                         NL_estep,NL_er,Integrator,l_use_DIPOLES,NL_P_t,  &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,freqs_done,n_freqs_todo, &
-&                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_step
+&                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_step,LSEX
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
  use parallel_m,     ONLY:PAR_IND_freqs,PAR_IND_freqs_ID,CPU_structure
@@ -139,6 +139,9 @@ subroutine NL_driver(E,X,k,q)
  !===================
  if(l_use_DIPOLES) call Build_DIP_bz(k,E,X)
  !
+ if(Correlation==LSEX) then
+   call NL_oscillators(q,k,E)
+ endif
  !
  ! Initialization
  ! ==================
