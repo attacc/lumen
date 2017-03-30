@@ -31,7 +31,7 @@ subroutine NL_driver(E,X,k,q)
  use X_m,            ONLY:X_t,Dipole_approach,X_alloc
  use wave_func,      ONLY:WF,wf_ng
  use interfaces,     ONLY:WF_load
- use R_lattice,      ONLY:bz_samp,qindx_free
+ use R_lattice,      ONLY:bz_samp,qindx_free,qindx_S
  use memory_m,       ONLY:mem_est
  use fields,         ONLY:Efield
  use QP_CTL_m,       ONLY:QP_apply
@@ -101,9 +101,9 @@ subroutine NL_driver(E,X,k,q)
  ! Evaluate Oscillators for LSEX
  !
  if(Correlation==LSEX) then
-   call WF_load(WF,wf_ng,1,(/NL_bands(1),NL_bands(2)/),(/1,k%nibz/),space='G',title='-NL')  
+   call WF_load(WF,1,maxval(qindx_S(:,:,2)),(/NL_bands(1),NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL') 
    call NL_oscillators(q,k,E)
-   call WF_free()
+   call WF_free(WF)
  endif
  !
  ! Free memory: qindx_* and unused DIPOLES

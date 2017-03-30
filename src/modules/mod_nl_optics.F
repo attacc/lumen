@@ -154,6 +154,10 @@ module nl_optics
  real(SP),    allocatable :: V_xc_ne(:,:)
  real(SP),    allocatable :: V_hartree_ne(:,:)
  !
+ ! Collisions
+ !
+ complex(SP), allocatable :: OSCL(:,:,:,:) ! Oscillators
+ !
  ! Density
  !
  real(SP),    allocatable :: rho_reference(:)    ! reference density from all bands  
@@ -216,6 +220,8 @@ module nl_optics
        call mem_est("dG",(/size(dG)/),(/2*SP/))
        allocate(Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
        call mem_est("Vnl_xc",(/size(Vnl_xc)/),(/2*SP/))
+       allocate(OSCL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,QP_nk))
+       call mem_est("OSCL",(/size(OSCL)/),(/2*SP/))
      endif          
      !
      ! Reference energies
@@ -327,6 +333,8 @@ module nl_optics
        call mem_est("dG")
        deallocate(Vnl_xc)
        call mem_est("Vnl_xc")
+       deallocate(OSCL)
+       call mem_est("OSCL")
      endif
      !
    end subroutine NL_free
