@@ -98,7 +98,14 @@ subroutine NL_driver(E,X,k,q)
  !
  NL_bands(1)=NL_bands1_save
  !
+ !
+ ! Allocation
+ ! ==================
+ call NL_alloc(E,q) 
+ !
+ !
  ! Evaluate Oscillators for LSEX
+ ! =============================
  !
  if(Correlation==LSEX) then
    call WF_load(WF,1,maxval(qindx_S(:,:,2)),(/NL_bands(1),NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL') 
@@ -130,10 +137,6 @@ subroutine NL_driver(E,X,k,q)
  ! QP-corrections 
  !================
  call QP_apply(NL_bands,E,k,"G",msg_fmt='s')
- !
- ! Allocation
- ! ==================
- call NL_alloc(E) 
  !
  ! Generate DIPOLES in all the BZ if required
  !===================

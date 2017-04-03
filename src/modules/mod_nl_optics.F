@@ -157,6 +157,7 @@ module nl_optics
  ! Collisions
  !
  complex(SP), allocatable :: OSCL(:,:,:,:) ! Oscillators
+ complex(SP), allocatable :: W(:)
  !
  ! Density
  !
@@ -166,20 +167,21 @@ module nl_optics
  !
  contains
    !
-   subroutine NL_alloc(en)
+   subroutine NL_alloc(en,q)
      !
      use pars,           ONLY:SP
      use memory_m,       ONLY:mem_est
      use FFT_m,          ONLY:fft_size
      use electrons,      ONLY:levels,n_spin,n_sp_pol
-     use R_lattice,      ONLY:nXkbz
+     use R_lattice,      ONLY:nXkbz,bz_samp
      use QP_m,           ONLY:QP_nk
      use electric,       ONLY:ELECTRIC_alloc
      use xc_functionals, ONLY:V_xc
      !
      implicit none
      !
-     type(levels), intent(in) :: en
+     type(levels),  intent(in) :: en
+     type(bz_samp), intent(in) :: q
      !
      allocate(Ho_plus_Sigma(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
      call mem_est("Ho_plus_Sigma",(/size(Ho_plus_Sigma)/),(/2*SP/))
@@ -222,6 +224,8 @@ module nl_optics
        call mem_est("Vnl_xc",(/size(Vnl_xc)/),(/2*SP/))
        allocate(OSCL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,QP_nk))
        call mem_est("OSCL",(/size(OSCL)/),(/2*SP/))
+       allocate(W(q%nbz))
+       call mem_est("W",(/size(W)/),(/2*SP/))
      endif          
      !
      ! Reference energies
@@ -335,6 +339,8 @@ module nl_optics
        call mem_est("Vnl_xc")
        deallocate(OSCL)
        call mem_est("OSCL")
+       deallocate(W)
+       call mem_est("W")
      endif
      !
    end subroutine NL_free

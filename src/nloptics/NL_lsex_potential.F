@@ -21,71 +21,63 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_oscillators(q,k,en) 
+subroutine NL_lsex_potential(q) 
  !
- ! Evaluate oscillators for the Local-SEX
+ ! Construct the screeend potential W(G=G'=0,q)
  !
- use nl_optics,           ONLY:NL_bands,OSCL
+ use nl_optics,           ONLY:NL_bands,W
  use LIVE_t,              ONLY:live_timing
  use pars,                ONLY:SP,cZERO
+ use frequency,           ONLY:w_samp,W_reset
  use R_lattice,           ONLY:bz_samp,qindx_S
  use electrons,           ONLY:levels
- use wave_func,           ONLY:WF
- use interfaces,          ONLY:WF_load
- use QP_m,                ONLY:QP_nk
  use collision,           ONLY:elemental_collision,elemental_collision_free, &
-&                              elemental_collision_alloc         
- use parallel_m,          ONLY:PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID
- use FFT_m,               ONLY:fft_size
-
+&                              elemental_collision_alloc
+ use X_m,                 ONLY:X_mat,X_alloc,X_t
+ use IO_m,                ONLY:io_control,OP_RD_CL,REP,VERIFY,NONE,RD_CL,OP_RD,RD_CL_IF_END 
  !
  implicit none
  !
- type(bz_samp), intent(in) :: q,k
- type(levels),  intent(in) :: en
+ type(bz_samp), intent(in) :: q
  !
  ! Work Space
  !
- type(elemental_collision)            :: isc 
- integer :: i_k,i_m,i_n,i_q,iqbz,i_kmq_G0,iqs,i_kmq,i_kmq_s,i_k_s
- integer :: i_k_sp,i_kmq_sp,iqibz,ig
+ integer                    :: iqbz,iqibz,iqs,io_err,ID
+ integer, external          :: io_X
+ type(elemental_collision)  :: isc 
+ type(w_samp)               :: Xw  
+ type(X_t)                  :: X
  !
- call elemental_collision_free(isc)
+ call W_reset(Xw)
+ Xw%n_freqs=1
+ call FREQUENCIES_setup(Xw)
+ !
+ X%whoami=2 ! load em1s
  !
  isc%iqref =0
- isc%ngrho =1  ! only G=1 is required for local-SEX
+ isc%ngrho =1  ! only G=1 is required for local-SEX 
  !
- call elemental_collision_alloc(isc,NG=isc%ngrho,TITLE="OSC")
+ call elemental_collision_free(isc)
+ call elemental_collision_alloc(isc,NG_GAMP=(/1,1/),TITLE="Wlr") 
  !
- call live_timing('[NL] Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
+ call X_alloc('X',(/1,1,1/))
+ ! 
+ call live_timing('[NL] W potential :',q%nbz)
  !
- do i_k=1,QP_nk
-   do iqbz=1,q%nbz
-   !
-   i_kmq_G0  =qindx_S(i_k,iqbz,2)
-   iqibz     =q%sstar(iqbz,1)
-   iqs       =q%sstar(iqbz,2)
-   isc%qs  =(/i_kmq_G0,iqibz,iqs/)
-   !
-   i_k_s=1
-   i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
-   i_kmq_s = k%sstar(qindx_S(i_k,iqbz,1),2)
-   !
-   !  Spin-Polarization not supported!!
+ do iqbz=1,q%nbz
    ! 
-   i_k_sp  = 1
-   i_kmq_sp= 1
+   isc%qs(2:)=(/q%sstar(iqbz,1),q%sstar(iqbz,2)/)
+   iqibz=isc%qs(2)
+   iqs  =isc%qs(3)
    !
-   do i_n=NL_bands(1),NL_bands(2)
-     do i_m=NL_bands(1),NL_bands(2)
-       isc%is  =(/i_n,i_k,i_k_s,i_k_sp/)
-       isc%os  =(/i_m,i_kmq,i_kmq_s,i_kmq_sp/)
-       call scatter_Bamp(isc)            
-       OSCL(i_n,i_m,i_k,i_kmq)=isc%rhotw(1)
-     enddo
-   enddo
+   call scatter_Gamp(isc,'c')
    !
-   enddo
+   if (iqbz ==1) call io_control(ACTION=OP_RD,COM=NONE,       SEC=(/1,2,2*iqibz+1/),ID=ID)
+   if (q%nbz==1) call io_control(ACTION=OP_RD_CL,COM=NONE,    SEC=(/1,2,3/),ID=ID)
+   if (iqbz>  1) call io_control(ACTION=RD_CL_IF_END,COM=NONE,SEC=(/2*iqibz,2*iqibz+1/),ID=ID)
+   io_err=io_X(X,Xw,ID)
+   !
+   W(iqbz)=X_mat(1,1,1)*isc%gamp(1,1)
    !
    call live_timing(steps=1)
    !
@@ -93,4 +85,7 @@ subroutine NL_oscillators(q,k,en)
  !
  call live_timing()
  !
-end subroutine NL_oscillators
+ call elemental_collision_free(isc)
+ call X_alloc('X')
+ !
+end subroutine NL_lsex_potential
