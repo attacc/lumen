@@ -48,6 +48,8 @@ integer function io_WF(ID,wf)
  !
  head_io=0
  select case ( count((/io_sec(ID,:)/=0/)) )
+   case(0)
+     goto 1
    case(1)
      ik=0
      ib_grp=0
@@ -87,10 +89,6 @@ integer function io_WF(ID,wf)
  !##################################################################
  ! BANDS BLOCKS (andrea 21/4/2008) VERSION >= 3.1.1
  !##################################################################
- !
- ! Manage RD_CL_IF_END
- !
- if (io_action(ID)==RD_CL_IF_END.and.(ik==nkibz.and.ib_grp==wf_nb_io_groups)) io_action(ID)=RD_CL
  !
  ! Fragmentation
  !

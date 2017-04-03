@@ -25,7 +25,7 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
  !
  ! K = <2V-W>
  !
- use pars,         ONLY:IP,SP,schlen,pi,cZERO,cI
+ use pars,         ONLY:IP,SP,schlen,pi,cZERO,cI,cONE
  use LOGO,         ONLY:pickup_a_random
  use memory_m,     ONLY:mem_est
  use drivers,      ONLY:l_bs_fxc,l_col_cut,l_td_hf,l_bss
@@ -57,6 +57,8 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
  use wrapper_omp,   ONLY:V_dot_V_omp,Vstar_dot_V_omp,M_by_V_omp
  use global_XC,     ONLY:WF_kind,WF_xc_functional
  use wave_func,     ONLY:WF
+ use matrix_operate,ONLY:hermitian
+ use linear_algebra,ONLY:DIAGO,LINEAR_ALGEBRA_driver
 #if defined _TIMING
  use timing_m,      ONLY:timing
 #endif
@@ -77,12 +79,13 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
  !
  integer    :: i_block,i_block_vv,i_block_cc,i_block_vc,i_block_cv,i_k_bz,i_p_bz,i_c_k,i_v_k,i_c_p,i_v_p,i_k_s,i_p_s,&
 &              i_Tgrp_k,i_Tgrp_p,i_Tp,i_Tk,i_k_spin,i_p_spin,i_k,i_p,H_pos(2),i_k_s_m1,&
-&              i_k_p_s,i_g1,ig_W,iq_W,iq_W_s,i_g2,i_g3,alloc_err,&
+&              i_k_p_s,i_g1,ig_W,iq_W,iq_W_s,i_g2,i_g3,alloc_err,i1,&
 &              bands_to_load(2),iOvv,iOcc,iOvc,iOcv,is(4),os(4),isp(4),osp(4)
  complex(SP):: Co,H_x,H_c,PHASE_1,PHASE_2
  real(SP)   :: sqrt_f_itk,sqrt_f_itp
  !
  complex(SP),allocatable ::BS_W(:,:,:)
+ complex(SP),allocatable ::temp_BS_W(:,:)
  complex(SP),   external ::TDDFT_ALDA_R_space
  logical                 ::W_is_em1s,W_is_pp
  !
@@ -91,6 +94,7 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
  logical    :: load_O_X
  complex(SP),allocatable  ::Ovv(:),Occ(:),O_times_W(:)
  complex(SP),allocatable  ::Ovc(:),Ocv(:)
+ real(SP),   allocatable  ::BS_W_e_real(:)
  type(elemental_collision)::isc
  !
  ! I/O
@@ -365,6 +369,37 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
    if (.not.l_bs_fxc) call live_timing('Kernel',     BS_LiveTiming_steps)
    if (     l_bs_fxc) call live_timing('Kernel->Fxc',BS_LiveTiming_steps)
  endif
+ !
+ ! DEBUG 
+ !
+ allocate(BS_W_e_real(BS_n_g_W))
+ allocate(temp_BS_W(BS_n_g_W,BS_n_g_W))
+ do iq_W=1,q%nibz
+    BS_W(:,:,iq_W)=(BS_W(:,:,iq_W)+hermitian(BS_W(:,:,iq_W)))/2._SP
+    write(*,*) 'iq_W ',iq_W
+    write(*,*)  BS_W(1,1,iq_W)
+    write(*,*)  BS_W(2,1,iq_W)
+    write(*,*)  BS_W(1,2,iq_W)
+    call LINEAR_ALGEBRA_driver(DIAGO,BS_W(:,:,iq_W),e_real=BS_W_e_real)
+    temp_BS_W=cZERO
+!    do i1=BS_n_g_W,BS_n_g_W,-1
+    do i1=BS_n_g_W,BS_n_g_W-5,-1
+      call ZGERC(BS_n_g_W,BS_n_g_W,cONE*BS_W_e_real(i1),BS_W(:,i1,iq_W),1,&
+&                                                      BS_W(:,i1,iq_W),1,temp_BS_W(:,:),BS_n_g_W)
+    enddo
+    write(*,*) 'Eigenvalues '
+    write(*,*) BS_W_e_real(BS_n_g_W)
+    write(*,*) BS_W_e_real(BS_n_g_w-1)
+    write(*,*) BS_W_e_real(BS_n_g_w-2)
+    BS_W(:,:,iq_W)=temp_BS_W(:,:)
+    write(*,*) 'new matrix ',iq_W
+    write(*,*)  BS_W(1,1,iq_W)
+    write(*,*)  BS_W(2,1,iq_W)
+    write(*,*)  BS_W(1,2,iq_W)
+ enddo
+ !
+ ! DEBUG
+ !
  !
  do i_block=1,n_BS_blks
    !
