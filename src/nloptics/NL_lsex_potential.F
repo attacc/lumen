@@ -35,6 +35,7 @@ subroutine NL_lsex_potential(q)
 &                              elemental_collision_alloc
  use X_m,                 ONLY:X_mat,X_alloc,X_t
  use IO_m,                ONLY:io_control,OP_RD_CL,REP,VERIFY,NONE,RD_CL,OP_RD,RD_CL_IF_END 
+ use com,                 ONLY:error
  !
  implicit none
  !
@@ -76,6 +77,8 @@ subroutine NL_lsex_potential(q)
    if (q%nbz==1) call io_control(ACTION=OP_RD_CL,COM=NONE,    SEC=(/1,2,3/),ID=ID)
    if (iqbz>  1) call io_control(ACTION=RD_CL_IF_END,COM=NONE,SEC=(/2*iqibz,2*iqibz+1/),ID=ID)
    io_err=io_X(X,Xw,ID)
+   !
+   if(io_err/=0) call error("Error loading em1s")
    !
    W(iqbz)=X_mat(1,1,1)*isc%gamp(1,1)
    !

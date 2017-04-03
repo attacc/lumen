@@ -54,7 +54,7 @@ subroutine NL_driver(E,X,k,q)
  ! 
  ! Work Space
  !
- integer           :: i_f,i1,NL_bands1_save,N_frequency_save
+ integer           :: i_f,i1,NL_bands1_save,N_frequency_save,iGo_max
  real(SP)          :: Time
  integer, external :: eval_G_minus_G
  !
@@ -98,24 +98,8 @@ subroutine NL_driver(E,X,k,q)
  !
  NL_bands(1)=NL_bands1_save
  !
- !
- ! Allocation
- ! ==================
- call NL_alloc(E,q) 
- !
- !
- ! Evaluate Oscillators for LSEX
- ! =============================
- !
- if(Correlation==LSEX) then
-   call WF_load(WF,1,maxval(qindx_S(:,:,2)),(/NL_bands(1),NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL') 
-   call NL_oscillators(q,k,E)
-   call WF_free(WF)
- endif
- !
- ! Free memory: qindx_* and unused DIPOLES
- ! =====================================================
- call qindx_free()
+ ! Free memory: unused DIPOLES
+ ! ===========================
  !
  call X_alloc('P_square')
  if(l_use_DIPOLES) then
@@ -131,8 +115,31 @@ subroutine NL_driver(E,X,k,q)
  !
  ! WFs loading
  !=============
- if(Correlation/=IPA) &
-&  call WF_load(WF,wf_ng,1,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
+ iGo_max=1
+ if(Correlation==LSEX) iGo_max=maxval(qindx_S(:,:,2))
+ !
+ if(Correlation/=IPA) then      
+   call WF_load(WF,wf_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
+ endif
+ !
+ ! Allocation
+ ! ==================
+ call NL_alloc(E,q) 
+ !
+ ! Evaluate Oscillators for LSEX
+ ! =============================
+ if(Correlation==LSEX) then
+   !      
+   call NL_oscillators(q,k,E)
+   call NL_lsex_potential(q) 
+   !
+ else
+   !      
+   ! Free memory: qindx_* 
+   ! ====================
+   call qindx_free()
+   !
+ endif
  !
  ! QP-corrections 
  !================

@@ -172,7 +172,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
      !
    endif
    !
-   if(Correlation==LSEX) call NL_long_range_SEX(dG,Hk,ik)
+   if(Correlation==LSEX) call NL_long_range_SEX(dG,Hk,k,q,ik)
    !
    ! Add Ho = T+V_ion+V_h+V_xc
    !==================

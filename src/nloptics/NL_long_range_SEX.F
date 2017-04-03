@@ -21,18 +21,47 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_long_range_SEX(dG,H,ik) 
+subroutine NL_long_range_SEX(dG,H,k,q,i_k) 
  !
  ! This subroutine calculate the long-range part of the Screened exchange
  !
  use electrons,      ONLY:n_sp_pol
- use pars,           ONLY:SP
+ use pars,           ONLY:SP,cI
  use FFT_m,          ONLY:fft_size
- use nl_optics,      ONLY:NL_bands
- use QP_m,        ONLY:QP_nk
+ use nl_optics,      ONLY:NL_bands,OSCL,W
+ use QP_m,           ONLY:QP_nk
+ use R_lattice,      ONLY:bz_samp,qindx_S
+ ! 
+ implicit none
  !
  complex(SP), intent(inout) :: H(NL_bands(2),NL_bands(2),n_sp_pol)
- integer,     intent(in)    :: ik
+ integer,     intent(in)    :: i_k
  complex(SP), intent(in)    :: dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk)
+ type(bz_samp), intent(in)  :: k,q
+ !
+ ! Work Space
+ !
+ integer :: i_m,i_mp  ! self-energy external indexes
+ integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
+ !
+ ! Long-range SEX
+ !
+ do i_m=NL_bands(1),NL_bands(2)
+   do i_mp=NL_bands(1),NL_bands(2)
+     !
+     ! Evaluate Sigma_SEX(i_m,i_mp,i_k)
+     !
+     do i_n=NL_bands(1),NL_bands(2)
+       do i_np=NL_bands(1),NL_bands(2)
+         do iqbz=1,q%nbz
+           i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
+           H(i_m,i_mp,1)=H(i_m,i_mp,1)+& 
+&               cI*OSCL(i_m,i_n,i_k,i_kmq)*conjg(OSCL(i_mp,i_np,i_k,i_kmq))*dG(i_n,i_np,i_kmq)*W(iqbz)
+         enddo
+       enddo
+     enddo
+     !
+   enddo
+ enddo
  !
 end subroutine NL_long_range_SEX

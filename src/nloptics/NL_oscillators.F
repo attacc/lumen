@@ -37,7 +37,6 @@ subroutine NL_oscillators(q,k,en)
 &                              elemental_collision_alloc         
  use parallel_m,          ONLY:PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID
  use FFT_m,               ONLY:fft_size
-
  !
  implicit none
  !
