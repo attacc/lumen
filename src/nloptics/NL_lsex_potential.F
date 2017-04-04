@@ -36,6 +36,7 @@ subroutine NL_lsex_potential(q,X,Xw)
  use X_m,                 ONLY:X_mat,X_alloc,X_t
  use IO_m,                ONLY:io_control,OP_RD_CL,REP,VERIFY,NONE,RD_CL,OP_RD,RD_CL_IF_END 
  use com,                 ONLY:error
+ use stderr,              ONLY:intc
  !
  implicit none
  !
@@ -80,7 +81,7 @@ subroutine NL_lsex_potential(q,X,Xw)
    endif
    io_err=io_X(X,Xw,ID)
    !
-   if(io_err/=0) call error(" Error loading em1s")
+   if(io_err<0) call error(" Error loading em1s iq="//intc(iqbz))
    !
    W(iqbz)=X_mat(1,1,1)*isc%gamp(1,1)
    !

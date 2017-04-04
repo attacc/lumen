@@ -65,7 +65,6 @@ subroutine NL_build_dGamma(en,V_bands,dG)
    !
  enddo
  !
- write(*,*) dG(4,5,1),dG(5,5,1)
  call PP_redux_wait(dG,COMM=PAR_COM_Xk_ibz_INDEX%COMM )
  !
 end subroutine NL_build_dGamma
