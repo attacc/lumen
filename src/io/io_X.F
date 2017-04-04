@@ -88,12 +88,14 @@ integer function io_X(X,Xw,ID)
    if (X%whoami==4) local_XC_KIND="Xp"
    io_X=io_header(ID,QPTS=.true.,R_LATT=.true.,WF=.true.,T_EL=.true.,XC_KIND=local_XC_KIND,&
 &                    CUTOFF=.true.,GAUGE=.TRUE.,FRAG=frag_RESPONSE)
+   write(*,*) 'primo ',io_X
    if (io_X/=0) goto 1
    !
    ! Global Descriptions
    !=====================
    !
    call variables_X(ID,X_description,X)
+   write(*,*) 'primo ',io_status(ID)
    !
    ! When the SN is different and I am importing this DB 
    ! from a different calculation I check the RL vectors
@@ -116,14 +118,17 @@ integer function io_X(X,Xw,ID)
    !
    ! Close & Menu lower line
    !
+   write(*,*) 'primo ',io_status(ID)
    if (.not.any((/io_sec(ID,:)==2/))) then
      call io_elemental(ID,VAR="",VAR_SZ=0,MENU=1)
      io_X=io_status(ID)
+   write(*,*) 'primo ',io_status(ID)
      if (io_X/=0) goto 1
    else
      call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
    endif
  endif
+   write(*,*) 'primo aaaaaaaaaaaaa',io_status(ID)
  !
  do i1=1,size(io_sec(ID,:))
    if (io_sec(ID,i1)==0) cycle
@@ -141,6 +146,7 @@ integer function io_X(X,Xw,ID)
  !
  !  type(X_t)    ::X(4)  x s d p
  !
+   write(*,*) 'primo bbbbbbbbbbbb',io_err
  if (any((/io_sec(ID,:)==2*iq/))) then
    !
    sec_size=6
@@ -172,6 +178,7 @@ integer function io_X(X,Xw,ID)
    call io_elemental(ID,VAR="",VAR_SZ=0,MENU=1)
    io_X=io_status(ID)
    !
+   write(*,*) 'primo cccccccccccccc',io_X
    io_com(ID)=io_com_save
    !
    if (io_X/=0) goto 1

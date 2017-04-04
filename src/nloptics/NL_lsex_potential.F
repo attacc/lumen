@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_lsex_potential(q) 
+subroutine NL_lsex_potential(q,X,Xw) 
  !
  ! Construct the screeend potential W(G=G'=0,q)
  !
@@ -40,20 +40,14 @@ subroutine NL_lsex_potential(q)
  implicit none
  !
  type(bz_samp), intent(in) :: q
+ type(w_samp)              :: Xw
+ type(X_t)                 :: X
  !
  ! Work Space
  !
  integer                    :: iqbz,iqibz,iqs,io_err,ID
  integer, external          :: io_X
  type(elemental_collision)  :: isc 
- type(w_samp)               :: Xw  
- type(X_t)                  :: X
- !
- call W_reset(Xw)
- Xw%n_freqs=1
- call FREQUENCIES_setup(Xw)
- !
- X%whoami=2 ! load em1s
  !
  isc%iqref =0
  isc%ngrho =1  ! only G=1 is required for local-SEX 
@@ -61,9 +55,13 @@ subroutine NL_lsex_potential(q)
  call elemental_collision_free(isc)
  call elemental_collision_alloc(isc,NG_GAMP=(/1,1/),TITLE="Wlr") 
  !
- call X_alloc('X',(/1,1,1/))
+ call X_alloc('X',(/X%ng,X%ng,1/))
  ! 
  call live_timing('[NL] W potential :',q%nbz)
+ !
+ call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1,2/),MODE=VERIFY,ID=ID)
+ io_err=io_X(X,Xw,ID)
+ if (io_err<0) call error('Incomplete and/or broken tatic diel. fun. database')
  !
  do iqbz=1,q%nbz
    ! 
@@ -73,12 +71,16 @@ subroutine NL_lsex_potential(q)
    !
    call scatter_Gamp(isc,'c')
    !
-   if (iqbz ==1) call io_control(ACTION=OP_RD,COM=NONE,       SEC=(/1,2,2*iqibz+1/),ID=ID)
-   if (q%nbz==1) call io_control(ACTION=OP_RD_CL,COM=NONE,    SEC=(/1,2,3/),ID=ID)
-   if (iqbz>  1) call io_control(ACTION=RD_CL_IF_END,COM=NONE,SEC=(/2*iqibz,2*iqibz+1/),ID=ID)
+   if (iqbz ==1) then
+     call io_control(ACTION=OP_RD,COM=NONE,       SEC=(/1,2,2*iqibz+1/),ID=ID)
+   elseif (q%nbz==1) then
+     call io_control(ACTION=OP_RD_CL,COM=NONE,    SEC=(/1,2,3/),ID=ID)
+   elseif (iqbz>  1) then 
+     call io_control(ACTION=RD_CL_IF_END,COM=NONE,SEC=(/2*iqibz,2*iqibz+1/),ID=ID)
+   endif
    io_err=io_X(X,Xw,ID)
    !
-   if(io_err/=0) call error("Error loading em1s")
+   if(io_err/=0) call error(" Error loading em1s")
    !
    W(iqbz)=X_mat(1,1,1)*isc%gamp(1,1)
    !

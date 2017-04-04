@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_driver(E,X,k,q)
+subroutine NL_driver(E,X,k,q,Xw)
  !
  use pars,           ONLY:SP,cZERO,cONE
  use stderr,         ONLY:set_real_printed_length
@@ -35,6 +35,7 @@ subroutine NL_driver(E,X,k,q)
  use memory_m,       ONLY:mem_est
  use fields,         ONLY:Efield
  use QP_CTL_m,       ONLY:QP_apply
+ use frequency,      ONLY:w_samp
  use nl_optics,      ONLY:n_frequencies,Correlation,IPA,NL_alloc,NL_free,V_bands,NL_bands, &
 &                         NL_estep,NL_er,Integrator,l_use_DIPOLES,NL_P_t,  &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,freqs_done,n_freqs_todo, &
@@ -50,6 +51,7 @@ subroutine NL_driver(E,X,k,q)
  type(levels)      :: E
  type(bz_samp)     :: k,q
  type(X_t)         :: X(2)
+ type(w_samp)      :: Xw(2)
  logical, external :: stop_now
  ! 
  ! Work Space
@@ -131,7 +133,7 @@ subroutine NL_driver(E,X,k,q)
  if(Correlation==LSEX) then
    !      
    call NL_oscillators(q,k,E)
-   call NL_lsex_potential(q) 
+   call NL_lsex_potential(q,X(2),Xw(2)) 
    !
  else
    !      
