@@ -133,7 +133,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  if(Correlation==LSEX) then
    !      
    call NL_oscillators(q,k,E)
-   call NL_lsex_potential(q,X(2),Xw(2)) 
+   call NL_lsex_potential(q,X(2),Xw(1)) 
    !
  else
    !      
