@@ -26,7 +26,7 @@ subroutine NL_build_dGamma(en,V_bands,dG)
  ! Construct the density matrix differences dGamma = gamma(t) - gamma(t=0) 
  ! from the time-dependent valence bands
  !
- use pars,        ONLY:SP,cZERO
+ use pars,        ONLY:SP,cZERO,cI
  use electrons,   ONLY:levels,spin_occ,n_sp_pol
  use nl_optics,   ONLY:NL_bands
  use wrapper_omp, ONLY:Vstar_dot_V_omp
@@ -56,11 +56,11 @@ subroutine NL_build_dGamma(en,V_bands,dG)
      enddo
    enddo
    !
-   dG(:,:,ik)=spin_occ*dG(:,:,ik)
+   dG(:,:,ik)=cI*spin_occ*dG(:,:,ik)
    !
    !
    do i1=NL_bands(1),en%nbf
-     dG(i1,i1,ik)=dG(i1,i1,ik)-spin_occ
+     dG(i1,i1,ik)=dG(i1,i1,ik)-cI*spin_occ
    enddo
    !
  enddo

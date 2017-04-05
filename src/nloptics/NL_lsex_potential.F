@@ -27,10 +27,11 @@ subroutine NL_lsex_potential(q,X,Xw)
  !
  use nl_optics,           ONLY:NL_bands,W
  use LIVE_t,              ONLY:live_timing
- use pars,                ONLY:SP,cZERO
+ use pars,                ONLY:SP,cZERO,pi
  use frequency,           ONLY:w_samp,W_reset
  use R_lattice,           ONLY:bz_samp,qindx_S
- use electrons,           ONLY:levels
+ use D_lattice,           ONLY:DL_vol
+ use electrons,           ONLY:levels,spin_occ
  use collision,           ONLY:elemental_collision,elemental_collision_free, &
 &                              elemental_collision_alloc
  use X_m,                 ONLY:X_mat,X_alloc,X_t
@@ -83,7 +84,9 @@ subroutine NL_lsex_potential(q,X,Xw)
    !
    if(io_err<0) call error(" Error loading em1s iq="//intc(iqbz))
    !
-   W(iqbz)=X_mat(1,1,1)*isc%gamp(1,1)
+   W(iqbz)=(1._SP+X_mat(1,1,1))*isc%gamp(1,1)
+   !
+   if(iqbz==1) W(iqbz)=W(iqbz)*sqrt(isc%gamp(1,1)/DL_vol/real(q%nbz,SP))
    !
    call live_timing(steps=1)
    !
