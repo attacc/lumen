@@ -57,6 +57,10 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
            i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
            H(i_m,i_mp,1)=H(i_m,i_mp,1)+& 
 &               cI*OSCL(i_m,i_n,i_k,i_kmq)*conjg(OSCL(i_np,i_mp,i_k,i_kmq))*dG(i_n,i_np,i_kmq)*W(iqbz)
+         if(i_k==1.and.i_m==4.and.i_mp==4.and.i_kmq==1.and.i_n==4.and.i_np==4) then
+             write(*,*) ' MY COLL ',OSCL(i_m,i_n,i_k,i_kmq)*conjg(OSCL(i_np,i_mp,i_k,i_kmq))*W(iqbz)
+         endif
+           
          enddo
        enddo
      enddo

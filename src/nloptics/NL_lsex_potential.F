@@ -52,10 +52,10 @@ subroutine NL_lsex_potential(q,X,Xw)
  type(elemental_collision)  :: isc 
  !
  isc%iqref =0
- isc%ngrho =1  ! only G=1 is required for local-SEX 
+ isc%ngrho =X%ng  ! only G=1 is required for local-SEX 
  !
  call elemental_collision_free(isc)
- call elemental_collision_alloc(isc,NG_GAMP=(/1,1/),TITLE="Wlr") 
+ call elemental_collision_alloc(isc,NG_GAMP=(/X%ng,1/),TITLE="Wlr") 
  !
  call X_alloc('X',(/X%ng,X%ng,1/))
  ! 
@@ -84,14 +84,33 @@ subroutine NL_lsex_potential(q,X,Xw)
    !
    if(io_err<0) call error(" Error loading em1s iq="//intc(iqbz))
    !
-   W(iqbz)=(1._SP+X_mat(1,1,1))*isc%gamp(1,1)
+   !  Screened part of the exchange  \tilde W = W - v
    !
-   if(iqbz==1) W(iqbz)=W(iqbz)*sqrt(isc%gamp(1,1)/DL_vol/real(q%nbz,SP))
+   W(iqbz)=-4._SP/spin_occ*pi*X_mat(1,1,1)*isc%gamp(1,1)
+   !
+   if(iqbz==1) then 
+       write(*,*) ' SEX ',-4._SP/spin_occ*pi*X_mat(1,1,1)*isc%gamp(1,1)
+   endif
+   isc%iqref=-1
+   call scatter_Gamp(isc,'x')
+   !
+   ! The base exchange v
+   !
+   if(iqbz==1) then 
+       write(*,*) ' FOCK ',-4._SP/spin_occ*pi*isc%gamp(1,1)
+   endif
+   !
+   W(iqbz)=W(iqbz)-4._SP/spin_occ*pi*isc%gamp(1,1)
+   !
+   if(iqbz==1) then 
+       write(*,*) ' FOCK+SEX ',W(iqbz)
+   endif
    !
    call live_timing(steps=1)
    !
  enddo
  !
+ stop
  call live_timing()
  !
  call elemental_collision_free(isc)
