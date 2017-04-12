@@ -88,29 +88,17 @@ subroutine NL_lsex_potential(q,X,Xw)
    !
    W(iqbz)=-4._SP/spin_occ*pi*X_mat(1,1,1)*isc%gamp(1,1)
    !
-   if(iqbz==1) then 
-       write(*,*) ' SEX ',-4._SP/spin_occ*pi*X_mat(1,1,1)*isc%gamp(1,1)
-   endif
    isc%iqref=-1
    call scatter_Gamp(isc,'x')
    !
-   ! The base exchange v
-   !
-   if(iqbz==1) then 
-       write(*,*) ' FOCK ',-4._SP/spin_occ*pi*isc%gamp(1,1)
-   endif
+   ! The bare exchange v
    !
    W(iqbz)=W(iqbz)-4._SP/spin_occ*pi*isc%gamp(1,1)
-   !
-   if(iqbz==1) then 
-       write(*,*) ' FOCK+SEX ',W(iqbz)
-   endif
    !
    call live_timing(steps=1)
    !
  enddo
  !
- stop
  call live_timing()
  !
  call elemental_collision_free(isc)

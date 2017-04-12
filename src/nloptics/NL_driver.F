@@ -39,7 +39,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  use nl_optics,      ONLY:n_frequencies,Correlation,IPA,NL_alloc,NL_free,V_bands,NL_bands, &
 &                         NL_estep,NL_er,Integrator,l_use_DIPOLES,NL_P_t,  &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,freqs_done,n_freqs_todo, &
-&                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_step,LSEX
+&                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_step,LSEX,LHF
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
  use parallel_m,     ONLY:PAR_IND_freqs,PAR_IND_freqs_ID,CPU_structure
@@ -118,7 +118,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  ! WFs loading
  !=============
  iGo_max=1
- if(Correlation==LSEX) iGo_max=maxval(qindx_S(:,:,2))
+ if(Correlation==LSEX.or.Correlation==LHF) iGo_max=maxval(qindx_S(:,:,2))
  !
  if(Correlation/=IPA) then      
    call WF_load(WF,wf_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
@@ -128,9 +128,9 @@ subroutine NL_driver(E,X,k,q,Xw)
  ! ==================
  call NL_alloc(E,q) 
  !
- ! Evaluate Oscillators for LSEX
+ ! Evaluate Oscillators for LSEX/LHF
  ! =============================
- if(Correlation==LSEX) then
+ if(Correlation==LSEX.or.Correlation==LHF) then
    !      
    call NL_oscillators(q,k,E)
    call NL_lsex_potential(q,X(2),Xw(2)) 

@@ -114,6 +114,7 @@ module nl_optics
  integer, parameter :: JGM    = 5
  integer, parameter :: LRCW   = 6
  integer, parameter :: LSEX   = 7
+ integer, parameter :: LHF    = 8
  !
  logical :: eval_dG
  logical :: eval_HARTREE
@@ -217,7 +218,7 @@ module nl_optics
      allocate(V_xc_ne(fft_size,n_spin))
      call mem_est('V_xc_ne',(/size(V_xc_ne)/),(/SP/))
      !
-     if(Correlation==LSEX) then
+     if(Correlation==LSEX.or.Correlation==LHF) then
        allocate(dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
        call mem_est("dG",(/size(dG)/),(/2*SP/))
        allocate(Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
@@ -332,7 +333,7 @@ module nl_optics
      deallocate(E_tot_t,E_ext_t,E_ks_t)
      call mem_est("E_tot_t E_ext_t E_ks_t")
      !
-     if(Correlation==LSEX) then
+     if(Correlation==LSEX.or.Correlation==LHF) then
        deallocate(dG)
        call mem_est("dG")
        deallocate(Vnl_xc)
