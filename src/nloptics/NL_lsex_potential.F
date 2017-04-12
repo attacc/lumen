@@ -25,7 +25,7 @@ subroutine NL_lsex_potential(q,X,Xw)
  !
  ! Construct the screeend potential W(G=G'=0,q)
  !
- use nl_optics,           ONLY:NL_bands,W
+ use nl_optics,           ONLY:NL_bands,W,Correlation,LSEX
  use LIVE_t,              ONLY:live_timing
  use pars,                ONLY:SP,cZERO,pi
  use frequency,           ONLY:w_samp,W_reset
@@ -61,9 +61,11 @@ subroutine NL_lsex_potential(q,X,Xw)
  ! 
  call live_timing('[NL] W potential :',q%nbz)
  !
- call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1,2/),MODE=VERIFY,ID=ID)
- io_err=io_X(X,Xw,ID)
- if (io_err<0) call error('Incomplete and/or broken tatic diel. fun. database')
+ if(Correlation==LSEX) then
+   call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1,2/),MODE=VERIFY,ID=ID)
+   io_err=io_X(X,Xw,ID)
+   if (io_err<0) call error('Incomplete and/or broken tatic diel. fun. database')
+ endif
  !
  do iqbz=1,q%nbz
    ! 
@@ -71,29 +73,34 @@ subroutine NL_lsex_potential(q,X,Xw)
    iqibz=isc%qs(2)
    iqs  =isc%qs(3)
    !
-   call scatter_Gamp(isc,'c')
-   !
-   if (iqbz ==1) then
-     call io_control(ACTION=OP_RD,COM=NONE,       SEC=(/1,2,2*iqibz+1/),ID=ID)
-   elseif (q%nbz==1) then
-     call io_control(ACTION=OP_RD_CL,COM=NONE,    SEC=(/1,2,3/),ID=ID)
-   elseif (iqbz>  1) then 
-     call io_control(ACTION=RD_CL_IF_END,COM=NONE,SEC=(/2*iqibz,2*iqibz+1/),ID=ID)
-   endif
-   io_err=io_X(X,Xw,ID)
-   !
-   if(io_err<0) call error(" Error loading em1s iq="//intc(iqbz))
-   !
-   !  Screened part of the exchange  \tilde W = W - v
-   !
-   W(iqbz)=-4._SP/spin_occ*pi*X_mat(1,1,1)*isc%gamp(1,1)
-   !
    isc%iqref=-1
    call scatter_Gamp(isc,'x')
    !
    ! The bare exchange v
    !
-   W(iqbz)=W(iqbz)-4._SP/spin_occ*pi*isc%gamp(1,1)
+   W(iqbz)=-4._SP/spin_occ*pi*isc%gamp(1,1)
+   !
+   if(Correlation==LSEX) then
+     !      
+     isc%iqref=-1
+     call scatter_Gamp(isc,'c')
+     !
+     if (iqbz ==1) then
+       call io_control(ACTION=OP_RD,COM=NONE,       SEC=(/1,2,2*iqibz+1/),ID=ID)
+     elseif (q%nbz==1) then
+       call io_control(ACTION=OP_RD_CL,COM=NONE,    SEC=(/1,2,3/),ID=ID)
+     elseif (iqbz>  1) then 
+       call io_control(ACTION=RD_CL_IF_END,COM=NONE,SEC=(/2*iqibz,2*iqibz+1/),ID=ID)
+     endif
+     io_err=io_X(X,Xw,ID)
+     !
+     if(io_err<0) call error(" Error loading em1s iq="//intc(iqbz))
+     !
+     !  Screened part of the exchange  \tilde W = W - v
+     !
+     W(iqbz)=W(iqbz)-4._SP/spin_occ*pi*X_mat(1,1,1)*isc%gamp(1,1)
+     !
+   endif
    !
    call live_timing(steps=1)
    !
