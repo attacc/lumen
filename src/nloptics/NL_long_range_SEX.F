@@ -60,7 +60,7 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
 !         enddo
          do i_kp=1,QP_nk
            H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL(i_n,i_m,i_k,i_np,i_mp,i_kp)*dG(i_np,i_mp,i_kp)
-!           if(i_k==2.and.i_n==5) then
+!           if(i_k==2.and.i_n==4) then
 !               if(abs(COLL(i_n,i_m,i_k,i_np,i_mp,i_kp))>1e-6) then
 !               write(100,*) i_n,i_m,i_k,i_np,i_mp,i_kp,COLL(i_n,i_m,i_k,i_np,i_mp,i_kp)
 !           endif

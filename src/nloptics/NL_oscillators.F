@@ -105,7 +105,7 @@ subroutine NL_oscillators(q,k,en)
           !
           i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
           COLL(i_n,i_m,i_k,i_np,i_mp,i_kmq)=COLL(i_n,i_m,i_k,i_np,i_mp,i_kmq)+&
-              OSCL(i_n,i_mp,i_k,i_kmq)*conjg(OSCL(i_m,i_np,i_k,i_kmq))*W(iqbz)  
+              OSCL(i_n,i_np,i_k,i_kmq)*conjg(OSCL(i_m,i_mp,i_k,i_kmq))*W(iqbz)  
           !
           enddo
         enddo
