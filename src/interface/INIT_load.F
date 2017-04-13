@@ -294,7 +294,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  ! Non-linear Optics
  !
  call it(defs,'NLstep',       '[NL] Real Time step length',NL_step,unit=Time_unit(1),Verb_level=V_nl_optics)
- call it(defs,'NLtime',       '[NL] Simulation Time',NL_tot_time,unit=Time_unit(1),Verb_level=V_nl_optics)
+ call it(defs,'NLtime',       '[NL] Simulation Time',NL_tot_time,unit=Time_unit(1))
  call it(defs,'NLintegrator', '[NL] Integrator ("EULEREXP/RK2/RK4/RK2EXP/HEUN/INVINT/CRANKNIC")',Integrator_name,&
 &     Verb_level=V_nl_optics)
  call it(defs,'NLverbosity', '[NL] Verbosity level (low | high)',Verbosity_name,Verb_level=V_nl_optics)
@@ -313,8 +313,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  call it(defs,'ExtF_Int',             '[NL ExtF] Intensity',Efield(1)%intensity,unit=I_unit  ,verb_level=V_nl_optics)
  call it(defs,'ExtF_FrStep',          '[NL ExtF] Frequency step',Efield(1)%W_step,unit=E_unit,verb_level=V_nl_optics)
  call it(defs,'ExtF_Damp',            '[NL ExtF] Damping',Efield(1)%damping,unit=Time_unit(1),verb_level=V_nl_optics)
- call it(defs,'ExtF_kind',            '[NL ExtF] Kind(SIN|SOFTSIN|RES|ANTIRES|GAUSS|DELTA|QSSIN)',Efield(1)%ef_name,& 
-&    verb_level=V_nl_optics)
+ call it(defs,'ExtF_kind',            '[NL ExtF] Kind(SIN|SOFTSIN|RES|ANTIRES|GAUSS|DELTA|QSSIN)',Efield(1)%ef_name)
  call it(defs,'ExtF_StartIdx',          '[NL ExtF] Electric field starting index (>=2)', &
 &    Efield(1)%t_initial_indx,verb_level=V_nl_optics)
  !

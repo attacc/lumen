@@ -160,6 +160,12 @@ module nl_optics
  complex(SP), allocatable :: OSCL(:,:,:,:) ! Oscillators
  complex(SP), allocatable :: W(:)
  !
+ ! DEBUG
+ !
+ complex(SP), allocatable :: COLL(:,:,:,:,:,:)
+ !
+ ! DEBUG
+ !
  ! Density
  !
  real(SP),    allocatable :: rho_reference(:)    ! reference density from all bands  
@@ -225,6 +231,11 @@ module nl_optics
        call mem_est("Vnl_xc",(/size(Vnl_xc)/),(/2*SP/))
        allocate(OSCL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,QP_nk))
        call mem_est("OSCL",(/size(OSCL)/),(/2*SP/))
+       ! DEBUG
+       allocate(COLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,& 
+                     NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
+       call mem_est("COLL",(/size(COLL)/),(/2*SP/))
+       ! DEBUG
        allocate(W(q%nbz))
        call mem_est("W",(/size(W)/),(/2*SP/))
      endif          

@@ -28,7 +28,7 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
  use electrons,      ONLY:n_sp_pol
  use pars,           ONLY:SP,cI
  use FFT_m,          ONLY:fft_size
- use nl_optics,      ONLY:NL_bands,OSCL,W
+ use nl_optics,      ONLY:NL_bands,OSCL,W,COLL
  use QP_m,           ONLY:QP_nk
  use R_lattice,      ONLY:bz_samp,qindx_S
  ! 
@@ -42,25 +42,42 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
  ! Work Space
  !
  integer :: i_m,i_mp  ! self-energy external indexes
- integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
+ integer :: i_n,i_np,iqbz,i_kmq,i_kp ! self-energy internal indexes
  !
  ! Long-range SEX
  !
- do i_m=NL_bands(1),NL_bands(2)
-   do i_mp=NL_bands(1),NL_bands(2)
+ do i_n=NL_bands(1),NL_bands(2)
+   do i_m=i_n,NL_bands(2)
      !
-     ! Evaluate Sigma_SEX(i_m,i_mp,i_k)
+     ! Evaluate Sigma_SEX(i_m,i_n,i_k)
      !
-     do i_n=NL_bands(1),NL_bands(2)
+     do i_mp=NL_bands(1),NL_bands(2)
        do i_np=NL_bands(1),NL_bands(2)
-         do iqbz=1,q%nbz
-           i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
-           H(i_m,i_mp,1)=H(i_m,i_mp,1)+& 
-&               cI*OSCL(i_m,i_n,i_k,i_kmq)*conjg(OSCL(i_np,i_mp,i_k,i_kmq))*dG(i_n,i_np,i_kmq)*W(iqbz)
+!         do iqbz=1,q%nbz
+!           i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
+!           H(i_n,i_m,1)=H(i_n,i_m,1)+& 
+!&               cI*OSCL(i_n,i_m,i_k,i_kmq)*conjg(OSCL(i_np,i_mp,i_k,i_kmq))*dG(i_np,i_mp,i_kmq)*W(iqbz)
+!         enddo
+         do i_kp=1,QP_nk
+           H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL(i_n,i_m,i_k,i_np,i_mp,i_kp)*dG(i_np,i_mp,i_kp)
+!           if(i_k==2.and.i_n==5) then
+!               if(abs(COLL(i_n,i_m,i_k,i_np,i_mp,i_kp))>1e-6) then
+!               write(100,*) i_n,i_m,i_k,i_np,i_mp,i_kp,COLL(i_n,i_m,i_k,i_np,i_mp,i_kp)
+!           endif
+!           endif
          enddo
        enddo
      enddo
      !
+   enddo
+ enddo
+! if(i_k==2) stop
+ !
+ ! Symmetrization
+ !
+ do i_n=NL_bands(1),NL_bands(2)
+   do i_m=i_n+1,NL_bands(2)
+     H(i_m,i_n,1)=conjg(H(i_n,i_m,1))
    enddo
  enddo
  !

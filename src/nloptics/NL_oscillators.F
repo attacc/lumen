@@ -25,7 +25,7 @@ subroutine NL_oscillators(q,k,en)
  !
  ! Evaluate oscillators for the Local-SEX
  !
- use nl_optics,           ONLY:NL_bands,OSCL
+ use nl_optics,           ONLY:NL_bands,OSCL,W,COLL
  use LIVE_t,              ONLY:live_timing
  use pars,                ONLY:SP,cZERO
  use R_lattice,           ONLY:bz_samp,qindx_S
@@ -47,7 +47,7 @@ subroutine NL_oscillators(q,k,en)
  !
  type(elemental_collision)            :: isc 
  integer :: i_k,i_m,i_n,i_q,iqbz,i_kmq_G0,iqs,i_kmq,i_kmq_s,i_k_s
- integer :: i_k_sp,i_kmq_sp,iqibz,ig
+ integer :: i_k_sp,i_kmq_sp,iqibz,ig,i_np,i_mp
  !
  call elemental_collision_free(isc)
  !
@@ -91,5 +91,29 @@ subroutine NL_oscillators(q,k,en)
  enddo
  !
  call live_timing()
+ !
+ ! DEBUG BUILD COLLISIONS
+ !
+ COLL=cZERO
+ do i_k=1,QP_nk
+   do i_n=NL_bands(1),NL_bands(2)
+     do i_m=NL_bands(1),NL_bands(2)
+      ! 
+      do i_np=NL_bands(1),NL_bands(2)
+        do i_mp=NL_bands(1),NL_bands(2)
+         do iqbz=1,q%nbz
+          !
+          i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
+          COLL(i_n,i_m,i_k,i_np,i_mp,i_kmq)=COLL(i_n,i_m,i_k,i_np,i_mp,i_kmq)+&
+              OSCL(i_n,i_mp,i_k,i_kmq)*conjg(OSCL(i_m,i_np,i_k,i_kmq))*W(iqbz)  
+          !
+          enddo
+        enddo
+      enddo
+      !
+     enddo
+   enddo
+ enddo
+ ! END DEBUG
  !
 end subroutine NL_oscillators
