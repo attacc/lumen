@@ -52,39 +52,17 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
      !
      ! Evaluate Sigma_SEX(i_m,i_n,i_k)
      !
-!     COLL2=cZERO
-!     do i_mp=NL_bands(1),NL_bands(2)
-!       do i_np=NL_bands(1),NL_bands(2)
-!         do iqbz=1,q%nbz
-!            i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
-!            COLL2(i_np,i_mp,i_kmq)=COLL2(i_np,i_mp,i_kmq)+&
-!              OSCL(i_n,i_np,i_k,iqbz)*conjg(OSCL(i_m,i_mp,i_k,iqbz))*W(iqbz)
-!          enddo
-!       enddo
-!     enddo
-     !
      do i_mp=NL_bands(1),NL_bands(2)
        do i_np=NL_bands(1),NL_bands(2)
-    !     do iqbz=1,q%nbz
-    !       i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
-    !       H(i_n,i_m,1)=H(i_n,i_m,1) & 
-&   !       -cI*OSCL(i_n,i_np,i_k,iqbz)*conjg(OSCL(i_m,i_mp,i_k,iqbz))*W(iqbz)*dG(i_np,i_mp,i_kmq)  
-    !     enddo
          do i_kp=1,QP_nk
-!           H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL2(i_np,i_mp,i_kp)*dG(i_np,i_mp,i_kp)
+!           H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL(i_n,i_m,i_k,i_np,i_mp,i_kp)*dG(i_np,i_mp,i_kp)
            H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL2(i_n,i_m,i_k,i_np,i_mp,i_kp)*dG(i_np,i_mp,i_kp)
-!           if(i_k==2.and.i_n==4) then
-!               if(abs(COLL(i_n,i_m,i_k,i_np,i_mp,i_kp))>1e-6) then
-!               write(100,*) i_n,i_m,i_k,i_np,i_mp,i_kp,COLL(i_n,i_m,i_k,i_np,i_mp,i_kp)
-!           endif
-!           endif
          enddo
        enddo
      enddo
      !
    enddo
  enddo
-! if(i_k==2) stop
  !
  ! Symmetrization
  !
