@@ -163,6 +163,7 @@ module nl_optics
  ! DEBUG
  !
  complex(SP), allocatable :: COLL(:,:,:,:,:,:)
+ complex(SP), allocatable :: COLL2(:,:,:,:,:,:)
  !
  ! DEBUG
  !
@@ -229,10 +230,12 @@ module nl_optics
        call mem_est("dG",(/size(dG)/),(/2*SP/))
        allocate(Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
        call mem_est("Vnl_xc",(/size(Vnl_xc)/),(/2*SP/))
-       allocate(OSCL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,QP_nk))
+       allocate(OSCL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,q%nbz))
        call mem_est("OSCL",(/size(OSCL)/),(/2*SP/))
        ! DEBUG
        allocate(COLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,& 
+                     NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
+       allocate(COLL2(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,& 
                      NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
        call mem_est("COLL",(/size(COLL)/),(/2*SP/))
        ! DEBUG
