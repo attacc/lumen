@@ -370,37 +370,6 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
    if (     l_bs_fxc) call live_timing('Kernel->Fxc',BS_LiveTiming_steps)
  endif
  !
- ! DEBUG 
- !
- allocate(BS_W_e_real(BS_n_g_W))
- allocate(temp_BS_W(BS_n_g_W,BS_n_g_W))
- do iq_W=1,q%nibz
-    BS_W(:,:,iq_W)=(BS_W(:,:,iq_W)+hermitian(BS_W(:,:,iq_W)))/2._SP
-    write(*,*) 'iq_W ',iq_W
-    write(*,*)  BS_W(1,1,iq_W)
-    write(*,*)  BS_W(2,1,iq_W)
-    write(*,*)  BS_W(1,2,iq_W)
-    call LINEAR_ALGEBRA_driver(DIAGO,BS_W(:,:,iq_W),e_real=BS_W_e_real)
-    temp_BS_W=cZERO
-!    do i1=BS_n_g_W,BS_n_g_W,-1
-    do i1=BS_n_g_W,BS_n_g_W-5,-1
-      call ZGERC(BS_n_g_W,BS_n_g_W,cONE*BS_W_e_real(i1),BS_W(:,i1,iq_W),1,&
-&                                                      BS_W(:,i1,iq_W),1,temp_BS_W(:,:),BS_n_g_W)
-    enddo
-    write(*,*) 'Eigenvalues '
-    write(*,*) BS_W_e_real(BS_n_g_W)
-    write(*,*) BS_W_e_real(BS_n_g_w-1)
-    write(*,*) BS_W_e_real(BS_n_g_w-2)
-    BS_W(:,:,iq_W)=temp_BS_W(:,:)
-    write(*,*) 'new matrix ',iq_W
-    write(*,*)  BS_W(1,1,iq_W)
-    write(*,*)  BS_W(2,1,iq_W)
-    write(*,*)  BS_W(1,2,iq_W)
- enddo
- !
- ! DEBUG
- !
- !
  do i_block=1,n_BS_blks
    !
    i_Tgrp_k=BS_blk(i_block)%iT_k

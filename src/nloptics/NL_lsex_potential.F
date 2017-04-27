@@ -81,7 +81,7 @@ subroutine NL_lsex_potential(q,X,Xw)
    ! The bare exchange v
    !
    do ig1=1,X%ng
-     W(iqbz,ig1,ig1)=-4._SP/spin_occ*pi*isc%gamp(ig1,1)
+     W(iqbz,ig1,ig1)=-4._SP/spin_occ*pi*isc%gamp(ig1,ig1)
    enddo
    !
    if(Correlation==LSEX) then

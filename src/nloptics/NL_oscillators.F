@@ -81,7 +81,6 @@ subroutine NL_oscillators(q,k,en)
        isc%os  =(/i_m,i_kmq,i_kmq_s,i_kmq_sp/)
        call scatter_Bamp(isc)            
        OSCL(i_n,i_m,i_k,iqbz,:)=isc%rhotw(:)
-       write(100,*) abs(OSCL(i_n,i_m,i_k,iqbz,1))
      enddo
    enddo
    !
