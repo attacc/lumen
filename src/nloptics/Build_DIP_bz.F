@@ -29,7 +29,7 @@ subroutine Build_DIP_bz(Xk,Xen,X)
  use X_m,            ONLY:X_t,DIP_iR
  use D_lattice,      ONLY:dl_sop,sop_inv
  use nl_optics,      ONLY:DIP_bz
- use parallel_m,     ONLY:PAR_Xk_ibz_index,PAR_IND_WF_k,PP_redux_wait,PAR_COM_Xk_ibz_INDEX
+ use parallel_m,     ONLY:PAR_Xk_ibz_index,PAR_IND_Xk_ibz,PP_redux_wait,PAR_COM_Xk_ibz_INDEX
  !
  implicit none
  !
@@ -51,7 +51,7 @@ subroutine Build_DIP_bz(Xk,Xen,X)
    !
    do ik=1,Xk%nibz
      !
-     if (.not.PAR_IND_WF_k%element_1D(ik)) cycle
+     if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
      ! 
      do iv=X%ib(1),X%ib_lim(1) 
        do ic=X%ib_lim(2),X%ib(2)

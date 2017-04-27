@@ -55,8 +55,8 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
      do i_mp=NL_bands(1),NL_bands(2)
        do i_np=NL_bands(1),NL_bands(2)
          do i_kp=1,QP_nk
-!           H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL(i_n,i_m,i_k,i_np,i_mp,i_kp)*dG(i_np,i_mp,i_kp)
-           H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL2(i_n,i_m,i_k,i_np,i_mp,i_kp)*dG(i_np,i_mp,i_kp)
+           H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL(i_n,i_m,i_k,i_np,i_mp,i_kp)*dG(i_np,i_mp,i_kp)
+!           H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL2(i_n,i_m,i_k,i_np,i_mp,i_kp)*dG(i_np,i_mp,i_kp)
          enddo
        enddo
      enddo

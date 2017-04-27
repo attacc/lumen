@@ -104,7 +104,11 @@ subroutine NL_oscillators(q,k,en)
           !
           i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
           COLL(i_n,i_m,i_k,i_np,i_mp,i_kmq)=COLL(i_n,i_m,i_k,i_np,i_mp,i_kmq)+&
-              OSCL(i_n,i_mp,i_k,iqbz)*conjg(OSCL(i_m,i_np,i_k,iqbz))*W(iqbz)  
+              OSCL(i_n,i_np,i_k,iqbz)*conjg(OSCL(i_m,i_mp,i_k,iqbz))*W(iqbz)  
+!         if(i_n==4.and.i_np==4.and.i_m==4.and.i_mp==4.and.i_k==2.and.i_kmq==3) then
+!           write(*,*) ' contribution from ',iqbz,OSCL(i_n,i_np,i_k,iqbz)*conjg(OSCL(i_m,i_mp,i_k,iqbz))*W(iqbz),W(iqbz)
+!         endif
+
           !
           enddo
         enddo
@@ -120,7 +124,7 @@ subroutine NL_oscillators(q,k,en)
  write(*,*)
  COLL2=cZERO
  do 
-   read(110,*,IOSTAT=io) i_n,i_m,i_k,i_np,i_mp,i_kmq,rcoll,icoll
+   read(110,*,IOSTAT=io) i_k,i_n,i_m,i_kmq,i_np,i_mp,rcoll,icoll
    if(io/=0) exit
    COLL2(i_n,i_m,i_k,i_np,i_mp,i_kmq)=cmplx(rcoll,icoll)
    ic=ic+1
@@ -132,6 +136,6 @@ subroutine NL_oscillators(q,k,en)
  write(*,*) 'READING COLLISIONS ',ic
  close(unit=110)
  ! END DEBUG
- stop
+! stop
  !
 end subroutine NL_oscillators
