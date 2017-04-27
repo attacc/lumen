@@ -41,6 +41,9 @@ module nl_optics
  real(SP)          :: NL_step   ! time-step in atomic units of time
  real(SP)          :: NL_tot_time ! Total simulation time
  !
+ !
+ integer           :: ng_hartree ! number of G-vectors in the Hartree term
+ integer           :: ng_oscll   ! number of G-vectors in the Oscillators
  ! 
  ! Polarization 
  ! ------------
@@ -157,15 +160,8 @@ module nl_optics
  !
  ! Collisions
  !
- complex(SP), allocatable :: OSCL(:,:,:,:) ! Oscillators
- complex(SP), allocatable :: W(:)
- !
- ! DEBUG
- !
- complex(SP), allocatable :: COLL(:,:,:,:,:,:)
- complex(SP), allocatable :: COLL2(:,:,:,:,:,:)
- !
- ! DEBUG
+ complex(SP), allocatable :: OSCL(:,:,:,:,:) ! Oscillators
+ complex(SP), allocatable :: W(:,:,:)
  !
  ! Density
  !
@@ -230,16 +226,9 @@ module nl_optics
        call mem_est("dG",(/size(dG)/),(/2*SP/))
        allocate(Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
        call mem_est("Vnl_xc",(/size(Vnl_xc)/),(/2*SP/))
-       allocate(OSCL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,q%nbz))
+       allocate(OSCL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,q%nbz,ng_oscll))
        call mem_est("OSCL",(/size(OSCL)/),(/2*SP/))
-       ! DEBUG
-       allocate(COLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,& 
-                     NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
-       allocate(COLL2(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,& 
-                     NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
-       call mem_est("COLL",(/size(COLL)/),(/2*SP/))
-       ! DEBUG
-       allocate(W(q%nbz))
+       allocate(W(q%nbz,ng_oscll,ng_oscll))
        call mem_est("W",(/size(W)/),(/2*SP/))
      endif          
      !

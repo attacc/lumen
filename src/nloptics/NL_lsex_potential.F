@@ -47,7 +47,7 @@ subroutine NL_lsex_potential(q,X,Xw)
  !
  ! Work Space
  !
- integer                    :: iqbz,iqibz,iqs,io_err,ID
+ integer                    :: iqbz,iqibz,iqs,io_err,ID,ig1,ig2
  integer, external          :: io_X
  type(elemental_collision)  :: isc 
  !
@@ -55,7 +55,7 @@ subroutine NL_lsex_potential(q,X,Xw)
  isc%ngrho =X%ng  ! only G=1 is required for local-SEX 
  !
  call elemental_collision_free(isc)
- call elemental_collision_alloc(isc,NG_GAMP=(/X%ng,1/),TITLE="Wlr") 
+ call elemental_collision_alloc(isc,NG=X%ng,NG_GAMP=(/X%ng,X%ng/),TITLE="Wlr") 
  !
  call X_alloc('X',(/X%ng,X%ng,1/))
  ! 
@@ -68,6 +68,8 @@ subroutine NL_lsex_potential(q,X,Xw)
  endif
  !
  do iqbz=1,q%nbz
+   !
+   W(iqbz,:,:)=cZERO
    ! 
    isc%qs(2:)=(/q%sstar(iqbz,1),q%sstar(iqbz,2)/)
    iqibz=isc%qs(2)
@@ -78,7 +80,9 @@ subroutine NL_lsex_potential(q,X,Xw)
    !
    ! The bare exchange v
    !
-   W(iqbz)=-4._SP/spin_occ*pi*isc%gamp(1,1)
+   do ig1=1,X%ng
+     W(iqbz,ig1,ig1)=-4._SP/spin_occ*pi*isc%gamp(ig1,1)
+   enddo
    !
    if(Correlation==LSEX) then
      !      
@@ -98,7 +102,11 @@ subroutine NL_lsex_potential(q,X,Xw)
      !
      !  Screened part of the exchange  \tilde W = W - v
      !
-     W(iqbz)=W(iqbz)-4._SP/spin_occ*pi*X_mat(1,1,1)*isc%gamp(1,1)
+     do ig1=1,X%ng
+       do ig2=1,X%ng
+         W(iqbz,ig1,ig2)=W(iqbz,ig1,ig2)-4._SP/spin_occ*pi*X_mat(ig1,ig2,1)*isc%gamp(ig1,ig2)
+       enddo
+     enddo
      !
    endif
    !

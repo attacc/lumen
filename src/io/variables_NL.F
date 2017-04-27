@@ -26,7 +26,8 @@ integer function variables_NL(ID,local_description)
  use pars,          ONLY:SP,lchlen
  use units,         ONLY:AUT2FS, HA2EV, AU2KWCMm2
  use nl_optics,     ONLY:NL_damping,l_use_DIPOLES,NL_correlation,NL_er,NL_correlation,n_frequencies,      &
-&                        n_NL_descriptions,NL_description,Integrator_name,NL_steps,NL_step,NL_bands
+&                        n_NL_descriptions,NL_description,Integrator_name,NL_steps,NL_step,NL_bands,      &
+&                        ng_hartree,ng_oscll
  use electric,      ONLY:l_force_SndOrd
  use fields,        ONLY:Efield
  use IO_m,          ONLY:io_elemental,io_status
@@ -86,6 +87,17 @@ integer function variables_NL(ID,local_description)
  i_desc=i_desc+1
  call io_elemental(ID,CH0=NL_correlation,VAR='[NL] Correlation           :',CHECK=.true.,OP=(/"=="/), &
 &        DESCRIPTION=local_description(i_desc))
+ call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
+ !
+ ! CORRELATION PARAMETERS
+ !
+ call io_elemental(ID,VAR="CORRPARS",VAR_SZ=2,MENU=0)
+ i_desc=i_desc+1
+ call io_elemental(ID,VAR="[NL] Number of G in Hartree  :",I0=ng_hartree,CHECK=.true.,OP=(/"=="/), & 
+&         DESCRIPTION=local_description(i_desc))
+ i_desc=i_desc+1
+ call io_elemental(ID,VAR="[NL] Number of G in Oscillators  :",I0=ng_oscll,CHECK=.true.,OP=(/"=="/), & 
+&         DESCRIPTION=local_description(i_desc))
  call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
  !
  ! Efield 

@@ -28,7 +28,7 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
  use electrons,      ONLY:n_sp_pol
  use pars,           ONLY:SP,cI,cZERO
  use FFT_m,          ONLY:fft_size
- use nl_optics,      ONLY:NL_bands,OSCL,W,COLL,COLL2
+ use nl_optics,      ONLY:NL_bands,OSCL,W,ng_oscll
  use QP_m,           ONLY:QP_nk
  use R_lattice,      ONLY:bz_samp,qindx_S
  ! 
@@ -43,6 +43,8 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
  !
  integer :: i_m,i_mp  ! self-energy external indexes
  integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
+ integer :: ig1,ig2
+ complex(SP) :: COLL_element
  !
  ! Long-range SEX
  !
@@ -58,8 +60,16 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
         do i_mp=NL_bands(1),NL_bands(2)
           do i_np=NL_bands(1),NL_bands(2)
             !
-            H(i_n,i_m,1)=H(i_n,i_m,1)-cI*OSCL(i_n,i_np,i_k,iqbz)*conjg(OSCL(i_m,i_mp,i_k,iqbz))*W(iqbz) &
-&                      *dG(i_np,i_mp,i_kmq) 
+            ! Build Collision on the fly
+            !
+            COLL_element=cZERO
+            do ig1=1,ng_oscll
+              do ig2=1,ng_oscll
+                COLL_element=COLL_element+OSCL(i_n,i_np,i_k,iqbz,ig1)*conjg(OSCL(i_m,i_mp,i_k,iqbz,ig2))*W(iqbz,ig2,ig1) 
+              enddo
+            enddo
+            !
+            H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL_element*dG(i_np,i_mp,i_kmq) 
             ! 
           enddo
         enddo
