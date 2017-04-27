@@ -61,6 +61,7 @@ subroutine NL_build_dGamma(en,V_bands,dG)
    !
    do i1=NL_bands(1),en%nbf
      dG(i1,i1,ik)=dG(i1,i1,ik)-cI*spin_occ
+     dG(i1,i1,ik)=aimag(dG(i1,i1,ik))
    enddo
    !
  enddo

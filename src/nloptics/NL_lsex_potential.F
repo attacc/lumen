@@ -37,6 +37,7 @@ subroutine NL_lsex_potential(q,X,Xw)
  use X_m,                 ONLY:X_mat,X_alloc,X_t
  use IO_m,                ONLY:io_control,OP_RD_CL,REP,VERIFY,NONE,RD_CL,OP_RD,RD_CL_IF_END 
  use com,                 ONLY:error
+ use matrix_operate,      ONLY:hermitian
  use stderr,              ONLY:intc
  !
  implicit none
@@ -109,6 +110,10 @@ subroutine NL_lsex_potential(q,X,Xw)
      enddo
      !
    endif
+   !
+   ! W should be Hermitian otherwise it introduces a damping
+   !
+   ! W(iqbz,:,:)=(W(iqbz,:,:)+hermitian(W(iqbz,:,:)))/2._SP
    !
    call live_timing(steps=1)
    !

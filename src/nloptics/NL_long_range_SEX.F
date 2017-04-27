@@ -85,6 +85,7 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
    do i_m=i_n+1,NL_bands(2)
      H(i_m,i_n,1)=conjg(H(i_n,i_m,1))
    enddo
+   H(i_n,i_n,1)=real(H(i_n,i_n,1))
  enddo
  !
 end subroutine NL_long_range_SEX
