@@ -239,7 +239,7 @@ contains
      !
      ! Working Space
      !
-     character(schlen) :: X_file_name
+     character(schlen) :: X_file_name,short_X_file_name
      integer           :: i_fp,i_dsc
      logical           :: l_prt_err
      real(SP)          :: Unit_of_Measure,VALUEs(11)
@@ -260,18 +260,20 @@ contains
      do i_order=0,X_order,1
        !
        X_file_name="YPP-X_probe_order_"//trim(intc(i_order))
+       short_X_file_name=trim(X_file_name)
        !
        call set_real_printed_length(f_length=15,g_length=15)
        !
-       call of_open_close(trim(X_file_name),'ot')
+       call of_open_close(X_file_name,'ot')
+       call of_open_close(trim(short_X_file_name))
        !
        do i_dsc=1,n_NL_descriptions
-         call msg('o '//trim(X_file_name),'#',trim(NL_description(i_dsc)),INDENT=0)
+         call msg('o '//trim(short_X_file_name),'#',trim(NL_description(i_dsc)),INDENT=0)
        enddo
        !
-       call msg('o '//trim(X_file_name),'#')
+       call msg('o '//trim(short_X_file_name),'#')
        !
-       call msg('o '//trim(X_file_name),'',headings(1:n_headings),USE_TABS=.TRUE.)
+       call msg('o '//trim(short_X_file_name),'',headings(1:n_headings),USE_TABS=.TRUE.)
        !
        do i_fp=1,n_frequencies
          !
@@ -290,11 +292,11 @@ contains
 &                      aimag(Susceptibility(i_order,i_f,3)*Unit_of_Measure),&
 &                       real(Susceptibility(i_order,i_f,3)*Unit_of_Measure)/)
          !
-        call msg('o '//trim(X_file_name),'',VALUEs(1:n_headings),USE_TABS=.TRUE.)
+        call msg('o '//trim(short_X_file_name),'',VALUEs(1:n_headings),USE_TABS=.TRUE.)
          !
        enddo 
        !
-       call of_open_close(trim(X_file_name))
+       call of_open_close(X_file_name)
        !
        call set_real_printed_length()
        !
