@@ -143,6 +143,12 @@ subroutine NL_driver(E,X,k,q,Xw)
    !
  endif
  !
+ if(iGo_max/=1) then
+   iGo_max=1
+   call WF_free(WF)
+   call WF_load(WF,wf_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
+ endif
+ !  
  ! QP-corrections 
  !================
  call QP_apply(NL_bands,E,k,"G",msg_fmt='s')

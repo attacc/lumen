@@ -42,7 +42,7 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
  ! Work Space
  !
  integer :: i_m,i_mp  ! self-energy external indexes
- integer :: i_n,i_np,iqbz,i_kmq,i_kp ! self-energy internal indexes
+ integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
  !
  ! Long-range SEX
  !
@@ -52,13 +52,18 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
      !
      ! Evaluate Sigma_SEX(i_m,i_n,i_k)
      !
-     do i_mp=NL_bands(1),NL_bands(2)
-       do i_np=NL_bands(1),NL_bands(2)
-         do i_kp=1,QP_nk
-           H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL(i_n,i_m,i_k,i_np,i_mp,i_kp)*dG(i_np,i_mp,i_kp)
-!           H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL2(i_n,i_m,i_k,i_np,i_mp,i_kp)*dG(i_np,i_mp,i_kp)
-         enddo
-       enddo
+     do iqbz=1,q%nbz
+        i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
+        !
+        do i_mp=NL_bands(1),NL_bands(2)
+          do i_np=NL_bands(1),NL_bands(2)
+            !
+            H(i_n,i_m,1)=H(i_n,i_m,1)-cI*OSCL(i_n,i_np,i_k,iqbz)*conjg(OSCL(i_m,i_mp,i_k,iqbz))*W(iqbz) &
+&                      *dG(i_np,i_mp,i_kmq) 
+            ! 
+          enddo
+        enddo
+        !
      enddo
      !
    enddo
