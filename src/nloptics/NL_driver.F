@@ -37,7 +37,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  use QP_CTL_m,       ONLY:QP_apply
  use frequency,      ONLY:w_samp
  use nl_optics,      ONLY:n_frequencies,Correlation,IPA,NL_alloc,NL_free,V_bands,NL_bands, &
-&                         NL_estep,NL_er,Integrator,l_use_DIPOLES,NL_P_t,  &
+&                         NL_estep,NL_er,Integrator,l_use_DIPOLES,NL_P_t,NL_ng,  &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,freqs_done,n_freqs_todo, &
 &                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_step,LSEX,LHF,ng_oscll
  use IO_m,           ONLY:IO_and_Messaging_switch
@@ -59,6 +59,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  integer           :: i_f,i1,NL_bands1_save,N_frequency_save,iGo_max
  real(SP)          :: Time
  integer, external :: eval_G_minus_G
+ integer           :: wf_ng_save
  !
  ! The non-linear bands
  ! ==============================================
@@ -144,11 +145,13 @@ subroutine NL_driver(E,X,k,q,Xw)
    !
  endif
  !
- if(iGo_max/=1) then
-   iGo_max=1
-   call WF_free(WF)
-   call WF_load(WF,wf_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
- endif
+ ! Reload WF with less G-vecs
+ !
+ wf_ng_save=wf_ng
+ wf_ng     =NL_ng
+ iGo_max   =1
+ call WF_free(WF)
+ call WF_load(WF,NL_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
  !  
  ! QP-corrections 
  !================
@@ -221,6 +224,8 @@ subroutine NL_driver(E,X,k,q,Xw)
  !
  ! Deallocation
  ! ==========================
+ !
+ wf_ng=wf_ng_save
  !
  call WF_free(WF)
  call NL_free()

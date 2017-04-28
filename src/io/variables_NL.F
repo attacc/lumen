@@ -27,7 +27,7 @@ integer function variables_NL(ID,local_description)
  use units,         ONLY:AUT2FS, HA2EV, AU2KWCMm2
  use nl_optics,     ONLY:NL_damping,l_use_DIPOLES,NL_correlation,NL_er,NL_correlation,n_frequencies,      &
 &                        n_NL_descriptions,NL_description,Integrator_name,NL_steps,NL_step,NL_bands,      &
-&                        ng_hartree,ng_oscll
+&                        NL_ng,ng_oscll
  use electric,      ONLY:l_force_SndOrd
  use fields,        ONLY:Efield
  use IO_m,          ONLY:io_elemental,io_status
@@ -93,7 +93,7 @@ integer function variables_NL(ID,local_description)
  !
  call io_elemental(ID,VAR="CORRPARS",VAR_SZ=2,MENU=0)
  i_desc=i_desc+1
- call io_elemental(ID,VAR="[NL] Number of G in Hartree  :",I0=ng_hartree,CHECK=.true.,OP=(/"=="/), & 
+ call io_elemental(ID,VAR="[NL] Number of G in NL-dynamics  :",I0=NL_ng,CHECK=.true.,OP=(/"=="/), & 
 &         DESCRIPTION=local_description(i_desc))
  i_desc=i_desc+1
  call io_elemental(ID,VAR="[NL] Number of G in Oscillators  :",I0=ng_oscll,CHECK=.true.,OP=(/"=="/), & 

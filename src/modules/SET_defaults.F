@@ -88,7 +88,7 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  use xc_functionals,  ONLY:GS_xc_FUNCTIONAL,GS_xc_KIND,GS_exx_FRACTION,GS_exx_SCREENING 
  use nl_optics,  ONLY:NL_correlation,NL_er,n_frequencies,NL_damping,NL_LRC_alpha, &
 &                     Integrator_name,NL_tot_time,NL_bands,Verbosity_name,NL_step, &
-&                     eval_OVERLAPS,ng_oscll,ng_hartree
+&                     eval_OVERLAPS,ng_oscll,NL_ng
  use fields,     ONLY:Efield,Efield_reset,n_ext_fields_max,n_ext_fields,A_vecpot_reset,   &
 &                     A_vecpot,A_vecpot_previous,A_ind,A_ind_previous,A_ext
   
@@ -505,7 +505,7 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  n_frequencies =80
  NL_damping    =0.2_SP/HA2EV
  NL_LRC_alpha  =0._SP
- ng_hartree    =wf_ng
+ NL_ng         =0
  ng_oscll      =1
  call Efield_reset(Efield(1))
  Efield(1)%frequency=0.1_SP/HA2EV

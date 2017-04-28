@@ -57,7 +57,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  use IO_m,          ONLY:DBs_IO_control_string,DBs_FRAG_control_string
  use collision,     ONLY:COLLISIONS_cutoff,COLL_bands
  use nl_optics,     ONLY:NL_damping,NL_correlation,NL_er,n_frequencies,NL_LRC_alpha,Integrator_name, &
-&                        NL_tot_time,NL_step,NL_bands,Verbosity_name,ng_hartree,ng_oscll
+&                        NL_tot_time,NL_step,NL_bands,Verbosity_name,NL_ng,ng_oscll
  use fields,        ONLY:Efield 
 #if defined _ELPH 
  use ELPH,          ONLY:QP_PH_n_G_bands,elph_nDBs_used,elph_Ham_ik,elph_Ham_bands,elph_branches,&
@@ -305,7 +305,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  call it(defs,'NLEnRange',    '[NL] Energy range',NL_er,E_unit)
  call it(defs,'NLEnSteps',    '[NL] Energy steps',n_frequencies)
  call it(defs,'NLGOscll',    '[NL] Number of G in the oscillators', ng_oscll,unit=G_unit,Verb_level=V_nl_optics)
- call it(defs,'NLGHartree', '[NL] Number of G in the Hartree term',ng_hartree,unit=G_unit)
+ call it(defs,'NLGvecs', '[NL] Number of G vectors in NL dynamics for Hartree/TDDFT',NL_ng,unit=G_unit)
  !
  call it('f',defs,'UseDipoles','[NL] Use Covariant Dipoles (just for testing purpose)',verb_level=V_nl_optics)
  call it('f',defs,'FrSndOrd','[NL] Force second order in Covariant Dipoles',verb_level=V_nl_optics)

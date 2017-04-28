@@ -60,7 +60,7 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
  use BS,             ONLY:BS_bands,BS_n_g_exch,BS_n_g_W,&
 &                         BS_eh_en,BSE_mode,BS_res_mode,BS_cpl_mode,BSK_mode
  use BS_solvers,     ONLY:BSS_mode,BSS_q0
- use nl_optics,      ONLY:ng_hartree
+ use nl_optics,      ONLY:NL_ng
 #if defined  _ELPH 
  use ELPH,           ONLY:elph_nDBs,elph_nDBs_used,elph_use_q_grid
 #endif
@@ -214,7 +214,7 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
  QP_ng_Sc=ng_closed
  QP_ng_SH=ng_closed
  BS_n_g_exch=ng_closed
- ng_hartree =ng_closed
+ NL_ng      =ng_closed
  !
  ! kindx
  !
@@ -643,7 +643,7 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
  !
  if (l_nl_optics) then
    call initactivate(1,'FFTGvecs NLBands NLstep NLtime NLverbosity NLintegrator NLCorrelation NLLrcAlpha')
-   call initactivate(1,'NLEnRange NLEnSteps NLDamping NLGOscll NLGHartree UseDipoles FrSndOrd InducedField') 
+   call initactivate(1,'NLEnRange NLEnSteps NLDamping NLGOscll NLGvecs UseDipoles FrSndOrd InducedField') 
    call initactivate(1,'ExtF_Dir ExtF_FrStep ExtF_Int ExtF_Damp ExtF_kind ExtF_StartIdx')
    call init_QP_ctl_switch('G')
  endif

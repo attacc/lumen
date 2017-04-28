@@ -42,7 +42,7 @@ module nl_optics
  real(SP)          :: NL_tot_time ! Total simulation time
  !
  !
- integer           :: ng_hartree ! number of G-vectors in the Hartree term
+ integer           :: NL_ng      ! number of G-vectors in the Hartree/TDDFT
  integer           :: ng_oscll   ! number of G-vectors in the Oscillators
  ! 
  ! Polarization 
