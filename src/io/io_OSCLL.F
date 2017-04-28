@@ -21,24 +21,22 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-integer function io_Overlaps(X,ID)
+integer function io_OSCLL(ID)
  !
  use pars,          ONLY:SP,schlen
  use X_m,           ONLY:X_t,X_alloc
  use electrons,     ONLY:levels
- use R_lattice,     ONLY:nXkbz
  use matrix_operate,ONLY:mat_c2r,mat_r2c
  use IO_m,          ONLY:io_connect,io_disconnect,io_sec,frag_DIP,&
 &                        io_bulk,read_is_on,write_is_on,io_header,io_extension,&
 &                        RD_CL_IF_END,RD_CL,io_action,&
 &                        IO_NOT_ALLOWED,io_DIP,io_fragment
- use X_m,           ONLY:DIP_S
+ use nl_optics,     ONLY:NL_bands,OSCL,W,ng_oscll
 #if defined _TIMING
  use timing_m,      ONLY:timing
 #endif
  !
  implicit none
- type(X_t)   ::X
  integer     ::ID
  !
  ! Work Space
@@ -48,28 +46,25 @@ integer function io_Overlaps(X,ID)
  character(schlen)    :: VAR_name
  real(SP),allocatable :: disk_data(:,:,:)
  !
- if (.not.io_DIP) then
-   io_Overlaps=IO_NOT_ALLOWED
-   call io_disconnect(ID,FORCE=.TRUE.)
-   return
- endif
- !
 #if defined _TIMING
- call timing('io_Overlaps',OPR='start')
+ call timing('io_OSCLL',OPR='start')
 #endif
  !
- io_extension(ID)='Overlap'
+ io_extension(ID)='OSCLL'
  !
- io_Overlaps=io_connect(desc=trim(io_extension(ID)),type=2,ID=ID)
- if (io_Overlaps/=0) goto 1
+ io_OSCLL=io_connect(desc=trim(io_extension(ID)),type=2,ID=ID)
+ if (io_OSCLL/=0) goto 1
  !
  if (any((/io_sec(ID,:)==1/))) then
    !
-   io_Overlaps=io_header(ID,R_LATT=.true.,WF=.true.,IMPOSE_SN=.true.,T_EL=.true.,FRAG=frag_DIP)
-   if (io_Overlaps/=0) goto 1
+   io_OSCLL=io_header(ID,R_LATT=.true.,WF=.true.,IMPOSE_SN=.true.,T_EL=.true.,FRAG=frag_DIP)
+   if (io_OSCLL/=0) goto 1
    !
-   io_Overlaps=variables_DIPOLES(X,ID)
-   if (io_Overlaps/=0) goto 1
+   ! Variable for the Oscillators
+   !
+
+   !
+   if (io_OSCLL/=0) goto 1
    !
  endif
  !
@@ -117,7 +112,7 @@ integer function io_Overlaps(X,ID)
 1 call io_disconnect(ID=ID)
  !
 #if defined _TIMING
- if (io_DIP) call timing('io_Overlaps',OPR='stop')
+ call timing('io_OSCLL',OPR='stop')
 #endif
  !
 end function

@@ -65,7 +65,7 @@ subroutine NL_long_range_SEX(dG,H,k,q,i_k)
             COLL_element=cZERO
             do ig1=1,ng_oscll
               do ig2=1,ng_oscll
-                COLL_element=COLL_element+OSCL(i_n,i_np,i_k,iqbz,ig1)*conjg(OSCL(i_m,i_mp,i_k,iqbz,ig2))*W(iqbz,ig2,ig1) 
+                COLL_element=COLL_element+OSCL(ig1,i_n,i_np,i_k,iqbz)*conjg(OSCL(ig2,i_m,i_mp,i_k,iqbz))*W(iqbz,ig2,ig1) 
               enddo
             enddo
             !
