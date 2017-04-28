@@ -295,7 +295,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  !
  call it(defs,'NLstep',       '[NL] Real Time step length',NL_step,unit=Time_unit(1),Verb_level=V_nl_optics)
  call it(defs,'NLtime',       '[NL] Simulation Time',NL_tot_time,unit=Time_unit(1))
- call it(defs,'NLintegrator', '[NL] Integrator ("EULEREXP/RK2/RK4/RK2EXP/HEUN/INVINT/CRANKNIC")',Integrator_name,&
+ call it(defs,'NLintegrator', '[NL] Integrator ("EULEREXP/RK4/RK2EXP/HEUN/INVINT/CRANKNIC")',Integrator_name,&
 &     Verb_level=V_nl_optics)
  call it(defs,'NLverbosity', '[NL] Verbosity level (low | high)',Verbosity_name,Verb_level=V_nl_optics)
  call it(defs,'NLBands',     '[NL] Bands',NL_bands)

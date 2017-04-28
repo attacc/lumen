@@ -111,10 +111,6 @@ subroutine NL_lsex_potential(q,X,Xw)
      !
    endif
    !
-   ! W should be Hermitian otherwise it introduces a damping
-   !
-   ! W(iqbz,:,:)=(W(iqbz,:,:)+hermitian(W(iqbz,:,:)))/2._SP
-   !
    call live_timing(steps=1)
    !
  enddo
