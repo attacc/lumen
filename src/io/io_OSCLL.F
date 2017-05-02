@@ -81,10 +81,10 @@ integer function io_OSCLL(ID)
  !
  ik_mem=ik 
  !
- allocate(disk_data(X%ib(2),X%ib(2),2))
+ allocate(disk_data(NL_bands,NL_bands,2))
  !
  if (read_is_on(ID)) then
-   call X_alloc('DIP_S',(/X%ib(2),X%ib(2),6,nXkbz/))
+   call X_alloc('OSCLL',(/X%ib(2),X%ib(2),6,nXkbz/))
  endif
  !
  ! Fragmentation
@@ -95,16 +95,16 @@ integer function io_OSCLL(ID)
  !
  if (io_action(ID)==RD_CL_IF_END.and.ik==nXkbz) io_action(ID)=RD_CL
  !
- do ixyz=1,6
-   !
-   ! S
-   !
-   if (write_is_on(ID)) call mat_c2r(DIP_S(:,:,ixyz,ik_mem,i_sp_pol),disk_data)
-   write (VAR_name,'(3(a,i4.4))') 'DIP_S_k_',ik,'_xyz_',ixyz,'_spin_',i_sp_pol
-   call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(disk_data))
-   call io_bulk(ID,R3=disk_data)
-   if (read_is_on(ID)) call mat_r2c(disk_data,DIP_S(:,:,ixyz,ik_mem,i_sp_pol))
-   !
+ do iqbz=1,q%nbz
+   do ig=1,ng_oscll
+     !
+     if (write_is_on(ID)) call mat_c2r(OSCL(ig,:,:,i_k,iqbz),disk_data)
+     write (VAR_name,'(3(a,i4.4))') 'OSCLL_',ik,'_iqbz_',iqbz,'_ig_',ig
+     call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(disk_data))
+     call io_bulk(ID,R3=disk_data)
+     if (read_is_on(ID)) call mat_r2c(disk_data,OSCL(ig,:,:,i_k,iqbz))
+     !
+   enddo
  enddo
  !
  deallocate(disk_data)

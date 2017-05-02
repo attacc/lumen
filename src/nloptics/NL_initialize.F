@@ -39,7 +39,7 @@ subroutine NL_initialize(E,k,q)
  use nl_optics,      ONLY:EULER,EULEREXP,RK2,RK4,RK2EXP,RK4EXP,HEUN,INVINT,Integrator,CRANK_NICOLSON,Integrator_name
  !
  use nl_optics,      ONLY:NL_damping,NL_correlation,Correlation,NL_er,NL_estep,n_frequencies,IPA,TDDFT,HARTREE,LRC,JGM, &
-&                         LRCW,eval_dG,eval_DFT,eval_HARTREE,NL_bands,NL_nbands,l_use_DIPOLES,LSEX,LHF, &
+&                         LRCW,eval_DFT,eval_HARTREE,NL_bands,NL_nbands,l_use_DIPOLES,LSEX,LHF, &
 &                         NL_steps,NL_tot_time,Phase_LifeTime,NL_step,Verbosity_name,VER_HIGH,VER_LOW,NL_verbosity
  !
  use electric,       ONLY:l_force_SndOrd
@@ -143,7 +143,6 @@ subroutine NL_initialize(E,k,q)
  !
  eval_HARTREE   =.false.
  eval_DFT       =.false.
- eval_dG        =.false.
  !
  select case (trim(NL_Correlation))
     case('IPA')
@@ -167,11 +166,9 @@ subroutine NL_initialize(E,k,q)
     case('LSEX')
         Correlation=LSEX
         eval_HARTREE =.true.
-        eval_dG      =.true.
     case('LHF')
         Correlation=LHF
         eval_HARTREE =.true.
-        eval_dG      =.true.
     case default
         call error("Unknow correlation in the response function")
  end select

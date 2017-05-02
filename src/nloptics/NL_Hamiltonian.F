@@ -38,7 +38,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  use wave_func,      ONLY:WF
  use xc_functionals, ONLY:V_xc,XC_potential_driver
  use nl_optics,      ONLY:Correlation,V_xc_0,full_rho,IPA,E_full,LRC,JGM,LRCW,l_use_DIPOLES,NL_LRC_alpha,   &
-&                         NL_initial_P,E_tot,E_ext,E_ks,E_xc_0,I_relax,Alpha_ED,dG,eval_dG, & 
+&                         NL_initial_P,E_tot,E_ext,E_ks,E_xc_0,I_relax,Alpha_ED, & 
 &                         V_hartree_ne,V_xc_ne,rho_n,Hk,eval_DFT,eval_HARTREE,rho_reference,NL_bands,&
 &                         Ho_plus_Sigma,NL_P,Phase_LifeTime,NL_nbands,VAL_BANDS,LSEX,LHF
  use global_XC,      ONLY:WF_KIND,WF_xc_functional 
@@ -140,10 +140,6 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
     !
  endif
  !
- ! Evaluate the G_lesser if using TD-SEX or TD-HF and than add COLLISIONS
- ! ======================================================
- if(eval_dG)         call NL_build_dGamma(E,V_bands,dG)
- !
  ! Build the Hamiltonian
  ! =====================
  !
@@ -172,7 +168,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
      !
    endif
    !
-   if(Correlation==LSEX.or.Correlation==LHF) call NL_long_range_SEX(dG,Hk,k,q,ik)
+   if(Correlation==LSEX.or.Correlation==LHF) call NL_long_range_SEX(V_bands,Hk,k,q,E,ik)
    !
    ! Add Ho = T+V_ion+V_h+V_xc
    !==================

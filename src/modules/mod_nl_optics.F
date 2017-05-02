@@ -119,7 +119,6 @@ module nl_optics
  integer, parameter :: LSEX   = 7
  integer, parameter :: LHF    = 8
  !
- logical :: eval_dG
  logical :: eval_HARTREE
  logical :: eval_DFT
  logical :: eval_OVERLAPS
@@ -222,8 +221,6 @@ module nl_optics
      call mem_est('V_xc_ne',(/size(V_xc_ne)/),(/SP/))
      !
      if(Correlation==LSEX.or.Correlation==LHF) then
-       allocate(dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
-       call mem_est("dG",(/size(dG)/),(/2*SP/))
        allocate(Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
        call mem_est("Vnl_xc",(/size(Vnl_xc)/),(/2*SP/))
        allocate(OSCL(ng_oscll,NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,q%nbz))
