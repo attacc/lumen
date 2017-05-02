@@ -21,21 +21,21 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_long_range_SEX(V_bands,H,k,q,E,i_k) 
+subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k) 
  !
  ! This subroutine calculate the long-range part of the Screened exchange
  !
  use electrons,      ONLY:n_sp_pol,levels,spin_occ
  use pars,           ONLY:SP,cI,cZERO,cONE
  use FFT_m,          ONLY:fft_size
- use nl_optics,      ONLY:NL_bands,OSCL,W,ng_oscll,NL_nbands
+ use nl_optics,      ONLY:NL_bands,OSCL,W,ng_oscll,NL_nbands,Sigma_SEX_EQ
  use QP_m,           ONLY:QP_nk
  use R_lattice,      ONLY:bz_samp,qindx_S
- use wrapper_omp,    ONLY:M_by_M_omp,Vstar_dot_V_omp
+ use wrapper,        ONLY:M_by_M,Vstar_dot_V,M_by_V
  ! 
  implicit none
  !
- complex(SP), intent(inout) :: H(NL_bands(2),NL_bands(2),n_sp_pol)
+ complex(SP), intent(inout) :: Hk(NL_bands(2),NL_bands(2),n_sp_pol)
  integer,     intent(in)    :: i_k
  type(bz_samp), intent(in)  :: k,q
  type(levels),  intent(in)  :: E
@@ -43,69 +43,38 @@ subroutine NL_long_range_SEX(V_bands,H,k,q,E,i_k)
  !
  ! Work Space
  !
- integer :: i_m,i_mp  ! self-energy external indexes
+ integer :: i_m,i_mp,i_v  ! self-energy external indexes
  integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
  integer :: ig1,ig2
- complex(SP) :: COLL_element,dGelement
- complex(SP) OSCL_val(NL_bands(1):NL_bands(2),E%nbf,q%nbz)
+ complex(SP) OSCL_val(NL_bands(1):NL_bands(2),E%nbf,ng_oscll,q%nbz)
  !
  !
  ! Build Oscillators in term of valence bands
  ! 
- do i_n=NL_bands(1),NL_bands(2)
-   do iqbz=1,q%nbz
-     i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
-     call M_by_M_omp('C','N',NL_nbands,E%nbf,NL_nbands,cONE,OSCL(1,:,:,i_k,iqbz),&
-&                    NL_nbands,V_bands(:,:,i_kmq,1),NL_bands(2),cZERO,OSCL_val(:,:,iqbz),NL_nbands)
-
+ do iqbz=1,q%nbz
+   i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
+   do ig1=1,ng_oscll
+     call M_by_M('N','N',NL_nbands,E%nbf,NL_nbands,cONE,OSCL(:,:,ig1,i_k,iqbz),&
+&                 NL_nbands,V_bands(NL_bands(1):,:,i_kmq,1),NL_nbands,cZERO,OSCL_val(:,:,ig1,iqbz),NL_nbands)
    enddo
  enddo
+ !
+ Hk=Hk-Sigma_SEX_EQ(:,:,:,i_k)
  !
  ! Long-range SEX
  !
+ ! Evaluate Sigma_SEX(i_m,i_n,i_k)
  !
- do i_n=NL_bands(1),NL_bands(2)
-   do i_m=i_n,NL_bands(2)
-     !
-     ! Evaluate Sigma_SEX(i_m,i_n,i_k)
-     !
-     do iqbz=1,q%nbz
-        i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
-        !
-!        call M_by_M_omp('C','N',NL_bands(2),en%nbf,NL_bands(2),cONE,OSCL(1,:,:,i_k,iqbz),&
-!&                          NL_bands(2),V_bands(:,:,i_kmq),NL_bands(2),cZERO,OCSL_val,NL_bands(2))
-        
-        do i_mp=NL_bands(1),NL_bands(2)
-          do i_np=NL_bands(1),NL_bands(2)
-            !
-            ! Build Collision on the fly
-            !
-            COLL_element=cZERO
-            do ig1=1,ng_oscll
-              do ig2=1,ng_oscll
-                COLL_element=COLL_element+OSCL(ig1,i_n,i_np,i_k,iqbz)*conjg(OSCL(ig2,i_m,i_mp,i_k,iqbz))*W(iqbz,ig2,ig1) 
-              enddo
-            enddo
-            !
-            dGelement=cI*spin_occ*Vstar_dot_V_omp(E%nbf,V_bands(i_mp,:,i_kmq,1),V_bands(i_np,:,i_kmq,1))
-            if(i_mp==i_np.and.i_np<=E%nbf) dGelement=dGelement-cI*spin_occ
-            H(i_n,i_m,1)=H(i_n,i_m,1)-cI*COLL_element*dGelement 
-            ! 
-          enddo
-        enddo
-        !
+ do iqbz=1,q%nbz
+   i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
+   !
+   do ig1=1,ng_oscll
+     do ig2=1,ng_oscll
+       call M_by_M('N','C',NL_nbands,NL_nbands,E%nbf,spin_occ*W(iqbz,ig1,ig2),OSCL_val(:,:,ig1,iqbz),&
+&                      NL_nbands,OSCL_val(:,:,ig2,iqbz),NL_nbands,cONE,Hk(NL_bands(1):,NL_bands(1):,1),NL_nbands)
      enddo
-     !
    enddo
- enddo
- !
- ! Symmetrization
- !
- do i_n=NL_bands(1),NL_bands(2)
-   do i_m=i_n+1,NL_bands(2)
-     H(i_m,i_n,1)=conjg(H(i_n,i_m,1))
-   enddo
-   H(i_n,i_n,1)=real(H(i_n,i_n,1))
+   !
  enddo
  !
 end subroutine NL_long_range_SEX

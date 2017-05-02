@@ -156,6 +156,7 @@ module nl_optics
  complex(SP), allocatable :: Hk(:,:,:)
  real(SP),    allocatable :: V_xc_ne(:,:)
  real(SP),    allocatable :: V_hartree_ne(:,:)
+ complex(SP), allocatable :: Sigma_SEX_EQ(:,:,:,:)
  !
  ! Collisions
  !
@@ -223,10 +224,12 @@ module nl_optics
      if(Correlation==LSEX.or.Correlation==LHF) then
        allocate(Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
        call mem_est("Vnl_xc",(/size(Vnl_xc)/),(/2*SP/))
-       allocate(OSCL(ng_oscll,NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,q%nbz))
+       allocate(OSCL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ng_oscll,QP_nk,q%nbz))
        call mem_est("OSCL",(/size(OSCL)/),(/2*SP/))
        allocate(W(q%nbz,ng_oscll,ng_oscll))
        call mem_est("W",(/size(W)/),(/2*SP/))
+       allocate(Sigma_SEX_EQ(NL_bands(2),NL_bands(2),n_sp_pol,QP_nk))
+       call mem_est("Sigma_SEX_EQ",(/size(Sigma_SEX_EQ)/),(/2*SP/))
      endif          
      !
      ! Reference energies
@@ -340,6 +343,8 @@ module nl_optics
        call mem_est("Vnl_xc")
        deallocate(OSCL)
        call mem_est("OSCL")
+       deallocate(Sigma_SEX_EQ)
+       call mem_est("Sigma_SEX_EQ")
        deallocate(W)
        call mem_est("W")
      endif

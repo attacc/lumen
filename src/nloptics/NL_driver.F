@@ -34,12 +34,13 @@ subroutine NL_driver(E,X,k,q,Xw)
  use R_lattice,      ONLY:bz_samp,qindx_free,qindx_S
  use memory_m,       ONLY:mem_est
  use fields,         ONLY:Efield
+ use QP_m,           ONLY:QP_nk
  use QP_CTL_m,       ONLY:QP_apply
  use frequency,      ONLY:w_samp
  use nl_optics,      ONLY:n_frequencies,Correlation,IPA,NL_alloc,NL_free,V_bands,NL_bands, &
 &                         NL_estep,NL_er,Integrator,l_use_DIPOLES,NL_P_t,NL_ng,  &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,freqs_done,n_freqs_todo, &
-&                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_step,LSEX,LHF,ng_oscll
+&                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_step,LSEX,LHF,ng_oscll,Sigma_SEX_EQ
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
  use parallel_m,     ONLY:PAR_IND_freqs,PAR_IND_freqs_ID,CPU_structure
@@ -56,7 +57,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  ! 
  ! Work Space
  !
- integer           :: i_f,i1,NL_bands1_save,N_frequency_save,iGo_max
+ integer           :: i_f,i1,NL_bands1_save,N_frequency_save,iGo_max,ik
  real(SP)          :: Time
  integer, external :: eval_G_minus_G
  integer           :: wf_ng_save
@@ -164,6 +165,18 @@ subroutine NL_driver(E,X,k,q,Xw)
  ! Initialization
  ! ==================
  call NL_start_and_restart(E,k,X)
+ !
+ ! Equilibrium Exchange
+ !=========================
+ ! If LSEX or LHF calculate the equilibrium contribution 
+ ! to the screened exchange
+ !
+ if(Correlation==LSEX.or.Correlation==LHF) then
+   Sigma_SEX_EQ=cZERO
+   do ik=1,QP_nk
+     call NL_long_range_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik),k,q,E,ik)
+   enddo
+ endif
  !
  ! Check if calculation was already done
  ! =====================================
