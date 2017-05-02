@@ -160,7 +160,7 @@ module nl_optics
  !
  ! Collisions
  !
- complex(SP), allocatable :: OSCL(:,:,:,:,:) ! Oscillators
+ complex(SP), allocatable :: OSCLL(:,:,:,:,:) ! Oscillators
  complex(SP), allocatable :: W(:,:,:)
  !
  ! Density
@@ -224,8 +224,8 @@ module nl_optics
      if(Correlation==LSEX.or.Correlation==LHF) then
        allocate(Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
        call mem_est("Vnl_xc",(/size(Vnl_xc)/),(/2*SP/))
-       allocate(OSCL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ng_oscll,QP_nk,q%nbz))
-       call mem_est("OSCL",(/size(OSCL)/),(/2*SP/))
+       allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ng_oscll,QP_nk,q%nbz))
+       call mem_est("OSCLL",(/size(OSCLL)/),(/2*SP/))
        allocate(W(q%nbz,ng_oscll,ng_oscll))
        call mem_est("W",(/size(W)/),(/2*SP/))
        allocate(Sigma_SEX_EQ(NL_bands(2),NL_bands(2),n_sp_pol,QP_nk))
@@ -341,8 +341,8 @@ module nl_optics
        call mem_est("dG")
        deallocate(Vnl_xc)
        call mem_est("Vnl_xc")
-       deallocate(OSCL)
-       call mem_est("OSCL")
+       deallocate(OSCLL)
+       call mem_est("OSCLL")
        deallocate(Sigma_SEX_EQ)
        call mem_est("Sigma_SEX_EQ")
        deallocate(W)

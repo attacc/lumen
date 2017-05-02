@@ -25,7 +25,7 @@ subroutine NL_oscillators(q,k,en)
  !
  ! Evaluate oscillators for the Local-SEX
  !
- use nl_optics,           ONLY:NL_bands,OSCL,W,ng_oscll
+ use nl_optics,           ONLY:NL_bands,OSCLL,W,ng_oscll
  use LIVE_t,              ONLY:live_timing
  use pars,                ONLY:SP,cZERO
  use R_lattice,           ONLY:bz_samp,qindx_S
@@ -37,6 +37,9 @@ subroutine NL_oscillators(q,k,en)
 &                              elemental_collision_alloc         
  use parallel_m,          ONLY:PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID
  use FFT_m,               ONLY:fft_size
+ use IO_m,                ONLY:io_control,OP_RD_CL,VERIFY,REP,OP_WR_CL,OP_APP_WR_CL 
+ use com,                 ONLY:msg
+ use parallel_m,          ONLY: master_cpu
  !
  implicit none
  !
@@ -47,14 +50,44 @@ subroutine NL_oscillators(q,k,en)
  !
  type(elemental_collision)            :: isc 
  integer :: i_k,i_m,i_n,i_q,iqbz,i_kmq_G0,iqs,i_kmq,i_kmq_s,i_k_s
- integer :: i_k_sp,i_kmq_sp,iqibz,ig,i_np,i_mp,io,ic
+ integer :: i_k_sp,i_kmq_sp,iqibz,ig,i_np,i_mp,io,ic,i_sp_pol
+ integer :: ID,io_err
+ integer, external :: io_OSCLL
  !
  call elemental_collision_free(isc)
  !
  isc%iqref =0
  isc%ngrho =ng_oscll  ! only G=1 is required for local-SEX
  !
- call elemental_collision_alloc(isc,NG=isc%ngrho,TITLE="OSC")
+ call elemental_collision_alloc(isc,NG=isc%ngrho,TITLE="OSCLL")
+ !
+ i_sp_pol=1
+ call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1/),MODE=VERIFY,ID=ID)
+ io_err=io_OSCLL(q,ID)
+ !
+ if(io_err==0) then
+   !
+   ! Load Oscillators
+   !   
+   do i_k=1,QP_nk
+     call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
+     io_err=io_OSCLL(q,ID)
+   enddo
+   !
+   call msg('rs','[NL] Oscillators loaded')
+   !
+   return
+   !
+ else
+   !
+   ! Oscillators not found, recalculated them
+   !
+   if(master_cpu) then
+     call io_control(ACTION=OP_WR_CL,COM=REP,SEC=(/1/),MODE=VERIFY,ID=ID)
+     io_err=io_OSCLL(q,ID)
+   endif
+   !
+ endif
  !
  call live_timing('[NL] Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
  !
@@ -80,13 +113,17 @@ subroutine NL_oscillators(q,k,en)
        isc%is  =(/i_n,i_k,i_k_s,i_k_sp/)
        isc%os  =(/i_m,i_kmq,i_kmq_s,i_kmq_sp/)
        call scatter_Bamp(isc)            
-       OSCL(i_n,i_m,:,i_k,iqbz)=isc%rhotw(:)
+       OSCLL(i_n,i_m,:,i_k,iqbz)=isc%rhotw(:)
      enddo
    enddo
    !
    enddo
    !
    call live_timing(steps=1)
+   !
+   i_sp_pol=1
+   call io_control(ACTION=OP_APP_WR_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
+   io_err=io_OSCLL(q,ID)
    !
  enddo
  !

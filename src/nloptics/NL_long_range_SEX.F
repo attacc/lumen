@@ -28,7 +28,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  use electrons,      ONLY:n_sp_pol,levels,spin_occ
  use pars,           ONLY:SP,cI,cZERO,cONE
  use FFT_m,          ONLY:fft_size
- use nl_optics,      ONLY:NL_bands,OSCL,W,ng_oscll,NL_nbands,Sigma_SEX_EQ
+ use nl_optics,      ONLY:NL_bands,OSCLL,W,ng_oscll,NL_nbands,Sigma_SEX_EQ
  use QP_m,           ONLY:QP_nk
  use R_lattice,      ONLY:bz_samp,qindx_S
  use wrapper,        ONLY:M_by_M,Vstar_dot_V,M_by_V
@@ -46,7 +46,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  integer :: i_m,i_mp,i_v  ! self-energy external indexes
  integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
  integer :: ig1,ig2
- complex(SP) OSCL_val(NL_bands(1):NL_bands(2),E%nbf,ng_oscll,q%nbz)
+ complex(SP) OSCLL_val(NL_bands(1):NL_bands(2),E%nbf,ng_oscll,q%nbz)
  !
  !
  ! Build Oscillators in term of valence bands
@@ -54,8 +54,8 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  do iqbz=1,q%nbz
    i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
    do ig1=1,ng_oscll
-     call M_by_M('N','N',NL_nbands,E%nbf,NL_nbands,cONE,OSCL(:,:,ig1,i_k,iqbz),&
-&                 NL_nbands,V_bands(NL_bands(1):,:,i_kmq,1),NL_nbands,cZERO,OSCL_val(:,:,ig1,iqbz),NL_nbands)
+     call M_by_M('N','N',NL_nbands,E%nbf,NL_nbands,cONE,OSCLL(:,:,ig1,i_k,iqbz),&
+&                 NL_nbands,V_bands(NL_bands(1):,:,i_kmq,1),NL_nbands,cZERO,OSCLL_val(:,:,ig1,iqbz),NL_nbands)
    enddo
  enddo
  !
@@ -70,8 +70,8 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
    !
    do ig1=1,ng_oscll
      do ig2=1,ng_oscll
-       call M_by_M('N','C',NL_nbands,NL_nbands,E%nbf,spin_occ*W(iqbz,ig1,ig2),OSCL_val(:,:,ig1,iqbz),&
-&                      NL_nbands,OSCL_val(:,:,ig2,iqbz),NL_nbands,cONE,Hk(NL_bands(1):,NL_bands(1):,1),NL_nbands)
+       call M_by_M('N','C',NL_nbands,NL_nbands,E%nbf,spin_occ*W(iqbz,ig1,ig2),OSCLL_val(:,:,ig1,iqbz),&
+&                      NL_nbands,OSCLL_val(:,:,ig2,iqbz),NL_nbands,cONE,Hk(NL_bands(1):,NL_bands(1):,1),NL_nbands)
      enddo
    enddo
    !

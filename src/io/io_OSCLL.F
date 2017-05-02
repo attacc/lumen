@@ -21,28 +21,32 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-integer function io_OSCLL(ID)
+integer function io_OSCLL(q,ID)
  !
  use pars,          ONLY:SP,schlen
  use X_m,           ONLY:X_t,X_alloc
  use electrons,     ONLY:levels
  use matrix_operate,ONLY:mat_c2r,mat_r2c
+ use R_lattice,     ONLY:nXkibz,bz_samp
+ use QP_m,          ONLY:QP_nk
  use IO_m,          ONLY:io_connect,io_disconnect,io_sec,frag_DIP,&
 &                        io_bulk,read_is_on,write_is_on,io_header,io_extension,&
 &                        RD_CL_IF_END,RD_CL,io_action,&
 &                        IO_NOT_ALLOWED,io_DIP,io_fragment
- use nl_optics,     ONLY:NL_bands,OSCL,W,ng_oscll
+ use IO_m,          ONLY:io_elemental,io_status
+ use nl_optics,     ONLY:NL_bands,OSCLL,ng_oscll,NL_nbands
+ use memory_m,      ONLY:mem_est
 #if defined _TIMING
  use timing_m,      ONLY:timing
 #endif
  !
  implicit none
  integer     ::ID
+ type(bz_samp), intent(in) :: q
  !
  ! Work Space
  !
- integer :: ik,ik_mem,i_fragment,ixyz,i_sp_pol,shift(2)
- integer, external    :: variables_DIPOLES
+ integer :: ik,i_fragment,i_sp_pol,iqbz,ig
  character(schlen)    :: VAR_name
  real(SP),allocatable :: disk_data(:,:,:)
  !
@@ -57,34 +61,40 @@ integer function io_OSCLL(ID)
  !
  if (any((/io_sec(ID,:)==1/))) then
    !
-   io_OSCLL=io_header(ID,R_LATT=.true.,WF=.true.,IMPOSE_SN=.true.,T_EL=.true.,FRAG=frag_DIP)
+   io_OSCLL=io_header(ID,R_LATT=.true.,WF=.true.,IMPOSE_SN=.true.,T_EL=.true.)
    if (io_OSCLL/=0) goto 1
    !
    ! Variable for the Oscillators
    !
-
+   call io_elemental(ID,VAR="OSCLLPARS",VAR_SZ=3,MENU=0)
+   call io_elemental(ID,VAR="[NL] RL vectors in oscillators :",I0=ng_oscll,CHECK=.true.,OP=(/"<="/))
+   call io_elemental(ID,VAR="[NL] OSCLL band rane           :",I1=NL_bands,CHECK=.true.,OP=(/"==","=="/))
+   call io_elemental(ID,VAR="",VAR_SZ=0)
    !
+   io_OSCLL=io_status(ID)
    if (io_OSCLL/=0) goto 1
    !
  endif
  !
  i_fragment=maxval(io_sec(ID,:))-1
- if(i_fragment<=nXkbz) then
+ !
+ if(i_fragment<=nXkibz) then
    i_sp_pol=1
    ik=i_fragment
  else
    i_sp_pol=2
-   ik=i_fragment-nXkbz
+   ik=i_fragment-nXkibz
  endif
  !
  if (ik==0) goto 1
  !
- ik_mem=ik 
- !
- allocate(disk_data(NL_bands,NL_bands,2))
+ allocate(disk_data(NL_nbands,NL_nbands,2))
  !
  if (read_is_on(ID)) then
-   call X_alloc('OSCLL',(/X%ib(2),X%ib(2),6,nXkbz/))
+   if(.not.allocated(OSCLL)) then
+     allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ng_oscll,QP_nk,q%nbz))
+     call mem_est("OSCLL",(/size(OSCLL)/),(/2*SP/))     
+   endif
  endif
  !
  ! Fragmentation
@@ -93,16 +103,16 @@ integer function io_OSCLL(ID)
  !
  ! Manage RD_CL_IF_END
  !
- if (io_action(ID)==RD_CL_IF_END.and.ik==nXkbz) io_action(ID)=RD_CL
+ if (io_action(ID)==RD_CL_IF_END.and.ik==nXkibz) io_action(ID)=RD_CL
  !
  do iqbz=1,q%nbz
    do ig=1,ng_oscll
      !
-     if (write_is_on(ID)) call mat_c2r(OSCL(ig,:,:,i_k,iqbz),disk_data)
+     if (write_is_on(ID)) call mat_c2r(OSCLL(:,:,ig,ik,iqbz),disk_data)
      write (VAR_name,'(3(a,i4.4))') 'OSCLL_',ik,'_iqbz_',iqbz,'_ig_',ig
      call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(disk_data))
      call io_bulk(ID,R3=disk_data)
-     if (read_is_on(ID)) call mat_r2c(disk_data,OSCL(ig,:,:,i_k,iqbz))
+     if (read_is_on(ID)) call mat_r2c(disk_data,OSCLL(:,:,ig,ik,iqbz))
      !
    enddo
  enddo
