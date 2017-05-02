@@ -80,8 +80,6 @@ module nl_optics
  ! Time-dependent Valence bands in real-space
  complex(SP), allocatable :: VAL_BANDS(:,:,:,:)
  !
- complex(SP), allocatable :: dG(:,:,:) 
- !
  ! Integrator Variables
  !
  integer, parameter :: EULER    = 1
@@ -337,8 +335,6 @@ module nl_optics
      call mem_est("E_tot_t E_ext_t E_ks_t")
      !
      if(Correlation==LSEX.or.Correlation==LHF) then
-       deallocate(dG)
-       call mem_est("dG")
        deallocate(Vnl_xc)
        call mem_est("Vnl_xc")
        deallocate(OSCLL)
