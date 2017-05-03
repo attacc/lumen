@@ -46,7 +46,8 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  integer :: i_m,i_mp,i_v  ! self-energy external indexes
  integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
  integer :: ig1,ig2
- complex(SP) OSCLL_val(NL_bands(1):NL_bands(2),E%nbf,ng_oscll,q%nbz)
+ complex(SP) :: OSCLL_val(NL_bands(1):NL_bands(2),E%nbf,ng_oscll,q%nbz)
+ complex(SP) :: qGG_sum(E%nbf)
  !
  !
  ! Build Oscillators in term of valence bands
@@ -65,16 +66,29 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  !
  ! Evaluate Sigma_SEX(i_m,i_n,i_k)
  !
- do iqbz=1,q%nbz
-   i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
-   !
-   do ig1=1,ng_oscll
-     do ig2=1,ng_oscll
-       call M_by_M('N','C',NL_nbands,NL_nbands,E%nbf,spin_occ*W(iqbz,ig1,ig2),OSCLL_val(:,:,ig1,iqbz),&
-&                      NL_nbands,OSCLL_val(:,:,ig2,iqbz),NL_nbands,cONE,Hk(NL_bands(1):,NL_bands(1):,1),NL_nbands)
+ do i_n=NL_bands(1),NL_bands(2)
+   do i_m=i_n,NL_bands(2)
+     !
+     do i_v=1,E%nbf
+       do ig1=1,ng_oscll
+         do ig2=1,ng_oscll
+          qGG_sum(i_v)=sum(W(:,ig1,ig2)*OSCLL_val(i_n,i_v,ig1,:)*conjg(OSCLL_val(i_m,i_v,ig2,:)))
+         enddo
+       enddo
      enddo
+     !
+     Hk(i_n,i_m,1)=Hk(i_n,i_m,1)+spin_occ*sum(qGG_sum)
+     !
    enddo
-   !
+ enddo
+ !
+ ! Symmetrization
+ !
+ do i_n=NL_bands(1),NL_bands(2)
+   do i_m=i_n+1,NL_bands(2)
+     Hk(i_m,i_n,1)=conjg(Hk(i_n,i_m,1))
+   enddo
+   Hk(i_n,i_n,1)=real(Hk(i_n,i_n,1))
  enddo
  !
 end subroutine NL_long_range_SEX
