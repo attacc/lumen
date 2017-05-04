@@ -222,7 +222,7 @@ module nl_optics
      if(Correlation==LSEX.or.Correlation==LHF) then
        allocate(Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
        call mem_est("Vnl_xc",(/size(Vnl_xc)/),(/2*SP/))
-       allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ng_oscll,QP_nk,q%nbz))
+       allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,q%nbz,ng_oscll))
        call mem_est("OSCLL",(/size(OSCLL)/),(/2*SP/))
        allocate(W(q%nbz,ng_oscll,ng_oscll))
        call mem_est("W",(/size(W)/),(/2*SP/))

@@ -55,7 +55,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  do iqbz=1,q%nbz
    i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
    do ig1=1,ng_oscll
-     call M_by_M('N','N',NL_nbands,E%nbf,NL_nbands,cONE,OSCLL(:,:,ig1,i_k,iqbz),&
+     call M_by_M('N','N',NL_nbands,E%nbf,NL_nbands,cONE,OSCLL(:,:,i_k,iqbz,ig1),&
 &                 NL_nbands,V_bands(NL_bands(1):,:,i_kmq,1),NL_nbands,cZERO,OSCLL_val(:,:,ig1,iqbz),NL_nbands)
    enddo
  enddo

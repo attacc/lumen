@@ -92,7 +92,7 @@ integer function io_OSCLL(q,ID)
  !
  if (read_is_on(ID)) then
    if(.not.allocated(OSCLL)) then
-     allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ng_oscll,QP_nk,q%nbz))
+     allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,q%nbz,ng_oscll))
      call mem_est("OSCLL",(/size(OSCLL)/),(/2*SP/))     
    endif
  endif
@@ -108,11 +108,11 @@ integer function io_OSCLL(q,ID)
  do iqbz=1,q%nbz
    do ig=1,ng_oscll
      !
-     if (write_is_on(ID)) call mat_c2r(OSCLL(:,:,ig,ik,iqbz),disk_data)
+     if (write_is_on(ID)) call mat_c2r(OSCLL(:,:,ik,iqbz,ig),disk_data)
      write (VAR_name,'(3(a,i4.4))') 'OSCLL_',ik,'_iqbz_',iqbz,'_ig_',ig
      call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(disk_data))
      call io_bulk(ID,R3=disk_data)
-     if (read_is_on(ID)) call mat_r2c(disk_data,OSCLL(:,:,ig,ik,iqbz))
+     if (read_is_on(ID)) call mat_r2c(disk_data,OSCLL(:,:,ik,iqbz,ig))
      !
    enddo
  enddo

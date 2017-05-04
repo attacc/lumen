@@ -78,9 +78,6 @@ subroutine NL_oscillators(q,k,en)
    enddo
    !
    call msg('rs','[NL] Oscillators loaded')
-   do ig=1,ng_oscll
-     call PP_redux_wait(OSCLL(:,:,ig,:,:),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
-   enddo
    !
    return
    !
@@ -122,7 +119,7 @@ subroutine NL_oscillators(q,k,en)
        isc%is  =(/i_n,i_k,i_k_s,i_k_sp/)
        isc%os  =(/i_m,i_kmq,i_kmq_s,i_kmq_sp/)
        call scatter_Bamp(isc)            
-       OSCLL(i_n,i_m,:,i_k,iqbz)=isc%rhotw(:)
+       OSCLL(i_n,i_m,i_k,iqbz,:)=isc%rhotw(:)
      enddo
    enddo
    !
@@ -135,7 +132,7 @@ subroutine NL_oscillators(q,k,en)
  call live_timing()
  !
  do ig=1,ng_oscll
-   call PP_redux_wait(OSCLL(:,:,ig,:,:),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
+   call PP_redux_wait(OSCLL(:,:,:,:,ig),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
  enddo
  !
  ! Write Oscillators on disk
