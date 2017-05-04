@@ -39,7 +39,7 @@ subroutine NL_oscillators(q,k,en)
  use FFT_m,               ONLY:fft_size
  use IO_m,                ONLY:io_control,OP_RD_CL,VERIFY,REP,OP_WR_CL,OP_APP_WR_CL 
  use com,                 ONLY:msg
- use parallel_m,          ONLY: master_cpu
+ use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu
  !
  implicit none
  !
@@ -61,6 +61,8 @@ subroutine NL_oscillators(q,k,en)
  !
  call elemental_collision_alloc(isc,NG=isc%ngrho,TITLE="OSCLL")
  !
+ OSCLL=cZERO
+ !
  i_sp_pol=1
  call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1/),MODE=VERIFY,ID=ID)
  io_err=io_OSCLL(q,ID)
@@ -70,11 +72,15 @@ subroutine NL_oscillators(q,k,en)
    ! Load Oscillators
    !   
    do i_k=1,QP_nk
+     if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
      call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
      io_err=io_OSCLL(q,ID)
    enddo
    !
    call msg('rs','[NL] Oscillators loaded')
+   do ig=1,ng_oscll
+     call PP_redux_wait(OSCLL(:,:,ig,:,:),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
+   enddo
    !
    return
    !
@@ -92,6 +98,9 @@ subroutine NL_oscillators(q,k,en)
  call live_timing('[NL] Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
  !
  do i_k=1,QP_nk
+   !
+   if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
+   ! 
    do iqbz=1,q%nbz
    !
    i_kmq_G0  =qindx_S(i_k,iqbz,2)
@@ -121,12 +130,22 @@ subroutine NL_oscillators(q,k,en)
    !
    call live_timing(steps=1)
    !
+ enddo
+ !
+ call live_timing()
+ !
+ do ig=1,ng_oscll
+   call PP_redux_wait(OSCLL(:,:,ig,:,:),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
+ enddo
+ !
+ ! Write Oscillators on disk
+ !
+ do i_k=1,QP_nk
+   !
    i_sp_pol=1
    call io_control(ACTION=OP_APP_WR_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
    io_err=io_OSCLL(q,ID)
    !
  enddo
- !
- call live_timing()
  !
 end subroutine NL_oscillators

@@ -119,12 +119,8 @@ subroutine NL_driver(E,X,k,q,Xw)
  !
  ! WFs loading
  !=============
- iGo_max=1
- if(Correlation==LSEX.or.Correlation==LHF) iGo_max=maxval(qindx_S(:,:,2))
- !
- if(Correlation/=IPA) then      
-   call WF_load(WF,wf_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
- endif
+ if(Correlation/=IPA) & 
+&   call WF_load(WF,wf_ng,1,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
  !
  ! Allocation
  ! ==================
@@ -136,6 +132,15 @@ subroutine NL_driver(E,X,k,q,Xw)
    !      
    X(2)%ng=ng_oscll
    call NL_lsex_potential(q,X(2),Xw(2)) 
+   !
+   ! I need all wave-functions parallel distribution on bands or q
+   ! not implemented yet!!
+   !
+   call PARALLEL_WF_distribute(CLEAN_UP=.TRUE.)
+   call PARALLEL_WF_index()
+   iGo_max=maxval(qindx_S(:,:,2))
+   call WF_load(WF,wf_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
+   !
    call NL_oscillators(q,k,E)
    !
  else
