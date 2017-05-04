@@ -67,12 +67,13 @@ subroutine NL_oscillators(q,k,en)
  call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1/),MODE=VERIFY,ID=ID)
  io_err=io_OSCLL(q,ID)
  !
+ call PP_redux_wait(COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
+ ! 
  if(io_err==0) then
    !
    ! Load Oscillators
    !   
    do i_k=1,QP_nk
-     if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
      call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
      io_err=io_OSCLL(q,ID)
    enddo
