@@ -18,6 +18,13 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_richardson()
+subroutine NL_richardson(Susceptibility,Harmonic_Frequency)
+ !
+ use pars,           ONLY:SP
+ use nl_optics,      ONLY:n_runs
+ use YPP_non_linear, ONLY:X_order
+ !
+ complex(SP), intent(in) :: Susceptibility(0:X_order,n_runs,3)
+ real(SP),    intent(in) :: Harmonic_Frequency(0:X_order,n_runs)
  !
 end subroutine NL_richardson
