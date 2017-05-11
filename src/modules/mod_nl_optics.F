@@ -126,7 +126,8 @@ module nl_optics
  real(SP) :: NL_er(2)
  real(SP) :: NL_estep
  integer  :: n_frequencies
- integer  :: n_freqs_todo
+ integer  :: n_intensities
+ integer  :: n_runs_todo
  !
  ! Databases input/output
  !
@@ -142,7 +143,7 @@ module nl_optics
  real(SP),     allocatable :: NL_P_t(:,:)
  complex(SP),  allocatable :: E_tot_t(:,:),E_ext_t(:,:), E_ks_t(:,:)
  complex(SP)               :: E_tot(3),E_ext(3),E_ks(3)
- logical,      allocatable :: freqs_done(:)
+ logical,      allocatable :: runs_done(:)
  integer                   :: n_NL_descriptions
  character(lchlen)         :: NL_description(100)
  !

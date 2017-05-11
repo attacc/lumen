@@ -42,11 +42,11 @@ subroutine NL_start_and_restart(E,k,X)
  use global_XC,      ONLY:WF_kind,WF_xc_functional
  use fields,         ONLY:A_vecpot,A_ext,A_vecpot_reset
  use parallel_m,     ONLY:master_cpu
- use nl_optics,      ONLY:Correlation,IPA,E_full,full_rho,V_bands,TDDFT,n_freqs_todo,NL_LRC_alpha,Alpha_ED,NL_bands,  &
-&                         V_xc_0,NL_initial_P,l_use_DIPOLES,n_frequencies,freqs_done,JGM,E_xc_0,I_relax,l_use_DIPOLES,&
-&                         NL_P,E_full,E_bare,Hk,rho_n,full_rho,rho_reference,V_hartree_ne,V_xc_ne,VAL_BANDS
+ use nl_optics,      ONLY:Correlation,IPA,E_full,full_rho,V_bands,TDDFT,n_runs_todo,NL_LRC_alpha,Alpha_ED,NL_bands,  &
+&                         V_xc_0,NL_initial_P,l_use_DIPOLES,n_frequencies,runs_done,JGM,E_xc_0,I_relax,l_use_DIPOLES,&
+&                         NL_P,E_full,E_bare,Hk,rho_n,full_rho,rho_reference,V_hartree_ne,V_xc_ne,VAL_BANDS,n_intensities
  use IO_m,           ONLY:OP_RD_CL,io_control,NONE,file_is_present,VERIFY
- use parallel_m,     ONLY:PAR_IND_freqs,PP_redux_wait
+ use parallel_m,     ONLY:PAR_IND_runs,PP_redux_wait
  use stderr,         ONLY:intc
  use IO_m,           ONLY:IO_and_Messaging_switch
  !
@@ -151,10 +151,10 @@ subroutine NL_start_and_restart(E,k,X)
  !
  ! Restart
  ! ====================================
- allocate(freqs_done(n_frequencies))
- call mem_est("freqs_done",(/size(freqs_done)/),(/LP/))
+ allocate(runs_done(n_frequencies))
+ call mem_est("runs_done",(/size(runs_done)/),(/LP/))
  !
- freqs_done=.false.
+ runs_done=.false.
  !
  if(master_cpu) then
    !      
@@ -163,16 +163,16 @@ subroutine NL_start_and_restart(E,k,X)
    !
    if(io_Nonlinear==0) then
      do i_f=1,n_frequencies
-        if(file_is_present('Nonlinear_fragment_'//intc(i_f))) freqs_done(i_f)=.true.
+        if(file_is_present('Nonlinear_fragment_'//intc(i_f))) runs_done(i_f)=.true.
      enddo                                                                    
     endif
     !
  endif
  !
- call PP_redux_wait(freqs_done,imode=3)
+ call PP_redux_wait(runs_done,imode=3)
  !
- n_freqs_todo=n_frequencies-count(freqs_done)
- if(n_freqs_todo/=n_frequencies) call msg('s','RESTART, remaining frequencies: ',n_freqs_todo)
+ n_runs_todo=n_frequencies-count(runs_done)
+ if(n_runs_todo/=n_frequencies*n_intensities) call msg('s','RESTART, remaining runs: ',n_runs_todo)
  !
 end subroutine NL_start_and_restart
 

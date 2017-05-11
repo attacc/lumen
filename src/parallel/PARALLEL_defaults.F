@@ -25,7 +25,7 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
  !
  use parallel_m,    ONLY:PARALLEL_n_structures_active,PARALLEL_CPU_used,&
 &                        PARALLEL_CPU_role,ncpu,QP_range,n_bands,n_c_bands,n_v_bands,Q_range,&
-&                        EH_range,K_range,CPU_structure,i_PAR_structure,n_freqs
+&                        EH_range,K_range,CPU_structure,i_PAR_structure,n_runs
  use interfaces,    ONLY:PARALLEL_live_message
  use vec_operate,   ONLY:GreatestCommonDivisor
  use com,           ONLY:error
@@ -213,11 +213,11 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
     implicit none
     integer :: ncpu_f,ncpu_k,ncpu_sndchain
     !
-    if(n_freqs>ncpu) then
+    if(n_runs>ncpu) then
       ncpu_f=ncpu
       ncpu_k=1
     else
-      ncpu_f       =GreatestCommonDivisor(ncpu,n_freqs)
+      ncpu_f       =GreatestCommonDivisor(ncpu,n_runs)
       ncpu_sndchain=ncpu/ncpu_f
       !
       if(ncpu_sndchain>K_range) then

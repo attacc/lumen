@@ -238,7 +238,7 @@ module parallel_m
  type(PP_indexes)            ,SAVE :: PAR_IND_T_ordered
  !
  ! .... Frequencies non-linear optics
- type(PP_indexes),SAVE :: PAR_IND_freqs
+ type(PP_indexes),SAVE :: PAR_IND_runs
  !
  ! Specific MPI ID's ...
  !======================
@@ -280,7 +280,7 @@ module parallel_m
  ! ... Optical oscillators
  integer            :: PAR_IND_DIPk_ID
  ! .... Frequencies
- integer            :: PAR_IND_freqs_ID
+ integer            :: PAR_IND_runs_ID
  !
  ! Specific MPI COMMUNICATORS...
  !==============================
@@ -343,9 +343,9 @@ module parallel_m
  type(MPI_comm),SAVE :: PAR_COM_density
  !
  ! ... Frequencies 
- type(MPI_comm),SAVE :: PAR_COM_freqs
- type(MPI_comm),SAVE :: PAR_COM_freqs_A2A
- type(MPI_comm),SAVE :: PAR_COM_freqs_INDEX
+ type(MPI_comm),SAVE :: PAR_COM_runs
+ type(MPI_comm),SAVE :: PAR_COM_runs_A2A
+ type(MPI_comm),SAVE :: PAR_COM_runs_INDEX
  !
  ! ... and dimensions (used for automatic cpu distribution)
  !=========================================================
@@ -356,7 +356,7 @@ module parallel_m
  integer            :: n_bands(2)
  integer            :: n_c_bands(2)
  integer            :: n_v_bands(2)
- integer            :: n_freqs
+ integer            :: n_runs
  !
  ! ... and derived variables
  !==========================
@@ -384,7 +384,7 @@ module parallel_m
  integer            :: PAR_nG_bands 
  integer,allocatable:: PAR_G_bands_index(:)
  integer            :: PAR_nFreqs
- integer,allocatable:: PAR_freqs_index(:)
+ integer,allocatable:: PAR_runs_index(:)
  !
  ! WorkSpace
  !

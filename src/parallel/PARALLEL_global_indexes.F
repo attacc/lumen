@@ -33,13 +33,13 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 &                        MPI_comm,PAR_DIPk_ibz_index,PAR_DIPk_nibz,COMM_copy,n_WF_bands_to_load,&
 &                        PAR_n_Bp_mat_elements,PAR_Bp_mat_index,PAR_PLASMA_index,&
 &                        PAR_BS_T_grps_index,PAR_BS_nT_col_grps,PAR_Kk_nibz,PAR_nG_bands,PAR_G_bands_index,&
-&                        PAR_Q_bz_index,PAR_nQ_bz,PAR_RL_index,n_freqs, &
+&                        PAR_Q_bz_index,PAR_nQ_bz,PAR_RL_index,n_runs, &
 &                        Q_range,QP_range,n_v_bands,n_c_bands,K_range,n_bands,EH_range
  use parallel_m,    ONLY:& ! LOGICALS
 &                        l_par_X_T,l_par_X_G_q0,l_par_RT,l_par_SE,l_par_X_G_all_q,l_par_X_G_finite_q,&
 &                        HEAD_QP_cpu,HEAD_k_cpu,l_par_SC,l_par_NL
- use parallel_m,    ONLY:PAR_IND_freqs_ID,PAR_COM_freqs_INDEX,PAR_COM_freqs_A2A,PAR_nFreqs,PAR_freqs_index, &
-&                        PAR_IND_freqs,PAR_COM_freqs,PAR_IND_OVLP_ibz ! Non_Linear optics
+ use parallel_m,    ONLY:PAR_IND_runs_ID,PAR_COM_runs_INDEX,PAR_COM_runs_A2A,PAR_nFreqs,PAR_runs_index, &
+&                        PAR_IND_runs,PAR_COM_runs,PAR_IND_OVLP_ibz ! Non_Linear optics
  use parallel_m,    ONLY:& ! COMMUNICATORS
 &                        COMM_reset,PAR_COM_WORLD,&  
 &                        PAR_COM_VAL_INDEX,PAR_COM_CON_INDEX,PAR_COM_Q_A2A,&
@@ -77,7 +77,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 #if defined _SCALAPACK
  use SLK_m,         ONLY:SLK_COM_INDEX,SLK_COM_A2A
 #endif
- use nl_optics,     ONLY:NL_bands,n_frequencies,eval_OVERLAPS
+ use nl_optics,     ONLY:NL_bands,n_frequencies,n_intensities,eval_OVERLAPS
  use electrons,     ONLY:levels
  use stderr,        ONLY:intc
  use R_lattice,     ONLY:bz_samp,nqibz,nqbz
@@ -149,7 +149,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    call PP_indexes_reset(PAR_IND_WF_linear)
    call PP_indexes_reset(PAR_IND_T_ordered)
    call PP_indexes_reset(PAR_IND_T_all)
-   call PP_indexes_reset(PAR_IND_freqs)
+   call PP_indexes_reset(PAR_IND_runs)
    !
    if (ENVIRONMENT=="Response_T_space") then
      if (.not.allocated(PAR_IND_eh)) then
@@ -173,7 +173,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    if (allocated(PAR_DIPk_ibz_index)) deallocate(PAR_DIPk_ibz_index)
    if (allocated(PAR_BS_T_grps_index))deallocate(PAR_BS_T_grps_index)
    if (allocated(PAR_RL_index))       deallocate(PAR_RL_index)
-   if (allocated(PAR_freqs_index))    deallocate(PAR_freqs_index)
+   if (allocated(PAR_runs_index))    deallocate(PAR_runs_index)
    !
    PAR_IND_Q_ID=0
    PAR_IND_Xk_ibz_ID=0
@@ -188,7 +188,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    PAR_IND_WF_k_ID=0
    PAR_IND_B_mat_ID=0
    PAR_IND_Bp_mat_ID=0
-   PAR_IND_freqs_ID=0
+   PAR_IND_runs_ID=0
    !
    call COMM_reset(PAR_COM_VAL_INDEX(X_type))
    call COMM_reset(PAR_COM_CON_INDEX(X_type))
@@ -215,8 +215,8 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    call COMM_reset(PAR_COM_eh_A2A)
    call COMM_reset(PAR_COM_T_INDEX)
    call COMM_reset(PAR_COM_SLK_INDEX_local)
-   call COMM_reset(PAR_COM_freqs_INDEX)
-   call COMM_reset(PAR_COM_freqs)
+   call COMM_reset(PAR_COM_runs_INDEX)
+   call COMM_reset(PAR_COM_runs)
 #if defined _SCALAPACK
    call COMM_reset(PAR_COM_SLK)
    call COMM_reset(PAR_COM_SLK_INDEX_global)
@@ -315,7 +315,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  !------------
  !
  if (ENVIRONMENT=="Non_Linear") then 
-   n_freqs =n_frequencies
+   n_runs =n_frequencies*n_intensities
    if(eval_OVERLAPS) then
       n_bands=(/1,NL_bands(2)/)
    else
@@ -651,22 +651,22 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    CALL PARALLEL_structure(2,(/"w ","k "/))
    !
    call PARALLEL_assign_chains_and_COMMs(2,ROLE=(/"w ","k "/),  &
-&                                  COMM_index_1=PAR_COM_freqs_INDEX, &
+&                                  COMM_index_1=PAR_COM_runs_INDEX, &
 &                                  COMM_index_2=PAR_COM_Xk_ibz_INDEX,&
-&                                  COMM_A2A_1=PAR_COM_freqs_A2A)
+&                                  COMM_A2A_1=PAR_COM_runs_A2A)
    !
    !
    ! Freq-points
    !
-   call PARALLEL_index(PAR_IND_freqs,(/n_frequencies/),COMM=PAR_COM_freqs_INDEX)
-   PAR_IND_freqs_ID=PAR_COM_freqs_INDEX%CPU_id
-   PAR_nFreqs      =PAR_IND_freqs%n_of_elements(PAR_IND_Q_ID+1)
+   call PARALLEL_index(PAR_IND_runs,(/n_frequencies/),COMM=PAR_COM_runs_INDEX)
+   PAR_IND_runs_ID=PAR_COM_runs_INDEX%CPU_id
+   PAR_nFreqs      =PAR_IND_runs%n_of_elements(PAR_IND_Q_ID+1)
    call PARALLEL_live_message("Freqs",ENVIRONMENT=ENVIRONMENT,         &
-&                             LOADED=PAR_IND_freqs%n_of_elements(PAR_IND_freqs_ID+1), &
-&                             TOTAL=n_frequencies,NCPU=PAR_COM_freqs_INDEX%n_CPU)
+&                             LOADED=PAR_IND_runs%n_of_elements(PAR_IND_runs_ID+1), &
+&                             TOTAL=n_frequencies,NCPU=PAR_COM_runs_INDEX%n_CPU)
    !
-   allocate(PAR_freqs_index(n_frequencies)) 
-   call Build_up_index(PAR_IND_freqs,n_frequencies,PAR_freqs_index,PAR_nFreqs)
+   allocate(PAR_runs_index(n_frequencies)) 
+   call Build_up_index(PAR_IND_runs,n_frequencies,PAR_runs_index,PAR_nFreqs)
    !
    ! K-points
    !
@@ -731,7 +731,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    !
    ! Io and messaging
    !
-   call COMM_copy(PAR_COM_freqs_INDEX,PAR_COM_DIPOLES_k_subgroup)
+   call COMM_copy(PAR_COM_runs_INDEX,PAR_COM_DIPOLES_k_subgroup)
    !
    call IO_and_Messaging_switch("+io_out",CONDITION=PAR_COM_Xk_ibz_INDEX%CPU_id==0)
    !
