@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !                  
-subroutine NL_databases_IO(i_f,read_or_write)
+subroutine NL_databases_IO(i_r,read_or_write)
  !
  use electrons,     ONLY:levels
  use X_m,           ONLY:X_t
@@ -31,7 +31,7 @@ subroutine NL_databases_IO(i_f,read_or_write)
  !
  implicit none
  !
- integer, intent(in)      :: i_f
+ integer, intent(in)      :: i_r
  character(5), intent(in) :: read_or_write
  !
  ! Working Space
@@ -43,7 +43,7 @@ subroutine NL_databases_IO(i_f,read_or_write)
  reading=trim(read_or_write)=="read"
  writing=trim(read_or_write)=="write"
  !    
- if(i_f==0) then
+ if(i_r==0) then
    if(master_cpu) then
      !
      if(reading) IO_ACTION=OP_RD_CL
@@ -57,7 +57,7 @@ subroutine NL_databases_IO(i_f,read_or_write)
    if(reading) IO_ACTION=OP_RD_CL
    if(writing) IO_ACTION=OP_APP_WR_CL
    !
-   call io_control(ACTION=IO_ACTION,COM=REP,SEC=(/i_f+1/),MODE=VERIFY,ID=ID(1))
+   call io_control(ACTION=IO_ACTION,COM=REP,SEC=(/i_r+1/),MODE=VERIFY,ID=ID(1))
    io_Nonlinear=io_NL(ID(1))
    !
  endif

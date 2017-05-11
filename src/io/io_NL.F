@@ -26,7 +26,7 @@ integer function io_NL(ID)
  use pars,          ONLY:SP,schlen,lchlen
  use units,         ONLY:HA2EV, AU2KWCMm2, AUT2FS
  use nl_optics,     ONLY:E_tot_t,E_ext_t,E_ks_t,NL_P_t,NL_damping,l_use_DIPOLES, &
-&                        NL_correlation,NL_er,NL_correlation,n_frequencies,Integrator_name, &
+&                        NL_correlation,NL_er,NL_correlation,n_runs,Integrator_name, &
 &                        NL_steps,NL_step
  use matrix_operate,ONLY:mat_r2c,mat_c2r
  use fields,        ONLY:Efield
@@ -99,7 +99,7 @@ integer function io_NL(ID)
  !
  ! Manage RD_CL_IF_END
  !
- if (io_action(ID)==RD_CL_IF_END.and.i_fragment==n_frequencies) io_action(ID)=RD_CL
+ if (io_action(ID)==RD_CL_IF_END.and.i_fragment==n_runs) io_action(ID)=RD_CL
  !
  ! Efield 
  !
