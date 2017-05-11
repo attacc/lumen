@@ -31,7 +31,7 @@ subroutine INIT_ypp(E,instr,lnstr,FINALIZE)
 &                         l_wannier,l_wavefunction,MAX_DbGd_DBs,n_DbGd_DBs,n_u_interp_pts,n_u_k_pts,n_u_q_pts,&
 &                         U_k_pts,U_interp_pts,U_q_pts,U_q_shifts,DbGd_DB1_paths
  use units,          ONLY:FS2AUT
- use YPP_non_linear, ONLY:NL_response,X_order
+ use YPP_non_linear, ONLY:NL_response,X_order,N_richardson
  use fields,         ONLY:Efield
  use pars,           ONLY:SP,schlen
  use D_lattice,      ONLY:i_time_rev
@@ -96,9 +96,9 @@ subroutine INIT_ypp(E,instr,lnstr,FINALIZE)
    ! and set the correct energy range
    if(trim(Efield(1)%ef_name)/="DELTA".and.NL_damping/=0._SP.and.n_frequencies/=1) then
      NL_response%T_range(:)=(/2._SP/NL_damping*5._SP+NL_step,-FS2AUT/)
-     X_Order=4
+     X_order=4
    else
-     X_Order=1
+     X_order=1
    endif
  endif
  !

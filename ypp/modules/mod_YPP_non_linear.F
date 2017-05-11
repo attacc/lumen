@@ -35,6 +35,7 @@ module YPP_non_linear
  integer  :: N_probe_frequencies
  integer  :: X_order
  real(SP) :: W_minimal_step ! minimal frequency sted defined from the simulation length
+ integer  :: N_richardson        =1  ! order of Richardson extrapolation
  !
  type NL_resp
    real(SP) :: delta_T           =0._SP                    ! delta T

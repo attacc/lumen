@@ -28,8 +28,8 @@ subroutine NL_driver(en)
  use units,          ONLY:HA2EV,AUT2FS
  use electrons,      ONLY:levels
  use parser_m,       ONLY:parser
- use nl_optics,      ONLY:n_frequencies,NL_P_t,NL_damping,NL_steps,NL_step, &
-&                         NL_steps
+ use nl_optics,      ONLY:n_runs,NL_P_t,NL_damping,NL_steps,NL_step, &
+&                         NL_steps,n_intensities
  use fields,         ONLY:Efield,EtoT,Divide_by_Field,ext_field,Efield_duplicate,Efield_strength
  use IO_m,           ONLY:OP_RD_CL,DUMP,io_control,NONE
  use com,            ONLY:msg,error,warning
@@ -45,7 +45,7 @@ subroutine NL_driver(en)
  !
  integer, external::io_NL
  integer  :: io_NonLinear,ID,i_Probe
- integer  :: i_f,i_d,i_order,i_t_field_range(2),i_time_range_save(2)
+ integer  :: i_r,i_d,i_order,i_t_field_range(2),i_time_range_save(2)
  real(SP) :: W_step,T_period,time_range_save(2)
  real(SP),    allocatable  :: NL_P(:,:,:),Harmonic_Frequency(:,:),Probe_frequency(:)
  complex(SP), allocatable  :: X_effective(:,:,:),Susceptibility(:,:,:)
@@ -61,20 +61,20 @@ subroutine NL_driver(en)
  io_Nonlinear=io_NL(ID)
  if(io_Nonlinear/=0) call error("Error reading NonLinear database")
  !
- allocate(NL_P(NL_steps,n_frequencies,3),Probe_frequency(n_frequencies))
+ allocate(NL_P(NL_steps,n_runs,3),Probe_frequency(n_runs))
  !
  ! Reads the polarization from dbs containing simulation at different frequencies 
  !
  Probe_consistency_error=.FALSE.
  i_Probe=1
  !
- do i_f=1,n_frequencies
-   call io_control(ACTION=OP_RD_CL,COM=NONE,SEC=(/1+i_f/),MODE=DUMP,ID=ID)
+ do i_r=1,n_runs
+   call io_control(ACTION=OP_RD_CL,COM=NONE,SEC=(/1+i_r/),MODE=DUMP,ID=ID)
    io_Nonlinear=io_NL(ID)
    !
    Efield(i_Probe)%amplitude=Efield_strength(Efield(i_Probe)%intensity,'AU')
    !
-   if (i_f==1) then
+   if (i_r==1) then
      call Efield_duplicate(Efield(i_Probe),Efield_probe)
    else
      if (Efield_probe%t_initial/=Efield(i_Probe)%t_initial)   Probe_consistency_error=.TRUE.
@@ -82,10 +82,10 @@ subroutine NL_driver(en)
    endif
    !
    do i_d=1,3
-     NL_P(:,i_f,i_d)=NL_P_t(:,i_d)
+     NL_P(:,i_r,i_d)=NL_P_t(:,i_d)
    enddo
    !
-   Probe_frequency(i_f)=Efield(i_Probe)%frequency(1)
+   Probe_frequency(i_r)=Efield(i_Probe)%frequency(1)
    !
  enddo
  !
@@ -146,8 +146,8 @@ subroutine NL_driver(en)
    !
  case('SIN','SOFTSIN','ANTIRES')
      !  
-     allocate(X_effective(0:X_order,n_frequencies,3))
-     allocate(Susceptibility(0:X_order,n_frequencies,3),Harmonic_Frequency(0:X_order,n_frequencies))
+     allocate(X_effective(0:X_order,n_runs,3))
+     allocate(Susceptibility(0:X_order,n_runs,3),Harmonic_Frequency(0:X_order,n_runs))
      !
      do i_order=0,X_order
        Harmonic_Frequency(i_order,:)=real(i_order,SP)*Probe_Frequency(:)
@@ -159,18 +159,18 @@ subroutine NL_driver(en)
      !
      call msg('s','[NL] Effective max time period [fs]:',T_period*AUT2FS)
      !
-     call live_timing('X effective :', n_frequencies)
+     call live_timing('X effective :', n_runs)
      !
      time_range_save  =NL_response%T_range
      i_time_range_save=NL_response%i_T_range
      !
-     do i_f = 1, n_frequencies
+     do i_r = 1, n_runs
        !
-       T_period=T_range(1,i_f)
+       T_period=T_range(1,i_r)
        !
        do i_d = 1,3
-         call NL_coefficients_Inversion(X_order+1,X_order+1,NL_P(:,i_f,i_d),X_effective(0:,i_f,i_d),&
-&                                     Harmonic_Frequency(0:,i_f),T_period)
+         call NL_coefficients_Inversion(X_order+1,X_order+1,NL_P(:,i_r,i_d),X_effective(0:,i_r,i_d),&
+&                                     Harmonic_Frequency(0:,i_r),T_period)
        end do
        !
        call live_timing(steps=1)
@@ -186,18 +186,23 @@ subroutine NL_driver(en)
      !
      do i_order=0,X_order
        !
-       do i_f=1,n_frequencies
+       do i_r=1,n_runs
          !
          if (i_order==1) then
-           Susceptibility(i_order,i_f,1)=4._SP*pi*dot_product( Efield(i_Probe)%versor(:),X_effective(i_order,i_f,:) )*&
+           Susceptibility(i_order,i_r,1)=4._SP*pi*dot_product( Efield(i_Probe)%versor(:),X_effective(i_order,i_r,:) )*&
                 &                                                   Divide_by_Field(Efield(i_Probe),i_order)
          else 
-           Susceptibility(i_order,i_f,:)=4._SP*pi*X_effective(i_order,i_f,:)*Divide_by_Field(Efield(i_Probe),i_order)
+           Susceptibility(i_order,i_r,:)=4._SP*pi*X_effective(i_order,i_r,:)*Divide_by_Field(Efield(i_Probe),i_order)
          end if
          !
        enddo
        ! 
      enddo
+     !
+     ! Richardson extrapolation
+     !
+     if(n_intensities>1) then
+     endif
      !
      ! Plot
      !
@@ -240,16 +245,13 @@ contains
      ! Working Space
      !
      character(schlen) :: X_file_name,short_X_file_name
-     integer           :: i_fp,i_dsc
-     logical           :: l_prt_err
+     integer           :: i_fp,i_dsc,i_f
      real(SP)          :: Unit_of_Measure,VALUEs(11)
-     integer           :: f_indx(n_frequencies),n_headings
+     integer           :: f_indx(n_runs),n_headings
      character(schlen) :: headings(11)
      !
-     l_prt_err=.false.
-     !
      Harmonic_Frequency(1,:)=Probe_Frequency(:)
-     call sort(Harmonic_Frequency(1,:),indx=f_indx(:n_frequencies))
+     call sort(Harmonic_Frequency(1,:),indx=f_indx(:n_runs))
      !
      n_headings=7
      !
@@ -275,7 +277,7 @@ contains
        !
        call msg('o '//trim(short_X_file_name),'',headings(1:n_headings),USE_TABS=.TRUE.)
        !
-       do i_fp=1,n_frequencies
+       do i_fp=1,n_runs
          !
          i_f=f_indx(i_fp)
          !

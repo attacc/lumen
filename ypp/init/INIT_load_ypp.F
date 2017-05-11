@@ -29,7 +29,7 @@ subroutine ypp_INIT_load(defs)
  use D_lattice,     ONLY:Tel,Bose_Temp
  use electrons,     ONLY:n_spinor
  use interpolate,   ONLY:lpfac
- use YPP_non_linear, ONLY:NL_response,X_order 
+ use YPP_non_linear, ONLY:NL_response,X_order,N_richardson 
  use YPP
 #if defined _YPP_ELPH
  use YPP_ELPH
@@ -199,6 +199,7 @@ subroutine ypp_INIT_load(defs)
  call it(defs,'ETStpsRt','Total Energy steps',NL_response%W_n_steps)
  call it(defs,'TimeRange','Time-window where processing is done',NL_response%T_range,unit=Time_unit(1))
  call it(defs,'TimeStep','Time step',NL_response%delta_T,unit=Time_unit(1))
+ call it(defs,'NRichardson','Order of Richardson extrapolation',N_richardson)
  call it(defs,'DampMode','Damping type ( NONE | LORENTZIAN | GAUSSIAN )',NL_response%damping)
  call it(defs,'DampFactor','Damping parameter',NL_response%damp_factor,unit=E_unit)
  !
