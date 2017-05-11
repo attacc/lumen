@@ -27,7 +27,7 @@ integer function variables_NL(ID,local_description)
  use units,         ONLY:AUT2FS, HA2EV, AU2KWCMm2
  use nl_optics,     ONLY:NL_damping,l_use_DIPOLES,NL_correlation,NL_er,NL_correlation,n_frequencies,      &
 &                        n_NL_descriptions,NL_description,Integrator_name,NL_steps,NL_step,NL_bands,      &
-&                        NL_ng,ng_oscll
+&                        NL_ng,ng_oscll,n_intensities
  use electric,      ONLY:l_force_SndOrd
  use fields,        ONLY:Efield
  use IO_m,          ONLY:io_elemental,io_status
@@ -46,7 +46,7 @@ integer function variables_NL(ID,local_description)
  !
  ! PARAMETERS
  !
- call io_elemental(ID,VAR="NLPARS",VAR_SZ=10,MENU=0)
+ call io_elemental(ID,VAR="NLPARS",VAR_SZ=11,MENU=0)
  i_desc=i_desc+1
  call io_elemental(ID,VAR="[RT] Time steps       :",I0=NL_steps,     CHECK=.true.,OP=(/"=="/), &
 &         DESCRIPTION=local_description(i_desc))
@@ -64,6 +64,9 @@ integer function variables_NL(ID,local_description)
 &         DESCRIPTION=local_description(i_desc),UNIT=HA2EV)
  i_desc=i_desc+1
  call io_elemental(ID,VAR="[NL] Number of freqs  :",I0=n_frequencies,CHECK=.true.,OP=(/"=="/), & 
+&         DESCRIPTION=local_description(i_desc))
+ i_desc=i_desc+1
+ call io_elemental(ID,VAR="[NL] Number of intens :",I0=n_intensities,CHECK=.true.,OP=(/"=="/), & 
 &         DESCRIPTION=local_description(i_desc))
  i_desc=i_desc+1
  call io_elemental(ID,VAR="[NL] Force 2nd approx :",L0=l_force_SndOrd,CHECK=.true.,OP=(/"=="/), & 

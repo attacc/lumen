@@ -37,10 +37,10 @@ subroutine NL_driver(E,X,k,q,Xw)
  use QP_m,           ONLY:QP_nk
  use QP_CTL_m,       ONLY:QP_apply
  use frequency,      ONLY:w_samp
- use nl_optics,      ONLY:n_frequencies,Correlation,IPA,NL_alloc,NL_free,V_bands,NL_bands, &
-&                         NL_estep,NL_er,Integrator,l_use_DIPOLES,NL_P_t,NL_ng,  &
-&                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,runs_done,n_runs_todo, &
-&                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_step,LSEX,LHF,ng_oscll,Sigma_SEX_EQ
+ use nl_optics,      ONLY:n_runs,Correlation,IPA,NL_alloc,NL_free,V_bands,NL_bands,NL_step,&
+&                         Integrator,l_use_DIPOLES,NL_P_t,NL_ng,EF_parms,Sigma_SEX_EQ,ng_oscll,   &
+&                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,runs_done,n_runs_todo,LSEX,LHF, &
+&                         NL_nbands,NL_P,NL_i_time,NL_steps
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
  use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure
@@ -57,7 +57,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  ! 
  ! Work Space
  !
- integer           :: i_f,i1,NL_bands1_save,N_frequency_save,iGo_max,ik
+ integer           :: i_r,i1,NL_bands1_save,N_runs_save,iGo_max,ik
  real(SP)          :: Time
  integer, external :: eval_G_minus_G
  integer           :: wf_ng_save
@@ -193,13 +193,13 @@ subroutine NL_driver(E,X,k,q,Xw)
  !
  ! Start-Up & Timing
  !===================
- call live_timing('[NL] Frequencies :',PAR_IND_runs%n_of_elements(PAR_IND_runs_ID+1)*NL_steps)
+ call live_timing('[NL] Runs :',PAR_IND_runs%n_of_elements(PAR_IND_runs_ID+1)*NL_steps)
  !
- do i_f=1,n_frequencies
+ do i_r=1,n_runs
    !
-   if(.not.PAR_IND_runs%element_1D(i_f)) cycle
+   if(.not.PAR_IND_runs%element_1D(i_r)) cycle
    !
-   if(runs_done(i_f)) then
+   if(runs_done(i_r)) then
      call live_timing(steps=NL_steps)
      cycle
    endif
@@ -211,7 +211,9 @@ subroutine NL_driver(E,X,k,q,Xw)
    !
    ! Efield
    ! ================
-   Efield(1)%frequency=NL_er(1)+real(i_f-1,SP)*NL_estep
+   Efield(1)%frequency=EF_parms(i_r)%frequency
+   Efield(1)%intensity=EF_parms(i_r)%intensity
+   Efield(1)%amplitude=EF_parms(i_r)%amplitude
    !
    do NL_i_time=1,NL_steps
      !
@@ -226,7 +228,7 @@ subroutine NL_driver(E,X,k,q,Xw)
      E_tot_t(NL_i_time,:)=E_tot
      E_ks_t (NL_i_time,:)=E_ks
      !
-     call NL_output(NL_i_time,i_f) 
+     call NL_output(NL_i_time,i_r) 
      !
      call NL_Integrator(E,k,q,X,Integrator,NL_i_time,V_bands)
      !
@@ -234,7 +236,7 @@ subroutine NL_driver(E,X,k,q,Xw)
      !
    enddo
    !
-   call NL_databases_IO(i_f,'write')
+   call NL_databases_IO(i_r,'write')
    !
  enddo
  !
@@ -263,11 +265,11 @@ subroutine NL_driver(E,X,k,q,Xw)
      NL_bands(1)     =1
      X(1)%ib         =(/1,NL_bands(2)/)
      !
-     ! Set n_frequencies = 1 
+     ! Set n_runs = 1 
      ! Parallelization on frequencies turned off
      !
-     N_frequency_save=n_frequencies
-     n_frequencies   =1
+     N_runs_save=n_runs
+     n_runs   =1
      eval_OVERLAPS   =.TRUE.
      !
      call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
@@ -287,7 +289,7 @@ subroutine NL_driver(E,X,k,q,Xw)
      ! Restore frequencies
      ! Parallelization on frequencies turned on
      !
-     n_frequencies =N_frequency_save
+     n_runs =N_runs_save
      eval_OVERLAPS   =.FALSE.
      !
      call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))

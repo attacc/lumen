@@ -39,7 +39,7 @@ subroutine NL_initialize(E,k,q)
  use nl_optics,      ONLY:EULER,EULEREXP,RK2,RK4,RK2EXP,RK4EXP,HEUN,INVINT,Integrator,CRANK_NICOLSON,Integrator_name
  !
  use nl_optics,      ONLY:NL_damping,NL_correlation,Correlation,NL_er,NL_estep,n_frequencies,IPA,TDDFT,HARTREE,LRC,JGM, &
-&                         LRCW,eval_DFT,eval_HARTREE,NL_bands,NL_nbands,l_use_DIPOLES,LSEX,LHF, &
+&                         LRCW,eval_DFT,eval_HARTREE,NL_bands,NL_nbands,l_use_DIPOLES,LSEX,LHF,n_intensities, &
 &                         NL_steps,NL_tot_time,Phase_LifeTime,NL_step,Verbosity_name,VER_HIGH,VER_LOW,NL_verbosity
  !
  use electric,       ONLY:l_force_SndOrd
@@ -183,6 +183,11 @@ subroutine NL_initialize(E,k,q)
  ! Frequencies range
  ! =========================
  NL_estep=(NL_er(2)-NL_er(1))/real(n_frequencies,SP)
+ !
+ ! Intensities range
+ !=========================
+ if(n_intensities>1) &
+&   call msg( 'sr', 'Multiple intensities for Richardson extrapolation')
  !
  ! Check Field
  ! =========================

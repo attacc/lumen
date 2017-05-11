@@ -128,6 +128,16 @@ module nl_optics
  integer  :: n_frequencies
  integer  :: n_intensities
  integer  :: n_runs_todo
+ real(SP) :: initial_Amplitude
+ integer  :: n_runs
+ !
+ type EF_parameters
+   real(SP) :: frequency
+   real(SP) :: intensity
+   real(SP) :: amplitude
+ end type
+ !
+ type(EF_parameters), allocatable :: EF_parms(:)
  !
  ! Databases input/output
  !
