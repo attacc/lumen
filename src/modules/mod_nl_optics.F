@@ -131,10 +131,13 @@ module nl_optics
  real(SP) :: initial_Amplitude
  integer  :: n_runs
  !
+ integer, parameter :: n_parms=2 ! Number of paramters in efield loop
+ !
  type EF_parameters
    real(SP) :: frequency
    real(SP) :: intensity
    real(SP) :: amplitude
+   integer  :: indexes(n_parms) 
  end type
  !
  type(EF_parameters), allocatable :: EF_parms(:)

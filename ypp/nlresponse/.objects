@@ -1,0 +1,3 @@
+objs = NL_driver.o NL_Cdamp_it.o NL_coefficients_Inversion.o NL_1D_Fourier_Transform.o NL_linear_response.o NL_Rdamp_it.o NL_richardson.o \ 
+#NL_plot_x_effective.o
+

@@ -199,15 +199,17 @@ subroutine NL_driver(en)
        ! 
      enddo
      !
+     ! Regenerate Efield indexes
+     !
+     call NL_generate_ef_list(Efield_probe)
+     !
      ! Richardson extrapolation
      !
-     if(n_intensities>1) then
-        call NL_richardson(Susceptibility)
-     endif
+     call NL_richardson(Susceptibility,Harmonic_Frequency)
      !
      ! Plot
      !
-     call plot_X_effective()
+!     call plot_X_effective()
      deallocate(X_effective,Susceptibility,Harmonic_Frequency)
      !
   case ('DELTA')

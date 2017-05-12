@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_plot_x_effective(en)
+subroutine NL_plot_x_effective()
  !
  ! ... ordering and frequency step (defines the P(t) periodicity)
  !

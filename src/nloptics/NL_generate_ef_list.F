@@ -24,9 +24,9 @@ subroutine NL_generate_ef_list(Efield)
  ! in the different runs
  !
  use pars ,        ONLY:SP
- use nl_optics,    ONLY:n_frequencies,n_intensities,n_runs,EF_parms,n_runs
+ use nl_optics,    ONLY:n_frequencies,n_intensities,n_runs,EF_parms,n_runs,nl_er
  use com,          ONLY:error
- use fields,       ONLY:ext_field
+ use fields,       ONLY:ext_field,Efield_strength
  !
  type(ext_field), intent(in) :: Efield
  !
@@ -60,6 +60,7 @@ subroutine NL_generate_ef_list(Efield)
      endif
      !
      EF_parms(i_r)%amplitude =Efield_strength(EF_parms(i_r)%intensity,'AU')
+     EF_parms(i_r)%indexes   =(/i_f, i_i/)
      !
      i_r=i_r+1
      !
