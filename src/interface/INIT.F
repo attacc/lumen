@@ -54,7 +54,7 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
  use X_m,            ONLY:X_t,X_duplicate,X_reset,Chi_mode
  use stderr,         ONLY:log_as_a_file,logfile,intc,string_add,string_remove
  use R_lattice,      ONLY:ng_closed,q0_def_norm,bz_samp,nqibz,bz_samp_reset 
- use wave_func,      ONLY:io_WF
+ use wave_func,      ONLY:io_WF,wf_ng
  use IO_m,           ONLY:io_control,OP_RD_CL,DUMP,NONE,mk_dir
  use TDDFT,          ONLY:io_BS_Fxc
  use BS,             ONLY:BS_bands,BS_n_g_exch,BS_n_g_W,&
@@ -214,7 +214,7 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
  QP_ng_Sc=ng_closed
  QP_ng_SH=ng_closed
  BS_n_g_exch=ng_closed
- NL_ng      =ng_closed
+ NL_ng      =wf_ng
  !
  ! kindx
  !
