@@ -37,7 +37,6 @@ subroutine NL_linear_response(en)
  use memory_m,       ONLY:mem_est
  use fields,         ONLY:Efield,small_a_frequency,small_a
  use functions,      ONLY:theta_function
- use parser_m,       ONLY:parser
  use units,          ONLY:AUT2FS
  use com,            ONLY:error,msg
  !

@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_plot_x_effective()
+subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
  !
  ! ... ordering and frequency step (defines the P(t) periodicity)
  !
@@ -29,19 +29,24 @@ subroutine NL_plot_x_effective()
  use units,          ONLY:HA2EV,SVCMm12VMm1,AU2VMm1
  use com,            ONLY:msg,of_open_close
  use vec_operate,    ONLY:sort
+ use YPP_non_linear, ONLY:X_order
  use stderr,         ONLY:set_real_printed_length
- use nl_optics,      ONLY:n_NL_descriptions,NL_description
+ use nl_optics,      ONLY:n_NL_descriptions,NL_description,n_frequencies
+ use stderr,         ONLY:intc,real2ch
+ !
+ implicit none
+ !
+ complex(SP), intent(in) :: Susc(0:X_order,3,n_frequencies)
+ real(SP),    intent(in) :: Freqs(n_frequencies)
+ integer,     intent(in) :: extra_idx
  !
  ! Working Space
  !
  character(schlen) :: X_file_name,short_X_file_name
- integer           :: i_fp,i_dsc,i_f
+ integer           :: i_order,i_dsc,i_f
  real(SP)          :: Unit_of_Measure,VALUEs(11)
- integer           :: f_indx(n_runs),n_headings
+ integer           :: n_headings
  character(schlen) :: headings(11)
- !
- Harmonic_Frequency(1,:)=Probe_Frequency(:)
- call sort(Harmonic_Frequency(1,:),indx=f_indx(:n_runs))
  !
  n_headings=7
  !
@@ -51,7 +56,13 @@ subroutine NL_plot_x_effective()
  !
  do i_order=0,X_order,1
    !
-   X_file_name="YPP-X_probe_order_"//trim(intc(i_order))
+   if(extra_idx==0) then
+     X_file_name="YPP-X_probe_order_"//trim(intc(i_order))
+   else
+     X_file_name="YPP-X_probe_int_"//trim(intc(extra_idx))// &
+&         "order_"//trim(intc(i_order))
+   endif
+   !
    short_X_file_name=trim(X_file_name)
    !
    call set_real_printed_length(f_length=15,g_length=15)
@@ -67,22 +78,20 @@ subroutine NL_plot_x_effective()
    !
    call msg('o '//trim(short_X_file_name),'',headings(1:n_headings),USE_TABS=.TRUE.)
    !
-   do i_fp=1,n_runs
-     !
-     i_f=f_indx(i_fp)
+   do i_f=1,n_frequencies
      !
      Unit_of_Measure = 1._SP
      !
      if (i_order==0) Unit_of_Measure =  SVCMm12VMm1/AU2VMm1
      if (i_order> 1) Unit_of_Measure = (SVCMm12VMm1/AU2VMm1)**(i_order-1)  
      !
-     VALUEs(1)  =Probe_Frequency(i_f)*HA2EV
-     VALUEs(2:7)=(/aimag(Susceptibility(i_order,i_f,1)*Unit_of_Measure),&
-&                   real(Susceptibility(i_order,i_f,1)*Unit_of_Measure),&
-                   aimag(Susceptibility(i_order,i_f,2)*Unit_of_Measure),&
-&                   real(Susceptibility(i_order,i_f,2)*Unit_of_Measure),&
-&                  aimag(Susceptibility(i_order,i_f,3)*Unit_of_Measure),&
-&                   real(Susceptibility(i_order,i_f,3)*Unit_of_Measure)/)
+     VALUEs(1)  =Freqs(i_f)*HA2EV
+     VALUEs(2:7)=(/aimag(Susc(i_order,1,i_f)*Unit_of_Measure),&
+&                   real(Susc(i_order,1,i_f)*Unit_of_Measure),&
+                   aimag(Susc(i_order,2,i_f)*Unit_of_Measure),&
+&                   real(Susc(i_order,2,i_f)*Unit_of_Measure),&
+&                  aimag(Susc(i_order,3,i_f)*Unit_of_Measure),&
+&                   real(Susc(i_order,3,i_f)*Unit_of_Measure)/)
      !
     call msg('o '//trim(short_X_file_name),'',VALUEs(1:n_headings),USE_TABS=.TRUE.)
      !

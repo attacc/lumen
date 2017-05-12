@@ -18,31 +18,17 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_richardson(Susceptibility,Harmonic_Frequency,Susc_extrapolated)
+subroutine NL_richardson(Susc_vs_field,Susc_extrapolated)
  !
  use pars,           ONLY:SP
  use nl_optics,      ONLY:n_runs,n_frequencies,n_intensities
  use YPP_non_linear, ONLY:X_order
  use com,            ONLY:error
  !
- complex(SP), intent(in)  :: Susceptibility(0:X_order,3,n_runs)
- real(SP),    intent(in)  :: Harmonic_Frequency(0:X_order,n_runs)
- complex(SP), intent(out) :: Susc_extrapolated(0:X_order,n_frequencies)
+ implicit none
  !
- ! Working Space
- !
- complex(SP), allocatable ::  Susc_vs_field(0:X_order,3,n_frequencies,n_intensities)
- !
- ! Reorder susceptibilities according to the field indexes
- !
- do i_r=1,n_runs
-   !
-   i_f=EF_parms(i_r)%indexes(1)
-   i_i=EF_parms(i_r)%indexes(1)
-   !
-   Susc_vs_field(:,:,i_f,i_i)=Susceptibility(:,:,i_r)
-   !
- enddo
+ complex(SP), intent(in)  :: Susc_vs_field(0:X_order,3,n_frequencies,n_intensities)
+ complex(SP), intent(out) :: Susc_extrapolated(0:X_order,3,n_frequencies)
  !
  if(n_intensities==1) then
    !
@@ -70,7 +56,7 @@ subroutine NL_richardson(Susceptibility,Harmonic_Frequency,Susc_extrapolated)
    ! X3 = 8/3 [ P(w,E) - 6 P(w, E/2) + 8 P(w, E/4) ]
    !
    Susc_extrapolated=Susc_vs_field(:,:,:,1) - 6._SP*Susc_vs_field(:,:,:,2) + 8._SP*Susc_vs_field(:,:,:,3)
-   Susc_extranpolated=8._SP/3._SP*Susc_extrapolated
+   Susc_extrapolated=8._SP/3._SP*Susc_extrapolated
    !
  else
    call error("Richardson extrapolation order==4 not implemented!! ")

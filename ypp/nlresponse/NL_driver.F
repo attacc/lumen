@@ -29,7 +29,7 @@ subroutine NL_driver(en)
  use electrons,      ONLY:levels
  use parser_m,       ONLY:parser
  use nl_optics,      ONLY:n_runs,NL_P_t,NL_damping,NL_steps,NL_step, &
-&                         NL_steps,n_intensities
+&                         NL_steps,n_intensities,EF_parms,n_frequencies
  use fields,         ONLY:Efield,EtoT,Divide_by_Field,ext_field,Efield_duplicate,Efield_strength
  use IO_m,           ONLY:OP_RD_CL,DUMP,io_control,NONE
  use com,            ONLY:msg,error,warning
@@ -44,16 +44,20 @@ subroutine NL_driver(en)
  ! Working Space
  !
  integer, external::io_NL
- integer  :: io_NonLinear,ID,i_Probe
+ integer  :: io_NonLinear,ID,i_Probe,i_f,i_i
  integer  :: i_r,i_d,i_order,i_t_field_range(2),i_time_range_save(2)
  real(SP) :: W_step,T_period,time_range_save(2)
  real(SP),    allocatable  :: NL_P(:,:,:),Harmonic_Frequency(:,:),Probe_frequency(:)
  complex(SP), allocatable  :: X_effective(:,:,:),Susceptibility(:,:,:)
+ complex(SP), allocatable ::  Susc_vs_field(:,:,:,:),Susc_extrapolated(:,:,:),Freqs(:)
  logical  :: Probe_consistency_error
  type(ext_field)   :: Efield_probe
  real(SP) :: NL_tot_time
+ logical  :: plot_all_Susc
  !
  call section("*",'NL Post Processing')
+ !
+ call parser('WrAllResps',plot_all_Susc)
  !
  ! Input/Output
  !
@@ -111,6 +115,8 @@ subroutine NL_driver(en)
    NL_response%T_range(2)  =(NL_steps-1)*NL_step
  endif
  !
+ ! 
+ !
  if(Efield_probe%ef_name=='SIN'.or.Efield_probe%ef_name=='SOFTSIN'.or.Efield_probe%ef_name=='ANTIRES') then
    !        
    ! Time Initialization for periodic probes
@@ -148,6 +154,9 @@ subroutine NL_driver(en)
      !  
      allocate(X_effective(0:X_order,n_runs,3))
      allocate(Susceptibility(0:X_order,3,n_runs),Harmonic_Frequency(0:X_order,n_runs))
+     allocate(Susc_vs_field(0:X_order,3,n_frequencies,n_intensities))
+     allocate(Susc_extrapolated(0:X_order,3,n_runs),Harmonic_Frequency(0:X_order,n_runs))
+     allocate(Freqs(n_frequencies))
      !
      do i_order=0,X_order
        Harmonic_Frequency(i_order,:)=real(i_order,SP)*Probe_Frequency(:)
@@ -203,16 +212,40 @@ subroutine NL_driver(en)
      !
      call NL_generate_ef_list(Efield_probe)
      !
+     ! Reorder susceptibilities according to the field indexes
+     !
+     do i_r=1,n_runs
+       !
+       i_f=EF_parms(i_r)%indexes(1)
+       i_i=EF_parms(i_r)%indexes(2)
+       !
+       Susc_vs_field(:,:,i_f,i_i)=Susceptibility(:,:,i_r)
+       if(i_i==1) Freqs(i_f)     =Probe_Frequency(i_r)
+       !
+     enddo
+     !
+     deallocate(Susceptibility,Harmonic_frequency,Probe_Frequency)
+     !
      ! Richardson extrapolation
      !
-     call NL_richardson(Susceptibility,Harmonic_Frequency)
+     call NL_richardson(Susc_vs_field,Susc_extrapolated)
      !
      ! Plot
      !
-!     call plot_X_effective()
-     deallocate(X_effective,Susceptibility,Harmonic_Frequency)
+     call plot_X_effective(Susc_extrapolated,Freqs,0)
+     !
+     if(plot_all_Susc) then
+       do i_i=1,n_intensities
+         call plot_X_effective(Susc_vs_field(:,:,:,i_i),Freqs,i_i)
+       enddo
+     endif
+     !
+     deallocate(X_effective,Susc_vs_field,Susc_extrapolated)
      !
   case ('DELTA')
+    !
+    if(n_intensities/=0) &
+      call error("More than one intensity not compatible with DELTA field ")
     !
     ! For testing purpose
     !
