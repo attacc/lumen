@@ -25,7 +25,7 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
  !
  use parallel_m,    ONLY:PARALLEL_n_structures_active,PARALLEL_CPU_used,&
 &                        PARALLEL_CPU_role,ncpu,QP_range,n_bands,n_c_bands,n_v_bands,Q_range,&
-&                        EH_range,K_range,CPU_structure,i_PAR_structure,n_runs
+&                        EH_range,K_range,CPU_structure,i_PAR_structure,n_ef_steps
  use interfaces,    ONLY:PARALLEL_live_message
  use vec_operate,   ONLY:GreatestCommonDivisor
  use com,           ONLY:error
@@ -213,15 +213,15 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
     implicit none
     integer :: ncpu_f,ncpu_k,ncpu_sndchain
     !
-    if(n_runs>ncpu) then
+    if(n_ef_steps>ncpu) then
       ncpu_f=ncpu
       ncpu_k=1
     else
-      ncpu_f       =GreatestCommonDivisor(ncpu,n_runs)
+      ncpu_f       =GreatestCommonDivisor(ncpu,n_ef_steps)
       ncpu_sndchain=ncpu/ncpu_f
       !
       if(ncpu_sndchain>K_range) then
-        call error('Number of processors > n_freq *n_kpoints')
+        call error('Number of processors > n_frequencies * n_intensities *n_kpoints')
       else
         ncpu_k=ncpu_sndchain
       endif

@@ -33,7 +33,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 &                        MPI_comm,PAR_DIPk_ibz_index,PAR_DIPk_nibz,COMM_copy,n_WF_bands_to_load,&
 &                        PAR_n_Bp_mat_elements,PAR_Bp_mat_index,PAR_PLASMA_index,&
 &                        PAR_BS_T_grps_index,PAR_BS_nT_col_grps,PAR_Kk_nibz,PAR_nG_bands,PAR_G_bands_index,&
-&                        PAR_Q_bz_index,PAR_nQ_bz,PAR_RL_index,n_runs, &
+&                        PAR_Q_bz_index,PAR_nQ_bz,PAR_RL_index,n_ef_steps, &
 &                        Q_range,QP_range,n_v_bands,n_c_bands,K_range,n_bands,EH_range
  use parallel_m,    ONLY:& ! LOGICALS
 &                        l_par_X_T,l_par_X_G_q0,l_par_RT,l_par_SE,l_par_X_G_all_q,l_par_X_G_finite_q,&
@@ -77,7 +77,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 #if defined _SCALAPACK
  use SLK_m,         ONLY:SLK_COM_INDEX,SLK_COM_A2A
 #endif
- use nl_optics,     ONLY:NL_bands,n_frequencies,n_intensities,eval_OVERLAPS
+ use nl_optics,     ONLY:NL_bands,n_runs,eval_OVERLAPS
  use electrons,     ONLY:levels
  use stderr,        ONLY:intc
  use R_lattice,     ONLY:bz_samp,nqibz,nqbz
@@ -315,7 +315,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  !------------
  !
  if (ENVIRONMENT=="Non_Linear") then 
-   n_runs =n_frequencies*n_intensities
+   n_ef_steps = n_runs
    if(eval_OVERLAPS) then
       n_bands=(/1,NL_bands(2)/)
    else
@@ -658,15 +658,15 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    !
    ! Freq-points
    !
-   call PARALLEL_index(PAR_IND_runs,(/n_frequencies/),COMM=PAR_COM_runs_INDEX)
+   call PARALLEL_index(PAR_IND_runs,(/n_runs/),COMM=PAR_COM_runs_INDEX)
    PAR_IND_runs_ID=PAR_COM_runs_INDEX%CPU_id
    PAR_nFreqs      =PAR_IND_runs%n_of_elements(PAR_IND_Q_ID+1)
    call PARALLEL_live_message("Freqs",ENVIRONMENT=ENVIRONMENT,         &
 &                             LOADED=PAR_IND_runs%n_of_elements(PAR_IND_runs_ID+1), &
-&                             TOTAL=n_frequencies,NCPU=PAR_COM_runs_INDEX%n_CPU)
+&                             TOTAL=n_runs,NCPU=PAR_COM_runs_INDEX%n_CPU)
    !
-   allocate(PAR_runs_index(n_frequencies)) 
-   call Build_up_index(PAR_IND_runs,n_frequencies,PAR_runs_index,PAR_nFreqs)
+   allocate(PAR_runs_index(n_runs)) 
+   call Build_up_index(PAR_IND_runs,n_runs,PAR_runs_index,PAR_nFreqs)
    !
    ! K-points
    !

@@ -356,7 +356,7 @@ module parallel_m
  integer            :: n_bands(2)
  integer            :: n_c_bands(2)
  integer            :: n_v_bands(2)
- integer            :: n_runs
+ integer            :: n_ef_steps
  !
  ! ... and derived variables
  !==========================

@@ -65,6 +65,8 @@ subroutine NL_driver(en)
  io_Nonlinear=io_NL(ID)
  if(io_Nonlinear/=0) call error("Error reading NonLinear database")
  !
+ n_runs=n_frequencies*n_intensities
+ !
  allocate(NL_P(NL_steps,n_runs,3),Probe_frequency(n_runs))
  !
  ! Reads the polarization from dbs containing simulation at different frequencies 
@@ -244,7 +246,7 @@ subroutine NL_driver(en)
      !
   case ('DELTA')
     !
-    if(n_intensities/=0) &
+    if(n_intensities/=1) &
       call error("More than one intensity not compatible with DELTA field ")
     !
     ! For testing purpose

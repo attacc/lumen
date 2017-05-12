@@ -40,7 +40,7 @@ subroutine NL_initialize(E,k,q)
  !
  use nl_optics,      ONLY:NL_damping,NL_correlation,Correlation,NL_er,NL_estep,n_frequencies,IPA,TDDFT,HARTREE,LRC,JGM, &
 &                         LRCW,eval_DFT,eval_HARTREE,NL_bands,NL_nbands,l_use_DIPOLES,LSEX,LHF,n_intensities, &
-&                         NL_steps,NL_tot_time,Phase_LifeTime,NL_step,Verbosity_name,VER_HIGH,VER_LOW,NL_verbosity
+&                         NL_steps,NL_tot_time,Phase_LifeTime,NL_step,Verbosity_name,VER_HIGH,VER_LOW,NL_verbosity 
  !
  use electric,       ONLY:l_force_SndOrd
  use parser_m,       ONLY:parser
@@ -184,6 +184,10 @@ subroutine NL_initialize(E,k,q)
  ! =========================
  NL_estep=(NL_er(2)-NL_er(1))/real(n_frequencies,SP)
  !
+ ! Generate Electric fields list
+ ! ==============================
+ call NL_generate_ef_list(Efield(1))
+ !
  ! Intensities range
  !=========================
  if(n_intensities>1) &
@@ -242,6 +246,7 @@ subroutine NL_initialize(E,k,q)
  call msg( 'r', 'Efield Initial Time    [fs]:',Efield(1)%t_initial*AUT2FS)
  call msg( 'r', 'Frequencies range          :',NL_er*HA2EV)
  call msg( 'sr','Frequencies steps          :',n_frequencies)
+ call msg( 'sr','Intensity steps            :',n_intensities)
  call msg( 'r', 'Frequency   step           :',NL_estep*HA2EV)
  call msg( 'r', 'Use Dipoles                :',l_use_DIPOLES)
  call msg( 'r', 'Force Snd Order Dipoles    :',l_force_SndOrd)
