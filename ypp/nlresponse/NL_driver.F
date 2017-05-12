@@ -147,7 +147,7 @@ subroutine NL_driver(en)
  case('SIN','SOFTSIN','ANTIRES')
      !  
      allocate(X_effective(0:X_order,n_runs,3))
-     allocate(Susceptibility(0:X_order,n_runs,3),Harmonic_Frequency(0:X_order,n_runs))
+     allocate(Susceptibility(0:X_order,3,n_runs),Harmonic_Frequency(0:X_order,n_runs))
      !
      do i_order=0,X_order
        Harmonic_Frequency(i_order,:)=real(i_order,SP)*Probe_Frequency(:)
@@ -189,10 +189,10 @@ subroutine NL_driver(en)
        do i_r=1,n_runs
          !
          if (i_order==1) then
-           Susceptibility(i_order,i_r,1)=4._SP*pi*dot_product( Efield(i_Probe)%versor(:),X_effective(i_order,i_r,:) )*&
+           Susceptibility(i_order,1,i_r)=4._SP*pi*dot_product( Efield(i_Probe)%versor(:),X_effective(i_order,i_r,:) )*&
                 &                                                   Divide_by_Field(Efield(i_Probe),i_order)
          else 
-           Susceptibility(i_order,i_r,:)=4._SP*pi*X_effective(i_order,i_r,:)*Divide_by_Field(Efield(i_Probe),i_order)
+           Susceptibility(i_order,:,i_r)=4._SP*pi*X_effective(i_order,i_r,:)*Divide_by_Field(Efield(i_Probe),i_order)
          end if
          !
        enddo
