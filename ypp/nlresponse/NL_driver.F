@@ -91,7 +91,7 @@ subroutine NL_driver(en)
      NL_P(:,i_r,i_d)=NL_P_t(:,i_d)
    enddo
    !
-   Probe_frequency(i_r)=Efield(i_Probe)%frequency(1)
+   Probe_frequency(i_r)=Efield(i_Probe)%frequency
    !
  enddo
  !
