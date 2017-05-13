@@ -39,6 +39,7 @@ subroutine NL_richardson(Susc_vs_field,Susc_extrapolated)
  elseif(n_intensities==2) then
    !
    ! For a system with inversion symmetry
+   ! Remove linear component 
    !
    ! X^(3)(3w) = [ 4 * P(3w,E)/E^(3) - P(3w, E/2)/ (E/2)^3 ] /3 + O(5)
    !
@@ -46,8 +47,8 @@ subroutine NL_richardson(Susc_vs_field,Susc_extrapolated)
    !
  elseif(n_intensities==3) then
    !
-   ! For a system without inversion symmetry (remove also contribution of second
-   ! order)
+   ! For a system without inversion symmetry 
+   ! Remove linear and quadratic components 
    !
    ! P(w,E)   = a E   + b E^2    + X3 E^3
    ! P(w,E/2) = a E/2 + b E^2/4  + X3 E^3/8
