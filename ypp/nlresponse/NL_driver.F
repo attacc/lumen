@@ -157,8 +157,7 @@ subroutine NL_driver(en)
      allocate(X_effective(0:X_order,n_runs,3))
      allocate(Susceptibility(0:X_order,3,n_runs),Harmonic_Frequency(0:X_order,n_runs))
      allocate(Susc_vs_field(0:X_order,3,n_frequencies,n_intensities))
-     allocate(Susc_extrapolated(0:X_order,3,n_runs),Harmonic_Frequency(0:X_order,n_runs))
-     allocate(Freqs(n_frequencies))
+     allocate(Susc_extrapolated(0:X_order,3,n_runs),Freqs(n_frequencies))
      !
      do i_order=0,X_order
        Harmonic_Frequency(i_order,:)=real(i_order,SP)*Probe_Frequency(:)
