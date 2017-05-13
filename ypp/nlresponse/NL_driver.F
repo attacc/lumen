@@ -160,7 +160,7 @@ subroutine NL_driver(en)
      allocate(Susc_extrapolated(0:X_order,3,n_runs),Freqs(n_frequencies))
      !
      do i_order=0,X_order
-       Harmonic_Frequency(i_order,:)=real(i_order,SP)*Probe_Frequency(:)
+       Harmonic_Frequency(i_order,:)=real(i_order,SP)*Probe_frequency(:)
      enddo
      !
      call msg('s',':: Harmonic frequencies    [eV]:',(/minval(Harmonic_Frequency),maxval(Harmonic_Frequency)/)*HA2EV)
@@ -221,11 +221,11 @@ subroutine NL_driver(en)
        i_i=EF_parms(i_r)%indexes(2)
        !
        Susc_vs_field(:,:,i_f,i_i)=Susceptibility(:,:,i_r)
-       if(i_i==1) Freqs(i_f)     =Probe_Frequency(i_r)
+       if(i_i==1) Freqs(i_f)     =Probe_frequency(i_r)
        !
      enddo
      !
-     deallocate(Susceptibility,Harmonic_frequency,Probe_Frequency)
+     deallocate(Susceptibility,Harmonic_frequency,Probe_frequency)
      !
      ! Richardson extrapolation
      !
@@ -233,11 +233,11 @@ subroutine NL_driver(en)
      !
      ! Plot
      !
-     call plot_X_effective(Susc_extrapolated,Freqs,0)
+     call NL_plot_X_effective(Susc_extrapolated,Freqs,0)
      !
      if(plot_all_Susc) then
        do i_i=1,n_intensities
-         call plot_X_effective(Susc_vs_field(:,:,:,i_i),Freqs,i_i)
+         call NL_plot_X_effective(Susc_vs_field(:,:,:,i_i),Freqs,i_i)
        enddo
      endif
      !

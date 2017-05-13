@@ -37,13 +37,11 @@ module fields
    integer  :: t_initial_indx    ! time index of extern field switch on  (input variable)
    real(SP) :: t_final
    integer  :: t_final_indx      ! time index of extern field switch off (computed in RT_Fluence)
-   integer  :: n_frequencies
-   real(SP) :: frequency(2)
+   real(SP) :: frequency
    real(SP) :: damping
    real(SP) :: fluence = 0._SP
    real(SP) :: intensity
    real(SP) :: amplitude
-   real(SP) :: W_step
    real(SP) :: versor(3)
    real(SP) :: versor_circ(3)
  end type ext_field
@@ -92,14 +90,6 @@ module fields
      if (present(E)) EtoT=2._SP*pi*HBAR_eVfs/(E*HA2EV)*FS2AUT
    end function
    !
-   real(SP) function field_frequency(E_field,i_f)
-     integer           ::i_f
-     type(ext_field)   ::E_field
-     field_frequency=E_field%frequency(1)
-     if (i_f>1.and.E_field%n_frequencies>1) field_frequency=E_field%frequency(1)+&
-&       (E_field%frequency(2)-E_field%frequency(1))/(E_field%n_frequencies-1)*(i_f-1)
-   end function
-   !
    function small_a(T_i,E_field,order)
      !
      ! The vector potential is generally written as
@@ -128,7 +118,7 @@ module fields
      !
      small_a=cZERO
      !
-     W_0=E_field%frequency(1)
+     W_0=E_field%frequency
      sigma=E_field%damping
      T_0=pi/W_0*(real(nint(W_0/pi*3._SP*sigma),SP))
      f_t=cZERO
@@ -146,13 +136,11 @@ module fields
          if (order==1 ) f_t(i_field)=1._SP
          if (order==2 ) f_t(i_field)=0._SP
        case('SIN')
-         do i_fr=1,E_field%n_frequencies     
-           W_i=field_frequency(E_field,i_fr)
-           WT_i=W_i*T_i+fr_shift(i_field)
-           if (order==0 ) f_t(i_field)=f_t(i_field)-    (cos(WT_i)-1._SP)/W_i
-           if (order==1 ) f_t(i_field)=f_t(i_field)+     sin(WT_i)
-           if (order==2 ) f_t(i_field)=f_t(i_field)+W_0* cos(WT_i)
-         enddo 
+         W_i=E_field%frequency
+         WT_i=W_i*T_i+fr_shift(i_field)
+         if (order==0 ) f_t(i_field)=f_t(i_field)-    (cos(WT_i)-1._SP)/W_i
+         if (order==1 ) f_t(i_field)=f_t(i_field)+     sin(WT_i)
+         if (order==2 ) f_t(i_field)=f_t(i_field)+W_0* cos(WT_i)
        case('SOFTSIN')
          T_0=sigma
          !
@@ -163,17 +151,13 @@ module fields
          damp_func=1._SP
          if(real(T_i)<T_0.and.T_0>0._SP) damp_func=(a*T_i**4 + b*T_i**3 + c*T_i**2)       
          !
-         do i_fr=1,E_field%n_frequencies     
-           !
-           W_i=field_frequency(E_field,i_fr)
-           WT_i=W_i*T_i+fr_shift(i_field)
-           !
-           if (order==0 ) f_t(i_field)=f_t(i_field)- damp_func*(cos(WT_i)-1._SP)/W_i
-           if (order==1 ) f_t(i_field)=f_t(i_field)+ damp_func*sin(WT_i)
-           if (order==2 ) f_t(i_field)=f_t(i_field)+ damp_func*W_0*cos(WT_i)
-           if (order==-1) f_t(i_field)=-2
-           !
-         enddo 
+         W_i=E_field%frequency
+         WT_i=W_i*T_i+fr_shift(i_field)
+         !
+         if (order==0 ) f_t(i_field)=f_t(i_field)- damp_func*(cos(WT_i)-1._SP)/W_i
+         if (order==1 ) f_t(i_field)=f_t(i_field)+ damp_func*sin(WT_i)
+         if (order==2 ) f_t(i_field)=f_t(i_field)+ damp_func*W_0*cos(WT_i)
+         if (order==-1) f_t(i_field)=-2
          !
        case('THETA')
          !  
@@ -191,22 +175,18 @@ module fields
          if (order==2 ) f_t(i_field)=0._SP
          !
        case('ANTIRES')
-         do i_fr=1,E_field%n_frequencies
-           W_i=field_frequency(E_field,i_fr)
-           WT_i=W_i*T_i+fr_shift(i_field)
-           if (order==0 ) f_t(i_field)=f_t(i_field)-cI*    exp(cI*WT_i)/W_i
-           if (order==1 ) f_t(i_field)=f_t(i_field)+       exp(cI*WT_i)
-           if (order==2 ) f_t(i_field)=f_t(i_field)+cI*W_i*exp(cI*WT_i)
-         enddo
+         W_i=E_field%frequency
+         WT_i=W_i*T_i+fr_shift(i_field)
+         if (order==0 ) f_t(i_field)=f_t(i_field)-cI*    exp(cI*WT_i)/W_i
+         if (order==1 ) f_t(i_field)=f_t(i_field)+       exp(cI*WT_i)
+         if (order==2 ) f_t(i_field)=f_t(i_field)+cI*W_i*exp(cI*WT_i)
          !
        case('RES')
-         do i_fr=1,E_field%n_frequencies
-           W_i=field_frequency(E_field,i_fr)
-           WT_i=W_i*T_i+fr_shift(i_field)
-           if (order==0 ) f_t(i_field)=f_t(i_field)+cI*    exp(-cI*WT_i)/W_i
-           if (order==1 ) f_t(i_field)=f_t(i_field)-       exp(-cI*WT_i)
-           if (order==2 ) f_t(i_field)=f_t(i_field)-cI*W_i*exp(-cI*WT_i)
-         enddo
+         W_i=E_field%frequency
+         WT_i=W_i*T_i+fr_shift(i_field)
+         if (order==0 ) f_t(i_field)=f_t(i_field)+cI*    exp(-cI*WT_i)/W_i
+         if (order==1 ) f_t(i_field)=f_t(i_field)-       exp(-cI*WT_i)
+         if (order==2 ) f_t(i_field)=f_t(i_field)-cI*W_i*exp(-cI*WT_i)
          !
        case('DELTA')
          if (order==0 ) f_t(i_field)=1._SP
@@ -263,25 +243,23 @@ module fields
      !
      local_a=cZERO
      !
-     do i_f=1,E_field%n_frequencies     
-       W_0=field_frequency(E_field,i_f)
-       select case( trim(E_field%ef_name) )
-       case('SIN')
-         local_a=local_a+   (1._SP/(W_i-W_0)-1._SP/(W_i+W_0))/2._SP-1._SP/W_0
-       case('ANTIRES')
-         local_a=local_a+cI*(               -1._SP/(W_i+W_0)       -1._SP/W_0)
-       case('RES')
-         local_a=       -cI*(1._SP/(W_i-W_0)                       -1._SP/W_0)
-       case('DELTA')
-         local_a=1._SP
-       case('GAUSS')
-         iErr=-1
-       case('QSSIN')
-         iErr=-1
-       case('PULSE')
-         iErr=-1
-       end select
-     enddo
+     W_0=E_field%frequency
+     select case( trim(E_field%ef_name) )
+     case('SIN')
+       local_a=local_a+   (1._SP/(W_i-W_0)-1._SP/(W_i+W_0))/2._SP-1._SP/W_0
+     case('ANTIRES')
+       local_a=local_a+cI*(               -1._SP/(W_i+W_0)       -1._SP/W_0)
+     case('RES')
+       local_a=       -cI*(1._SP/(W_i-W_0)                       -1._SP/W_0)
+     case('DELTA')
+       local_a=1._SP
+     case('GAUSS')
+       iErr=-1
+     case('QSSIN')
+       iErr=-1
+     case('PULSE')
+       iErr=-1
+     end select
      !
      small_a_frequency=local_a
      !
@@ -294,8 +272,6 @@ module fields
      E2%t_final=E1%t_final  
      E2%t_final_indx=E1%t_final_indx  
      E2%frequency=E1%frequency  
-     E2%n_frequencies=E1%n_frequencies  
-     E2%W_step=E1%W_step  
      E2%damping=E1%damping  
      E2%intensity=E1%intensity  
      E2%amplitude=E1%amplitude  
@@ -312,8 +288,6 @@ module fields
      E%t_final      =0._SP
      E%t_final_indx =0
      E%frequency    =0._SP
-     E%n_frequencies=1
-     E%W_step       =0._SP
      E%intensity    =0._SP
      E%damping      =0._SP
      E%ef_name      ='none'
@@ -345,8 +319,8 @@ module fields
        Rabi_Factor=2._SP*sum(R(:)*Field%versor(:))*Field%amplitude
      else 
        Rabi_Factor=2._SP*sum(P(:)*Field%versor(:))*Field%amplitude
-       if( any( trim(Field%ef_name)==(/'ANTIRES','SIN    '/)) ) Rabi_Factor=-cI*Rabi_Factor/Field%frequency(1)
-       if( any( trim(Field%ef_name)==(/'RES'/)) )               Rabi_Factor= cI*Rabi_Factor/Field%frequency(1)
+       if( any( trim(Field%ef_name)==(/'ANTIRES','SIN    '/)) ) Rabi_Factor=-cI*Rabi_Factor/Field%frequency
+       if( any( trim(Field%ef_name)==(/'RES'/)) )               Rabi_Factor= cI*Rabi_Factor/Field%frequency
      endif
    end function Rabi_Factor
    !
@@ -369,7 +343,7 @@ module fields
        case('QSSIN') !Approximate relations/does not work yet
          sigma=Field%damping
          T_0=10._SP*sigma
-         W_0=Field%frequency(1)
+         W_0=Field%frequency
          T = 2._SP*pi/W_0
          E_w= sqrt(pi/2._SP)*Field%amplitude*sigma*exp(-cI*W_0*T_0)*&
               &(erf((T-T_0)/sqrt(2._SP)/sigma)+erf(T_0/sqrt(2._SP)/sigma))
