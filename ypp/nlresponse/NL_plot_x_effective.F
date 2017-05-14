@@ -63,20 +63,19 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
 &         "order_"//trim(intc(i_order))
    endif
    !
-   short_X_file_name=trim(X_file_name)
+   X_file_name=trim(X_file_name)
    !
    call set_real_printed_length(f_length=15,g_length=15)
    !
    call of_open_close(X_file_name,'ot')
-   call of_open_close(trim(short_X_file_name))
    !
    do i_dsc=1,n_NL_descriptions
-     call msg('o '//trim(short_X_file_name),'#',trim(NL_description(i_dsc)),INDENT=0)
+     call msg('o '//X_file_name,'#',trim(NL_description(i_dsc)),INDENT=0)
    enddo
    !
-   call msg('o '//trim(short_X_file_name),'#')
+   call msg('o '//X_file_name,'#')
    !
-   call msg('o '//trim(short_X_file_name),'',headings(1:n_headings),USE_TABS=.TRUE.)
+   call msg('o '//X_file_name,'',headings(1:n_headings),USE_TABS=.TRUE.)
    !
    do i_f=1,n_frequencies
      !
@@ -93,7 +92,7 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
 &                  aimag(Susc(i_order,3,i_f)*Unit_of_Measure),&
 &                   real(Susc(i_order,3,i_f)*Unit_of_Measure)/)
      !
-    call msg('o '//trim(short_X_file_name),'',VALUEs(1:n_headings),USE_TABS=.TRUE.)
+    call msg('o '//X_file_name,'',VALUEs(1:n_headings),USE_TABS=.TRUE.)
      !
    enddo 
    !
