@@ -24,11 +24,13 @@ subroutine NL_generate_ef_list(Efield)
  ! in the different runs
  !
  use pars ,        ONLY:SP
- use nl_optics,    ONLY:n_frequencies,n_intensities,n_runs,EF_parms,n_runs,nl_er
+ use nl_optics,    ONLY:n_frequencies,n_intensities,n_runs,EF_parms,n_runs,nl_er,NL_estep
  use com,          ONLY:error
  use fields,       ONLY:ext_field,Efield_strength
  !
- type(ext_field), intent(in) :: Efield
+ implicit none
+ !
+ type(ext_field), intent(out) :: Efield
  !
  ! Work Space
  !
@@ -43,11 +45,9 @@ subroutine NL_generate_ef_list(Efield)
  !
  do i_f=1,n_frequencies
    !
-   frequency=NL_er(1)+real(i_r-1,SP)*NL_estep
+   frequency=NL_er(1)+real(i_f-1._SP,SP)*NL_estep
    !
    do i_i=1,n_intensities
-     !
-     EF_parms(i_r)%frequency = frequency
      !
      if(i_i==1) then
        EF_parms(i_r)%intensity =Efield%intensity
@@ -59,6 +59,7 @@ subroutine NL_generate_ef_list(Efield)
        call error("Wrong intensity range! ")
      endif
      !
+     EF_parms(i_r)%frequency = frequency
      EF_parms(i_r)%amplitude =Efield_strength(EF_parms(i_r)%intensity,'AU')
      EF_parms(i_r)%indexes   =(/i_f, i_i/)
      !
