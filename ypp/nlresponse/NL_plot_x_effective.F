@@ -85,6 +85,7 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
      if (i_order> 1) Unit_of_Measure = (SVCMm12VMm1/AU2VMm1)**(i_order-1)  
      !
      VALUEs(1)  =Freqs(i_f)*HA2EV
+     write(*,*) ' inside ',i_f,VALUEs(1)
      VALUEs(2:7)=(/aimag(Susc(i_order,1,i_f)*Unit_of_Measure),&
 &                   real(Susc(i_order,1,i_f)*Unit_of_Measure),&
                    aimag(Susc(i_order,2,i_f)*Unit_of_Measure),&

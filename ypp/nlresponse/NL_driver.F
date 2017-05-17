@@ -47,9 +47,9 @@ subroutine NL_driver(en)
  integer  :: io_NonLinear,ID,i_Probe,i_f,i_i
  integer  :: i_r,i_d,i_order,i_t_field_range(2),i_time_range_save(2)
  real(SP) :: W_step,T_period,time_range_save(2)
- real(SP),    allocatable  :: NL_P(:,:,:),Harmonic_Frequency(:,:),Probe_frequency(:)
+ real(SP),    allocatable  :: NL_P(:,:,:),Harmonic_Frequency(:,:),Probe_frequency(:),Freqs(:)
  complex(SP), allocatable  :: X_effective(:,:,:),Susceptibility(:,:,:)
- complex(SP), allocatable ::  Susc_vs_field(:,:,:,:),Susc_extrapolated(:,:,:),Freqs(:)
+ complex(SP), allocatable ::  Susc_vs_field(:,:,:,:),Susc_extrapolated(:,:,:)
  logical  :: Probe_consistency_error
  type(ext_field)   :: Efield_probe
  real(SP) :: NL_tot_time
