@@ -41,6 +41,7 @@ subroutine NL_richardson(Susc_vs_field,Susc_extrapolated)
    ! For a system with inversion symmetry
    ! Remove linear component 
    !
+   ! X^(2)(2w) = ..... work in progess 
    ! X^(3)(3w) = [ 4 * P(3w,E)/E^(3) - P(3w, E/2)/ (E/2)^3 ] /3 + O(5)
    !
    Susc_extrapolated=(4._SP*Susc_vs_field(:,:,:,1) - Susc_vs_field(:,:,:,2))/3._SP
@@ -54,7 +55,7 @@ subroutine NL_richardson(Susc_vs_field,Susc_extrapolated)
    ! P(w,E/2) = a E/2 + b E^2/4  + X3 E^3/8
    ! P(w,E/4) = a E/4 + b E^2/16 + X3 E^3/16
    !
-   ! X3 = 8/3 [ P(w,E) - 6 P(w, E/2) + 8 P(w, E/4) ]
+   ! X3 = 8/3 [ P(w,E) - 6 P(w, E/2) + 8 P(w, E/4) ]/E^3
    !
    Susc_extrapolated=Susc_vs_field(:,:,:,1) - 6._SP*Susc_vs_field(:,:,:,2) + 8._SP*Susc_vs_field(:,:,:,3)
    Susc_extrapolated=8._SP/3._SP*Susc_extrapolated
