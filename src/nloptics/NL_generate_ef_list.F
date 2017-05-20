@@ -30,7 +30,7 @@ subroutine NL_generate_ef_list(Efield)
  !
  implicit none
  !
- type(ext_field), intent(out) :: Efield
+ type(ext_field), intent(in) :: Efield
  !
  ! Work Space
  !

@@ -508,6 +508,7 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  NL_LRC_alpha  =0._SP
  NL_ng         =0
  ng_oscll      =1
+ n_ext_fields  =1
  call Efield_reset(Efield(1))
  Efield(1)%frequency=0.1_SP/HA2EV
  Efield(1)%intensity=1000._SP*kWCMm22AU
