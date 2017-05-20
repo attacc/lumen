@@ -167,19 +167,23 @@ subroutine Build_W_operator(V_bands,en,Xk,A_input,ik,i_sp,Hk)
      ! First order formula D(dk)      
      ! Eq. 96 of PRB 63, 155107(2001)
      !
+!$omp parallel do default(shared), private(id)
      do id=1,3
        Wk(id,NL_bands(1):,NL_bands(1):)=Wk(id,NL_bands(1):,NL_bands(1):)+Wop(NL_bands(1):,NL_bands(1):,1)*a(id_red,id)
      enddo
+!$omp end parallel do
      !
    else
      !      
      ! Second order formula   ( 4*D(dk) - D(2*dk) ) / 3
      ! Eq. 97 of PRB 63, 155107(2001)
      !
+!$omp parallel do default(shared), private(id)
      do id=1,3
        Wk(id,NL_bands(1):,NL_bands(1):)=Wk(id,NL_bands(1):,NL_bands(1):)+&
 &               (4._SP*Wop(NL_bands(1):,NL_bands(1):,1)-Wop(NL_bands(1):,NL_bands(1):,2))/3._SP*a(id_red,id)
      enddo
+!$omp end parallel do
 
    endif
    !
@@ -187,15 +191,19 @@ subroutine Build_W_operator(V_bands,en,Xk,A_input,ik,i_sp,Hk)
  !
  ! Make an Hermitian operator
  !
+!$omp parallel do default(shared), private(id)
  do id=1,3
    Wk(id,NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2))=(Wk(id,NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2)) &
 &                                               +hermitian(Wk(id,NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2))))
  enddo
+!$omp end parallel do
  !
+!$omp parallel do default(shared), private(id), reduction(+:Hk)
  do id=1,3
    Hk(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),i_sp)= &
 &  Hk(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),i_sp)-  &
 &      E_vec_pot(id)*Wk(id,NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2))
  enddo
+!$omp end parallel do
  !
 end subroutine Build_W_operator

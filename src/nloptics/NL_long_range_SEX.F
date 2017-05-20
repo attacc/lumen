@@ -52,6 +52,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  !
  ! Build Oscillators in term of valence bands
  ! 
+!$omp parallel do default(shared), private(iqbz,i_kmq,ig1)
  do iqbz=1,q%nbz
    i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
    do ig1=1,ng_oscll
@@ -59,6 +60,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
 &                 NL_nbands,V_bands(NL_bands(1):,:,i_kmq,1),NL_nbands,cZERO,OSCLL_val(:,:,ig1,iqbz),NL_nbands)
    enddo
  enddo
+!$omp end parallel do
  !
  Hk=Hk-Sigma_SEX_EQ(:,:,:,i_k)
  !
@@ -96,11 +98,13 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
 ! !
 ! ! Symmetrization
 ! !
-! do i_n=NL_bands(1),NL_bands(2)
-!   do i_m=i_n+1,NL_bands(2)
-!     Hk(i_m,i_n,1)=conjg(Hk(i_n,i_m,1))
-!   enddo
-!   Hk(i_n,i_n,1)=real(Hk(i_n,i_n,1))
-! enddo
+!$omp parallel do default(shared), private(i_n,i_m)
+ do i_n=NL_bands(1),NL_bands(2)
+   do i_m=i_n+1,NL_bands(2)
+     Hk(i_m,i_n,1)=conjg(Hk(i_n,i_m,1))
+   enddo
+   Hk(i_n,i_n,1)=real(Hk(i_n,i_n,1))
+ enddo
+!$omp end parallel do
  !
 end subroutine NL_long_range_SEX
