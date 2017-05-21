@@ -45,7 +45,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  !
  integer :: i_m,i_mp,i_v  ! self-energy external indexes
  integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
- integer :: ig1,ig2
+ integer :: ig1,ig2,i1
  complex(SP) :: OSCLL_val(NL_bands(1):NL_bands(2),E%nbf,ng_oscll,q%nbz)
  complex(SP) :: qGG_sum(E%nbf)
  !
@@ -62,7 +62,11 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  enddo
 !$omp end parallel do
  !
- Hk=Hk-Sigma_SEX_EQ(:,:,:,i_k)
+!$omp parallel do default(shared), private(i1)
+ do i1=1,NL_bands(2)
+   Hk(:,i1,:)=Hk(:,i1,:)-Sigma_SEX_EQ(:,i1,:,i_k)
+ enddo
+!$omp end parallel do
  !
  ! Long-range SEX
  !

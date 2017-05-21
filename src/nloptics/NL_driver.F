@@ -151,7 +151,8 @@ subroutine NL_driver(E,X,k,q,Xw)
    !
  endif
  !
- ! Reload WF with less G-vecs
+ ! Reload WF with less G-vecs for the real-time dynamics
+ ! =====================================================
  !
  wf_ng_save=wf_ng
  wf_ng     =NL_ng

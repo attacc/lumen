@@ -172,7 +172,11 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
    !
    ! Add Ho = T+V_ion+V_h+V_xc
    !==================
-   forall(i1=NL_bands(1):NL_bands(2),is=1:n_sp_pol) Hk(i1,i1,is)=Hk(i1,i1,is)+E_full(i1,ik,is)
+!$omp parallel do default(shared), private(i1,is)
+   do i1=NL_bands(1),NL_bands(2)
+     Hk(i1,i1,:)=Hk(i1,i1,:)+E_full(i1,ik,:)
+   enddo
+!$omp end parallel do
    ! 
    if(l_use_DIPOLES) then
      !    
@@ -194,8 +198,11 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
    !
    ! Store the Hamiltonian
    ! =====================
-   Ho_plus_Sigma(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ik,:)= &
-&        Hk(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),:)
+!$omp parallel do default(shared), private(i1)
+   do i1=NL_bands(1),NL_bands(2)
+     Ho_plus_Sigma(NL_bands(1):NL_bands(2),i1,ik,:)=Hk(NL_bands(1):NL_bands(2),i1,:)
+   enddo
+!$omp end parallel do
    !
  enddo  !---- loop on k-point
  !

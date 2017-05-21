@@ -103,11 +103,13 @@ subroutine NL_lsex_potential(q,X,Xw)
      !
      !  Screened part of the exchange  \tilde W = W - v
      !
+!$omp parallel do default(shared), private(ig1,ig2)
      do ig1=1,X%ng
        do ig2=1,X%ng
          W(iqbz,ig1,ig2)=W(iqbz,ig1,ig2)-4._SP/spin_occ*pi*X_mat(ig1,ig2,1)*isc%gamp(ig1,ig2)
        enddo
      enddo
+!$omp end parallel do
      !
    endif
    !
