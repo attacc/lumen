@@ -54,12 +54,15 @@ subroutine NL_apply_field(ik,H_nl_sc,A_input)
    ! in case of complex Efield puts the correct Hermitian matrix
    ! and the intraband optical matrix elements have been set to zero
    !
+!$omp parallel do default(shared), private(i1,CURR,A_dot_J)
    do i1=NL_bands(1),NL_bands(2)
      CURR(1:3)= -DIP_P(1:3,i1,i1,PAR_Xk_ibz_index(ik),1)+A_vec_pot(1:3)/2._SP
      A_dot_J=sum(A_vec_pot(1:3)*CURR(1:3)) 
      H_nl_sc(i1,i1,1)=H_nl_sc(i1,i1,1)-real(A_dot_J,SP)
    enddo
+!$omp end parallel do
    !
+!$omp parallel do default(shared), private(i1,i2,CURR,A_dot_J)
    do i1=NL_bands(1),NL_bands(2)
      do i2=i1+1,NL_bands(2)
        !
@@ -72,6 +75,7 @@ subroutine NL_apply_field(ik,H_nl_sc,A_input)
        !
      enddo
    enddo
+!$omp end parallel do
    !
    ! Correction to the pseudo should be included here ... <nk|V(r,r')[exp(iA*(r-r'))-1]|n'k>
    !
@@ -84,12 +88,15 @@ subroutine NL_apply_field(ik,H_nl_sc,A_input)
    !
    ! Intraband terms
    !
+!$omp parallel do default(shared), private(i1,POL,E_dot_P)
    do i1=NL_bands(1),NL_bands(2)
      POL(:)=cI*DIP_iR(:,i1,i1,PAR_Xk_ibz_index(ik),1)
      E_dot_P=sum(E_vec_pot(1:3)*POL(1:3))
      H_nl_sc(i1,i1,1)=H_nl_sc(i1,i1,1)-real(E_dot_P,SP)
    enddo
+!$omp end parallel do
    !
+!$omp parallel do default(shared), private(i1,i2,POL,E_dot_P)
    do i1=NL_bands(1),NL_bands(2)
      do i2=i1+1,NL_bands(2)
        !
@@ -102,6 +109,7 @@ subroutine NL_apply_field(ik,H_nl_sc,A_input)
        !
      enddo
    enddo
+!$omp end parallel do
  endif
  !
 end subroutine NL_apply_field
