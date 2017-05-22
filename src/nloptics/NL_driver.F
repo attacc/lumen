@@ -43,7 +43,8 @@ subroutine NL_driver(E,X,k,q,Xw)
 &                         NL_nbands,NL_P,NL_i_time,NL_steps
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
- use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure,PAR_IND_Xk_ibz
+ use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX, &
+&                         PP_redux_wait         
  !
  implicit none
  !
@@ -181,8 +182,10 @@ subroutine NL_driver(E,X,k,q,Xw)
  if(Correlation==LSEX.or.Correlation==LHF) then
    Sigma_SEX_EQ=cZERO
    do ik=1,QP_nk
+     if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
      call NL_long_range_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik),k,q,E,ik)
    enddo
+   call PP_redux_wait(Sigma_SEX_EQ,COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
  endif
  !
  ! Check if calculation was already done

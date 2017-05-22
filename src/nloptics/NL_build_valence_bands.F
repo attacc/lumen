@@ -32,7 +32,7 @@ subroutine NL_build_valence_bands(en,V_input,VAL_BANDS,lowest_band)
  use FFT_m,       ONLY:fft_size
  use QP_m,        ONLY:QP_nk
  use wave_func,   ONLY:WF
- use parallel_m,  ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX
+ use parallel_m,  ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,myid
  !
  implicit none
  !
@@ -43,7 +43,7 @@ subroutine NL_build_valence_bands(en,V_input,VAL_BANDS,lowest_band)
  !
  ! Work Space
  !
- integer :: ib,is,ir,ik,i_wf
+ integer :: ib,is,ir,ik,i_wf,i_v
  !
  Val_bands=cZERO
  !
@@ -55,9 +55,9 @@ subroutine NL_build_valence_bands(en,V_input,VAL_BANDS,lowest_band)
      do ib=lowest_band,NL_bands(2)
        !
        i_wf=WF%index(ib,ik,is)
-!$omp parallel do default(shared), private(ir)
-       do ir=1,fft_size
-         Val_bands(ir,:,ik,is)=Val_bands(ir,:,ik,is)+V_input(ib,:,ik,is)*WF%c(ir,i_wf)
+!$omp parallel do default(shared), private(i_v)
+       do i_v=1,en%nbf
+         Val_bands(:,i_v,ik,is)=Val_bands(:,i_v,ik,is)+V_input(ib,i_v,ik,is)*WF%c(:,i_wf)
        enddo
 !$omp end parallel do
        !
