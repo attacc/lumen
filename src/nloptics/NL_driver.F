@@ -160,7 +160,8 @@ subroutine NL_driver(E,X,k,q,Xw)
  iGo_max   =1
  call WF_free(WF)
  call PARALLEL_WF_distribute(K_index=PAR_IND_Xk_ibz,CLEAN_UP=.TRUE.)
- call WF_load(WF,NL_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
+ if(Correlation/=IPA) & 
+&  call WF_load(WF,NL_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
  !  
  ! QP-corrections 
  !================
