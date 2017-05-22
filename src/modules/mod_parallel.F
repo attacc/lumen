@@ -383,7 +383,7 @@ module parallel_m
  integer,allocatable:: PAR_BS_T_grps_index(:)
  integer            :: PAR_nG_bands 
  integer,allocatable:: PAR_G_bands_index(:)
- integer            :: PAR_nFreqs
+ integer            :: PAR_nRuns
  integer,allocatable:: PAR_runs_index(:)
  !
  ! WorkSpace

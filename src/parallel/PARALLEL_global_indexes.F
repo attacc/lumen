@@ -38,7 +38,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  use parallel_m,    ONLY:& ! LOGICALS
 &                        l_par_X_T,l_par_X_G_q0,l_par_RT,l_par_SE,l_par_X_G_all_q,l_par_X_G_finite_q,&
 &                        HEAD_QP_cpu,HEAD_k_cpu,l_par_SC,l_par_NL
- use parallel_m,    ONLY:PAR_IND_runs_ID,PAR_COM_runs_INDEX,PAR_COM_runs_A2A,PAR_nFreqs,PAR_runs_index, &
+ use parallel_m,    ONLY:PAR_IND_runs_ID,PAR_COM_runs_INDEX,PAR_COM_runs_A2A,PAR_nRuns,PAR_runs_index, &
 &                        PAR_IND_runs,PAR_COM_runs,PAR_IND_OVLP_ibz ! Non_Linear optics
  use parallel_m,    ONLY:& ! COMMUNICATORS
 &                        COMM_reset,PAR_COM_WORLD,&  
@@ -660,13 +660,13 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    !
    call PARALLEL_index(PAR_IND_runs,(/n_runs/),COMM=PAR_COM_runs_INDEX)
    PAR_IND_runs_ID=PAR_COM_runs_INDEX%CPU_id
-   PAR_nFreqs      =PAR_IND_runs%n_of_elements(PAR_IND_Q_ID+1)
+   PAR_nRuns      =PAR_IND_runs%n_of_elements(PAR_IND_Q_ID+1)
    call PARALLEL_live_message("Runs",ENVIRONMENT=ENVIRONMENT,         &
 &                             LOADED=PAR_IND_runs%n_of_elements(PAR_IND_runs_ID+1), &
 &                             TOTAL=n_runs,NCPU=PAR_COM_runs_INDEX%n_CPU)
    !
    allocate(PAR_runs_index(n_runs)) 
-   call Build_up_index(PAR_IND_runs,n_runs,PAR_runs_index,PAR_nFreqs)
+   call Build_up_index(PAR_IND_runs,n_runs,PAR_runs_index,PAR_nRuns)
    !
    ! K-points
    !
