@@ -43,7 +43,7 @@ subroutine NL_driver(E,X,k,q,Xw)
 &                         NL_nbands,NL_P,NL_i_time,NL_steps
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
- use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure
+ use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure,PAR_IND_Xk_ibz
  !
  implicit none
  !
@@ -158,6 +158,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  wf_ng     =NL_ng
  iGo_max   =1
  call WF_free(WF)
+ call PARALLEL_WF_distribute(K_index=PAR_IND_Xk_ibz,CLEAN_UP=.TRUE.)
  call WF_load(WF,NL_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
  !  
  ! QP-corrections 
