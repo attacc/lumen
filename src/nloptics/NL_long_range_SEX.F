@@ -43,11 +43,11 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  !
  ! Work Space
  !
- integer :: i_m,i_mp,i_v  ! self-energy external indexes
+ integer :: i_m,i_mp  ! self-energy external indexes
  integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
  integer :: ig1,ig2,i1
  complex(SP) :: OSCLL_val(NL_bands(1):NL_bands(2),E%nbf,ng_oscll,q%nbz)
- complex(SP) :: qGG_sum
+ complex(SP) :: qGG_sum,val_sum(q%nbz)
  !
  !
  ! Build Oscillators in term of valence bands
@@ -72,7 +72,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  !
  ! Evaluate Sigma_SEX(i_m,i_n,i_k)
  !
-!$omp parallel do default(shared), private(i_n,i_m,ig1,ig2,i_v,qGG_sum)
+!$omp parallel do default(shared), private(i_n,i_m,ig1,ig2,qGG_sum,val_sum)
  do i_n=NL_bands(1),NL_bands(2)
    do i_m=NL_bands(1),NL_bands(2)
      !
@@ -80,9 +80,8 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
      !
      do ig1=1,ng_oscll
        do ig2=1,ng_oscll
-         do i_v=1,E%nbf
-          qGG_sum=qGG_sum+sum(W(:,ig1,ig2)*OSCLL_val(i_n,i_v,ig1,:)*conjg(OSCLL_val(i_m,i_v,ig2,:)))
-         enddo
+         val_sum=sum(OSCLL_val(i_n,:,ig1,1:q%nbz)*conjg(OSCLL_val(i_m,:,ig2,1:q%nbz)),dim=1) ! sum of valence bands
+         qGG_sum=qGG_sum+sum(W(:,ig1,ig2)*val_sum)  ! sum on q-points
        enddo
      enddo
      !

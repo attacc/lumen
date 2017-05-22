@@ -42,7 +42,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
 &                         V_hartree_ne,V_xc_ne,rho_n,Hk,eval_DFT,eval_HARTREE,rho_reference,NL_bands,&
 &                         Ho_plus_Sigma,NL_P,Phase_LifeTime,NL_nbands,VAL_BANDS,LSEX,LHF
  use global_XC,      ONLY:WF_KIND,WF_xc_functional 
- use parallel_m,     ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu
+ use parallel_m,     ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu,myid
  use IO_m,           ONLY:IO_and_Messaging_switch
  use wrapper_omp,    ONLY:V_by_V_plus_V_omp
  !

@@ -173,7 +173,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    if (allocated(PAR_DIPk_ibz_index)) deallocate(PAR_DIPk_ibz_index)
    if (allocated(PAR_BS_T_grps_index))deallocate(PAR_BS_T_grps_index)
    if (allocated(PAR_RL_index))       deallocate(PAR_RL_index)
-   if (allocated(PAR_runs_index))    deallocate(PAR_runs_index)
+   if (allocated(PAR_runs_index))     deallocate(PAR_runs_index)
    !
    PAR_IND_Q_ID=0
    PAR_IND_Xk_ibz_ID=0
@@ -661,7 +661,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    call PARALLEL_index(PAR_IND_runs,(/n_runs/),COMM=PAR_COM_runs_INDEX)
    PAR_IND_runs_ID=PAR_COM_runs_INDEX%CPU_id
    PAR_nFreqs      =PAR_IND_runs%n_of_elements(PAR_IND_Q_ID+1)
-   call PARALLEL_live_message("Freqs",ENVIRONMENT=ENVIRONMENT,         &
+   call PARALLEL_live_message("Runs",ENVIRONMENT=ENVIRONMENT,         &
 &                             LOADED=PAR_IND_runs%n_of_elements(PAR_IND_runs_ID+1), &
 &                             TOTAL=n_runs,NCPU=PAR_COM_runs_INDEX%n_CPU)
    !
