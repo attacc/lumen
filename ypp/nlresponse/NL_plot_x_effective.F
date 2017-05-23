@@ -75,6 +75,16 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
    !
    call msg('o '//X_file_name,'#')
    !
+   if(extra_idx==1.or.extra_idx==0) then
+      call msg('o '//X_file_name,'Amplitude rescale: 1 ')
+   elseif(extra_idx==2) then
+      call msg('o '//X_file_name,'Amplitude resclae: 0.5 ')
+   elseif(extra_idx==3) then
+      call msg('o '//X_file_name,'Amplitude rescale: 0.25 ')
+   endif
+   !
+   call msg('o '//X_file_name,'#')
+   !
    call msg('o '//X_file_name,'',headings(1:n_headings),USE_TABS=.TRUE.)
    !
    do i_f=1,n_frequencies

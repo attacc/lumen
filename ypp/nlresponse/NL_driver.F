@@ -53,11 +53,8 @@ subroutine NL_driver(en)
  logical  :: Probe_consistency_error
  type(ext_field)   :: Efield_probe
  real(SP) :: NL_tot_time
- logical  :: plot_all_Susc
  !
  call section("*",'NL Post Processing')
- !
- call parser('WrAllResps',plot_all_Susc)
  !
  ! Input/Output
  !
@@ -229,13 +226,13 @@ subroutine NL_driver(en)
      !
      ! Richardson extrapolation
      !
-     call NL_richardson(Susc_vs_field,Susc_extrapolated)
+!     call NL_richardson(Susc_vs_field,Susc_extrapolated)
      !
      ! Plot
      !
-     call NL_plot_X_effective(Susc_extrapolated,Freqs,0)
-     !
-     if(plot_all_Susc) then
+     if(n_intensities==1) then
+       call NL_plot_X_effective(Susc_extrapolated,Freqs,0)
+     else
        do i_i=1,n_intensities
          call NL_plot_X_effective(Susc_vs_field(:,:,:,i_i),Freqs,i_i)
        enddo

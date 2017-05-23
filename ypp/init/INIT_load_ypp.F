@@ -203,6 +203,4 @@ subroutine ypp_INIT_load(defs)
  call it(defs,'DampMode','Damping type ( NONE | LORENTZIAN | GAUSSIAN )',NL_response%damping)
  call it(defs,'DampFactor','Damping parameter',NL_response%damp_factor,unit=E_unit)
  !
- call it('f',defs,'WrAllResps','Write all response function at diff. intensities',verb_level=V_nl_optics)
- !
 end subroutine
