@@ -60,7 +60,7 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
      X_file_name="YPP-X_probe_order_"//trim(intc(i_order))
    else
      X_file_name="YPP-X_probe_int_"//trim(intc(extra_idx))// &
-&         "order_"//trim(intc(i_order))
+&         "_order_"//trim(intc(i_order))
    endif
    !
    X_file_name=trim(X_file_name)

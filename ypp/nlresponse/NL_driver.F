@@ -171,6 +171,10 @@ subroutine NL_driver(en)
      time_range_save  =NL_response%T_range
      i_time_range_save=NL_response%i_T_range
      !
+     ! Regenerate Efield indexes
+     !
+     call NL_generate_ef_list(Efield_probe)
+     !
      do i_r = 1, n_runs
        !
        T_period=T_range(1,i_r)
@@ -195,6 +199,10 @@ subroutine NL_driver(en)
        !
        do i_r=1,n_runs
          !
+         Efield(i_Probe)%amplitude=EF_parms(i_r)%amplitude
+         Efield(i_Probe)%intensity=EF_parms(i_r)%intensity
+         Efield(i_Probe)%frequency=EF_parms(i_r)%frequency
+         !
          if (i_order==1) then
            Susceptibility(i_order,1,i_r)=4._SP*pi*dot_product( Efield(i_Probe)%versor(:),X_effective(i_order,i_r,:) )*&
                 &                                                   Divide_by_Field(Efield(i_Probe),i_order)
@@ -205,10 +213,6 @@ subroutine NL_driver(en)
        enddo
        ! 
      enddo
-     !
-     ! Regenerate Efield indexes
-     !
-     call NL_generate_ef_list(Efield_probe)
      !
      ! Reorder susceptibilities according to the field indexes
      !
