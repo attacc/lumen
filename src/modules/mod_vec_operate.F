@@ -473,6 +473,11 @@ module vec_operate
      !
      implicit  none
      integer :: a, b, c
+     integer :: a_save, b_save
+     !
+     a_save=a
+     b_save=b
+     !
      if (a < b) then       ! since a >= b must be true, they
        c = a               ! are swapped if a < b
        a = b
@@ -486,6 +491,9 @@ module vec_operate
      end do                !    go back
      !
      GreatestCommonDivisor = b
+     !
+     a=a_save
+     b=b_save
      !
    end function GreatestCommonDivisor
    !

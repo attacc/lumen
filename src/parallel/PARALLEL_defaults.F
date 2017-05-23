@@ -132,15 +132,7 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
            CPU_structure(i_PAR_structure)%CPU(3)=assign_cpu(K_range)
            CPU_structure(i_PAR_structure)%N_chains=3
          case("Response_G_space_Finite_Momentum","Response_G_space") 
-           CPU_structure(i_PAR_structure)%ROLE(1)="c"
-           CPU_structure(i_PAR_structure)%CPU(1)=assign_cpu(n_c_bands(2)-n_c_bands(1)+1)
-           CPU_structure(i_PAR_structure)%ROLE(2)="v"
-           CPU_structure(i_PAR_structure)%CPU(2)=assign_cpu(n_v_bands(2)-n_v_bands(1)+1)
-           CPU_structure(i_PAR_structure)%ROLE(3)="k"
-           CPU_structure(i_PAR_structure)%CPU(3)=assign_cpu(K_range)
-           CPU_structure(i_PAR_structure)%ROLE(4)="q"
-           CPU_structure(i_PAR_structure)%CPU(4)=assign_cpu(Q_range(2)-Q_range(1)+1)
-           CPU_structure(i_PAR_structure)%N_chains=4
+           call default_G_finite_Momentum()
         case("Non_Linear") 
            call default_Non_Linear()
 #if defined _SCALAPACK
@@ -237,4 +229,61 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
     !
    end subroutine
    !
+   subroutine default_G_finite_Momentum
+    implicit none
+    integer :: ncpu_c,ncpu_v,ncpu_k,ncpu_q
+    integer :: c_bands,v_bands,ncpu_rest
+    !
+    c_bands=n_c_bands(2)-n_c_bands(1)+1
+    v_bands=n_v_bands(2)-n_v_bands(1)+1
+    !
+    if(K_range==1) then
+       ncpu_q=1
+       ncpu_k=1
+       if(c_bands>ncpu) then
+         ncpu_c=ncpu
+         ncpu_v=1
+       else
+         ncpu_c       =GreatestCommonDivisor(ncpu,c_bands)
+         ncpu_v       =ncpu/ncpu_c
+       if(ncpu_v>v_bands) &
+&         call error('Number of processors > n_conduction * n_valence')  
+       endif
+    else
+      !  
+      ncpu_q=2
+      ncpu_rest=ncpu/2
+      !
+      if(c_bands>ncpu_rest) then
+        ncpu_c=ncpu_rest
+        ncpu_v=1
+        ncpu_k=1
+      else
+        ncpu_c       =GreatestCommonDivisor(ncpu_rest,c_bands)
+        ncpu_v       =ncpu_rest/ncpu_c
+        ncpu_k       =1
+        if(ncpu_v>v_bands.and.ncpu_v<K_range) then
+           ncpu_k       =ncpu_v
+           ncpu_v       =1
+        elseif(ncpu_v>v_bands.and.ncpu_v>K_range) then
+           ncpu_v       =GreatestCommonDivisor(ncpu_rest/ncpu_c,v_bands)
+           ncpu_k       =ncpu_rest/ncpu_v
+           if(ncpu_k>K_range) &
+&            call error('Number of processors > n_conduction * n_valence * n_kpt * 2') 
+        endif
+      endif
+    endif
+    !
+    CPU_structure(i_PAR_structure)%ROLE(1)="c"
+    CPU_structure(i_PAR_structure)%CPU(1)=ncpu_c
+    CPU_structure(i_PAR_structure)%ROLE(2)="v"
+    CPU_structure(i_PAR_structure)%CPU(2)=ncpu_v
+    CPU_structure(i_PAR_structure)%ROLE(3)="k"
+    CPU_structure(i_PAR_structure)%CPU(3)=ncpu_k
+    CPU_structure(i_PAR_structure)%ROLE(4)="q"
+    CPU_structure(i_PAR_structure)%CPU(4)=ncpu_q
+    CPU_structure(i_PAR_structure)%N_chains=4
+    !
+  end subroutine
+  !
 end subroutine
