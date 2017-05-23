@@ -65,7 +65,7 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
  use ELPH,           ONLY:elph_nDBs,elph_nDBs_used,elph_use_q_grid
 #endif
 #if defined _OPENMP
- use openmp,         ONLY:n_threads,n_threads_X,n_threads_DIP,n_threads_SE,n_threads_RT,n_threads_K,n_threads_NL
+ use openmp,         ONLY:n_threads
 #endif
  !
  implicit none
@@ -924,21 +924,6 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
        endif
        !
      endif
-     !
-     !
-#if defined _OPENMP
-     if (l_optics.or.l_em1s.or.l_em1d.or.l_ppa.or.l_bse) then
-       n_threads_K=n_threads
-       n_threads_X=n_threads
-       n_threads_DIP=n_threads
-     endif
-     if (l_HF_and_locXC.or.l_gw0.or.l_cohsex.or.l_sc_run) n_threads_SE=n_threads
-     if (l_real_time)                                     n_threads_RT=n_threads
-     if (l_nl_optics) then
-        n_threads_NL =n_threads
-        n_threads_DIP=n_threads
-     endif
-#endif
      !
    end subroutine before_infile_write_setup 
    !

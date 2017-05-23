@@ -63,9 +63,6 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  use ELPH,          ONLY:QP_PH_n_G_bands,elph_nDBs_used,elph_Ham_ik,elph_Ham_bands,elph_branches,&
 &                               RES_tresh,FAN_deltaE_treshold,DW_deltaE_treshold
 #endif
-#if defined _OPENMP
- use openmp,        ONLY:n_threads_X,n_threads_SE,n_threads_RT,n_threads_DIP,n_threads_K,n_threads_NL
-#endif
 #if defined _SCALAPACK
  use SLK_m,                ONLY:SLK_test_H_dim
 #endif
@@ -143,14 +140,6 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  !
  ! Parallel Setup
  !
-#if defined _OPENMP
- call it(defs,'K_Threads',       '[OPENMP/BSK] Number of threads for response functions',n_threads_K)
- call it(defs,'X_Threads',       '[OPENMP/X] Number of threads for response functions',n_threads_X)
- call it(defs,'DIP_Threads',     '[OPENMP/X] Number of threads for dipoles',n_threads_DIP)
- call it(defs,'SE_Threads',      '[OPENMP/GW] Number of threads for self-energy',n_threads_SE)
- call it(defs,'RT_Threads',      '[OPENMP/RT] Number of threads for real-time',n_threads_RT)
- call it(defs,'NL_Threads',      '[OPENMP/NL] Number of threads for nl-optics',n_threads_NL) 
-#endif
 #if defined _MPI 
  call it(defs,'NLogCPUs',     '[PARALLEL] Live-timing CPU`s (0 for all)',n_log_CPUs,verb_level=V_parallel)
 #endif

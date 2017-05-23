@@ -46,7 +46,7 @@
 subroutine fft_3d(c,n,fft_sign,fftw_plan)
  !
  use pars,          ONLY:DP
- use openmp,        ONLY:n_threads_now,n_threads_FFT
+ use openmp,        ONLY:n_threads_now
  implicit none
  integer     :: fft_sign,n(3)
  integer(8)  :: fftw_plan
@@ -65,11 +65,7 @@ subroutine fft_3d(c,n,fft_sign,fftw_plan)
    if (fft_sign<0) i_sign=-1
 #if defined _OPENMP && defined _FFTW_OMP
    call dfftw_init_threads(iret)
-   if (n_threads_FFT > 0) then
-     call dfftw_plan_with_nthreads(n_threads_FFT)
-   else
-     call dfftw_plan_with_nthreads(n_threads_now)
-   endif
+   call dfftw_plan_with_nthreads(n_threads_now)
 #endif
 #if defined _OPENMP
 !$omp single

@@ -36,13 +36,6 @@ module openmp
  !
  integer     :: n_threads     = 0   ! Max number of threads possible
  integer     :: n_threads_limit = 0
- integer     :: n_threads_FFT = 0    
- integer     :: n_threads_X   = 0    
- integer     :: n_threads_SE  = 0   
- integer     :: n_threads_RT  = 0  
- integer     :: n_threads_NL  = 0  
- integer     :: n_threads_DIP = 0  
- integer     :: n_threads_K   = 0  
  integer     :: n_threads_now = 0
  logical     :: master_thread = .TRUE.
  !
@@ -87,13 +80,6 @@ module openmp
      n_threads     = 1
      n_threads_limit = 1
      n_threads_now = 1
-     n_threads_FFT = 0
-     n_threads_X   = 1
-     n_threads_SE  = 1
-     n_threads_RT  = 1
-     n_threads_K   = 1
-     n_threads_DIP = 1
-     n_threads_NL  = 1
      !
      n_outthr = 1
      n_innthr = 1

@@ -73,7 +73,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 #if defined _ELPH
  use ELPH,          ONLY:elph_nDBs_used,QP_PH_n_G_bands,elph_use_q_grid
 #endif
- use openmp,        ONLY:OPENMP_set_threads,n_threads_X,n_threads_SE,n_threads_RT,n_threads_K,n_threads_NL
+ use openmp,        ONLY:OPENMP_set_threads
 #if defined _SCALAPACK
  use SLK_m,         ONLY:SLK_COM_INDEX,SLK_COM_A2A
 #endif
@@ -398,8 +398,6 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
      call IO_and_Messaging_switch("+io_out",CONDITION=.TRUE.)
    endif
    !
-   call OPENMP_set_threads(n_threads_in=n_threads_X)
-   !
  endif
  !
  !===========================================================================================
@@ -500,8 +498,6 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
      !
    endif
    !
-   call OPENMP_set_threads(n_threads_in=n_threads_X)
-   !
    if (ENVIRONMENT=="Response_G_space") then
      !
      ! io_RESPONSE check
@@ -522,15 +518,6 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
        !
      endif
    endif
-   !
- endif
- !
- !=================================
- if (ENVIRONMENT=="Real_Time") then
-   !===============================
-   !
-   !
-   call OPENMP_set_threads(n_threads_in=n_threads_RT)
    !
  endif
  !
@@ -640,8 +627,6 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    !
    call IO_and_Messaging_switch("+output",CONDITION=master_cpu)
    !
-   call OPENMP_set_threads(n_threads_in=n_threads_SE)
-   !
  endif
  !
  !==============================
@@ -736,8 +721,6 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    call IO_and_Messaging_switch("+io_out",CONDITION=PAR_COM_Xk_ibz_INDEX%CPU_id==0)
    !
    call IO_and_Messaging_switch("+output",CONDITION=PAR_COM_Xk_ibz_INDEX%CPU_id==0)
-   !
-   call OPENMP_set_threads(n_threads_in=n_threads_NL)
    !
  endif
  !
@@ -842,8 +825,6 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    !
    call IO_and_Messaging_switch("+output",CONDITION=master_cpu)
    !
-   call OPENMP_set_threads(n_threads_in=n_threads_K)
-   !  
  endif
  !
  !==========================================================================================================
