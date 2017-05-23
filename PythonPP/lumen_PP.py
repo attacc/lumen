@@ -49,11 +49,49 @@ for iR in range(0,args.nR):
         print("Reading %s " % file_name)
         XHI[iR,iX,:,:]=np.genfromtxt(file_name,comments="#")
 #
-# Apply Richardson to correct XHI2(2w) and XHI3(3w)
-# 
+# Apply Richardson to correct XHI2(2w) 
+# XHI2(2w: w, w )
+#
+# Remove any possible linear dependence from the field
+# intensity
+#
+# XHI2 = 2/E^2 [ P(E) - 2 * P(E/2) ] = 2 XHI2(E) - XHI2(E/2)
 
+XHI2=np.zeros([nfreqs,7],dtype=float)
+
+XHI2=2.0*XHI[0,2,:,:]-XHI[1,2,:,:]
+
+#
+# Apply Richardson to correct XHI3(3w) 
+# XHI3(3w: w, w, w )
+#
+XHI3=np.zeros([nfreqs,7],dtype=float)
+#
+#
+if args.nR == 2:
+    #
+    # Remove any linear dependence 
+    # from the field intensity in XH3
+    #
+    # XHI3 = 1/3 [ 4 P(E)/E^3 - 8/E^3 P(E/2) ] = 1/3 [4 XHI3(E) - XHI3(E/2) ]
+    #
+    XHI3=1.0/3.0*(4.0*XHI[0,3,:,:]-XHI[1,3,:,:])
+    #
+elif args.nR == 3:
+    #
+    # Remove any linear and quadratic dependence 
+    # from the field intensity in XH3
+    #  TO BE DONE
+    XHI3=1.0/3.0*(4.0*XHI[0,3,:,:]-XHI[1,3,:,:])
+    #
+
+
+XHI3=np.zeros([nfreqs,7],dtype=float)
 
 #
 # Extract Kerr and Two-photon absorption 
+# XHI3(w: w, -w , w)
 # 
+
+KERR=np.zeros([nfreqs,7],dtype=float)
 
