@@ -90,6 +90,8 @@ if args.nR == 2:
     #
     # And for the Kerr Kerr
     #
+    # KERR = 4/3 [ XHI(E) - XHI(E/2) ] /E^2
+    #
     KERR[:,1:]=4.0/3.0*(XHI[0,1,:,1:]-XHI[1,1,:,1:])/E_square
     #
 elif args.nR == 3:
@@ -97,13 +99,15 @@ elif args.nR == 3:
     # Remove any linear and quadratic dependence 
     # from the field intensity in XH3
     #
-    # P1 = 1/3 [ 4 P(E)/E^3   - 8/E^3 P(E/2) ] 
-    # P2 = 1/3 [ 4 P(E/2)/E^3 - 8/E^3 P(E/4) ] 
-    # XHI3 = 2 * [ P1 -4 * P2] = 1/3 [ 8 XHI3(E) - 6 * XHI3(E/2) + XHI3(E/4) ]
+    # P1 = 1/3 [ 4 P(E)   - 8 P(E/2) ] 
+    # P2 = 1/3 [ 4 P(E/2) - 8 P(E/4) ] 
+    # XHI3 = 2 * [ P1 -4 * P2]/E^3 = 1/3 [ 8 XHI3(E) - 6 * XHI3(E/2) + XHI3(E/4) ]
     #
     XHI3    = 1.0/3.0*(8.0* XHI[0,3,:,:] - 6.0 * XHI[1,3,:,:] + XHI[2,3,:,:])
     #
-#    KERR    = 1.0/3.0*(2.*XHI[0,1,:,:] - XHI[1,1,:,:] + XHI[2,1,:,:])/E_square
+    # KERR = 2/3 * [ 4 XHI(E) - 12 XHI(E/2) + 8 XHI(E/4) ]/E^2
+    #
+    KERR    = 2.0/3.0*(4.*XHI[0,1,:,:] - 12.0*XHI[1,1,:,:] + 8.0*XHI[2,1,:,:])/E_square
     #
 
 XHI2[:,0]=XHI[0,1,:,0]
