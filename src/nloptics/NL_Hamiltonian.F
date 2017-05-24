@@ -74,7 +74,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  ! I reconstruct the full density if necessary because both TDDFT 
  ! and JGM are not linear in rho_n and require the full density
  ! 
- if(NL_bands(1)>1) rho_n=full_rho+rho_n-rho_reference
+ if(NL_bands(1)>1.and.Correlation/=IPA) rho_n=full_rho+rho_n-rho_reference
  !
  if(eval_DFT) then
    !
@@ -84,7 +84,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
    call IO_and_Messaging_switch("+report +log +io_in +io_out")
    V_xc_ne=V_xc-V_xc_0
    !
- else
+ elseif(Correlation/=IPA) then
    V_xc_ne=cZERO
  endif
  !
