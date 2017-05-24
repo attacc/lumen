@@ -254,23 +254,20 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
       ncpu_q=2
       ncpu_rest=ncpu/2
       !
+      if(mod(ncpu_rest,2)==0) then
+        ncpu_v=2
+        ncpu_rest=ncpu_rest/2
+      endif
+      !
+      if(mod(ncpu_rest,2)==0) then
+        ncpu_k=2
+        ncpu_rest=ncpu_rest/2
+      endif
+      !
       if(c_bands>ncpu_rest) then
         ncpu_c=ncpu_rest
-        ncpu_v=1
-        ncpu_k=1
       else
-        ncpu_c       =GreatestCommonDivisor(ncpu_rest,c_bands)
-        ncpu_v       =ncpu_rest/ncpu_c
-        ncpu_k       =1
-        if(ncpu_v>v_bands.and.ncpu_v<K_range) then
-           ncpu_k       =ncpu_v
-           ncpu_v       =1
-        elseif(ncpu_v>v_bands.and.ncpu_v>K_range) then
-           ncpu_v       =GreatestCommonDivisor(ncpu_rest/ncpu_c,v_bands)
-           ncpu_k       =ncpu_rest/ncpu_v
-           if(ncpu_k>K_range) &
-&            call error('Number of processors > n_conduction * n_valence * n_kpt * 2') 
-        endif
+        call error('Problem with automatic parallelization try manual one: verbosity -V par') 
       endif
     endif
     !
