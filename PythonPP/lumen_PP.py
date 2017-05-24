@@ -36,7 +36,8 @@ try:
     match = re.search(pattern, lines, re.MULTILINE)
     nfreqs= int(match.group(1))
 except:
-    exit_error("Error reading nfreqs")
+    print("Error reading nfreqs !!")
+    sys.exit(1)
 xhi0.close()
 
 print("Number of frequency step: %d \n " % nfreqs)
@@ -47,7 +48,11 @@ for iR in range(0,args.nR):
     for iX in range(0,args.nX):
         file_name=file_begin+"_int_"+str(iR+1)+"_order_"+str(iX)
         print("Reading %s " % file_name)
-        XHI[iR,iX,:,:]=np.genfromtxt(file_name,comments="#")
+        try:
+            XHI[iR,iX,:,:]=np.genfromtxt(file_name,comments="#")
+        except:
+            print("Error reading file "+file_name+" !! ")
+            sys.exit(1)
 #
 # Apply Richardson to correct XHI2(2w) 
 # XHI2(2w: w, w )
@@ -72,6 +77,8 @@ XHI3=np.zeros([nfreqs,7],dtype=float)
 #
 KERR=np.zeros([nfreqs,7],dtype=float)
 #
+E_square=1.0
+#
 if args.nR == 2:
     #
     # Remove any linear dependence 
@@ -81,9 +88,9 @@ if args.nR == 2:
     #
     XHI3=1.0/3.0*(4.0*XHI[0,3,:,:]-XHI[1,3,:,:])
     #
-    # Same formula for the Kerr
+    # And for the Kerr Kerr
     #
-    KERR=1.0/3.0*(4.0*XHI[0,1,:,:]-XHI[1,1,:,:])
+    KERR[:,1:]=4.0/3.0*(XHI[0,1,:,1:]-XHI[1,1,:,1:])/E_square
     #
 elif args.nR == 3:
     #
@@ -96,8 +103,12 @@ elif args.nR == 3:
     #
     XHI3    = 1.0/3.0*(8.0* XHI[0,3,:,:] - 6.0 * XHI[1,3,:,:] + XHI[2,3,:,:])
     #
-    KERR    = 1.0/3.0*(8.0* XHI[0,1,:,:] - 6.0 * XHI[1,1,:,:] + XHI[2,1,:,:])
+#    KERR    = 1.0/3.0*(2.*XHI[0,1,:,:] - XHI[1,1,:,:] + XHI[2,1,:,:])/E_square
     #
+
+XHI2[:,0]=XHI[0,1,:,0]
+XHI3[:,0]=XHI[0,1,:,0]
+KERR[:,0]=XHI[0,1,:,0]
 
 np.savetxt("xhi2.dat",XHI2)
 np.savetxt("xhi3.dat",XHI3)
