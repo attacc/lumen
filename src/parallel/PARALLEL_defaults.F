@@ -260,15 +260,15 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
       endif
       !
       if(mod(ncpu_rest,2)==0) then
-        ncpu_k=2
-        ncpu_rest=ncpu_rest/2
+        if(c_bands<K_range) then
+          ncpu_c=2
+          ncpu_k=ncpu_rest/2
+        else
+          ncpu_k=2
+          ncpu_c=ncpu_rest/2
+        endif
       endif
       !
-      if(c_bands>ncpu_rest) then
-        ncpu_c=ncpu_rest
-      else
-        call error('Problem with automatic parallelization try manual one: verbosity -V par') 
-      endif
     endif
     !
     CPU_structure(i_PAR_structure)%ROLE(1)="c"
