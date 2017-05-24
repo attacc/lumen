@@ -67,6 +67,10 @@ XHI2=2.0*XHI[0,2,:,:]-XHI[1,2,:,:]
 #
 XHI3=np.zeros([nfreqs,7],dtype=float)
 #
+# Kerr and Two-photon absorption 
+# XHI3(w: w, -w , w)
+#
+KERR=np.zeros([nfreqs,7],dtype=float)
 #
 if args.nR == 2:
     #
@@ -77,28 +81,25 @@ if args.nR == 2:
     #
     XHI3=1.0/3.0*(4.0*XHI[0,3,:,:]-XHI[1,3,:,:])
     #
+    # Same formula for the Kerr
+    #
+    KERR=1.0/3.0*(4.0*XHI[0,1,:,:]-XHI[1,1,:,:])
+    #
 elif args.nR == 3:
     #
     # Remove any linear and quadratic dependence 
     # from the field intensity in XH3
     #
-    XHI3_one=np.zeros([nfreqs,7],dtype=float)
-    XHI3_two=np.zeros([nfreqs,7],dtype=float)
+    # P1 = 1/3 [ 4 P(E)/E^3   - 8/E^3 P(E/2) ] 
+    # P2 = 1/3 [ 4 P(E/2)/E^3 - 8/E^3 P(E/4) ] 
+    # XHI3 = 2 * [ P1 -4 * P2] = 1/3 [ 8 XHI3(E) - 6 * XHI3(E/2) + XHI3(E/4) ]
     #
-    # XHI3_one = 1/3 [ 4 P(E)/E^3   - 8/E^3 P(E/2) ] 
-    # XHI3_two = 1/3 [ 4 P(E/2)/E^3 - 8/E^3 P(E/4) ] 
-    # XHI3     = XHI3_one - XHI3_two
+    XHI3    = 1.0/3.0*(8.0* XHI[0,3,:,:] - 6.0 * XHI[1,3,:,:] + XHI[2,3,:,:])
     #
-    XHI3_one=1.0/3.0*(4.0*XHI[0,3,:,:]-XHI[1,3,:,:])
-    XHI3_two=1.0/3.0*(4.0*XHI[1,3,:,:]-XHI[2,3,:,:])
-    XHI3    =XHI3_one - XHI3_two
+    KERR    = 1.0/3.0*(8.0* XHI[0,1,:,:] - 6.0 * XHI[1,1,:,:] + XHI[2,1,:,:])
     #
-#
-# Extract Kerr and Two-photon absorption 
-# XHI3(w: w, -w , w)
-# 
 
-KERR=np.zeros([nfreqs,7],dtype=float)
+np.savetxt("xhi2.dat",XHI2)
+np.savetxt("xhi3.dat",XHI3)
+np.savetxt("kerr.dat",KERR)
 
-
-KERR=XHI[0,0,:,:]
