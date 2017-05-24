@@ -64,6 +64,7 @@ subroutine NL_oscillators(q,k,en)
  OSCLL=cZERO
  !
  i_sp_pol=1
+ call msg('s','[OSC] Checking oscillators header ')
  call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1/),MODE=VERIFY,ID=ID)
  io_err=io_OSCLL(q,ID)
  !
@@ -78,7 +79,7 @@ subroutine NL_oscillators(q,k,en)
      io_err=io_OSCLL(q,ID)
    enddo
    !
-   call msg('rs','[NL] Oscillators loaded')
+   call msg('rs','[OSC] Oscillators loaded')
    !
    return
    !
@@ -93,7 +94,7 @@ subroutine NL_oscillators(q,k,en)
    !
  endif
  !
- call live_timing('[NL] Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
+ call live_timing('[OSC] Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
  !
  do i_k=1,QP_nk
    !

@@ -40,7 +40,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  use nl_optics,      ONLY:n_runs,Correlation,IPA,NL_alloc,NL_free,V_bands,NL_bands,NL_step,&
 &                         Integrator,l_use_DIPOLES,NL_P_t,NL_ng,EF_parms,Sigma_SEX_EQ,ng_oscll,   &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,runs_done,n_runs_todo,LSEX,LHF, &
-&                         NL_nbands,NL_P,NL_i_time,NL_steps
+&                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_alloc_real_space_quantities
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
  use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX, &
@@ -114,15 +114,6 @@ subroutine NL_driver(E,X,k,q,Xw)
    call X_alloc('DIP_P')
  endif
  !
- ! Non_Linear parallization
- ! ===================================
- call setup_NL_parallelization() 
- !
- ! WFs loading
- !=============
- if(Correlation/=IPA) & 
-&   call WF_load(WF,wf_ng,1,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
- !
  ! Allocation
  ! ==================
  call NL_alloc(E,q) 
@@ -130,19 +121,20 @@ subroutine NL_driver(E,X,k,q,Xw)
  ! Evaluate Oscillators for LSEX/LHF
  ! =============================
  if(Correlation==LSEX.or.Correlation==LHF) then
-   !      
-   X(2)%ng=ng_oscll
-   call NL_lsex_potential(q,X(2),Xw(2)) 
    !
    ! I need all wave-functions parallel distribution on bands or q
    ! not implemented yet!!
    !
    call PARALLEL_WF_distribute(CLEAN_UP=.TRUE.)
-   call PARALLEL_WF_index()
    iGo_max=maxval(qindx_S(:,:,2))
    call WF_load(WF,wf_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
    !
    call NL_oscillators(q,k,E)
+   !
+   call WF_free(WF)
+   !
+   X(2)%ng=ng_oscll
+   call NL_lsex_potential(q,X(2),Xw(2)) 
    !
  else
    !      
@@ -152,6 +144,10 @@ subroutine NL_driver(E,X,k,q,Xw)
    !
  endif
  !
+ ! Non_Linear parallization
+ ! ===================================
+ call setup_NL_parallelization() 
+ !
  ! Reload WF with less G-vecs for the real-time dynamics
  ! =====================================================
  !
@@ -160,9 +156,19 @@ subroutine NL_driver(E,X,k,q,Xw)
  iGo_max   =1
  call WF_free(WF)
  call PARALLEL_WF_distribute(K_index=PAR_IND_Xk_ibz,CLEAN_UP=.TRUE.)
- if(Correlation/=IPA) & 
-&  call WF_load(WF,NL_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
- !  
+ !
+ ! WF loading
+ !=============
+ if(Correlation/=IPA) then
+   !  
+   call WF_load(WF,NL_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
+   !
+   ! Allocate all quantities that depends from the fft_size
+   ! ======================================================
+   call NL_alloc_real_space_quantities(E,q)
+   !
+ endif
+ !
  ! QP-corrections 
  !================
  call QP_apply(NL_bands,E,k,"G",msg_fmt='s')

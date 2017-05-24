@@ -183,15 +183,13 @@ module nl_optics
  !
  contains
    !
-   subroutine NL_alloc(en,q)
-     !
+   subroutine NL_alloc_real_space_quantities(en,q)
+     use FFT_m,          ONLY:fft_size
      use pars,           ONLY:SP
      use memory_m,       ONLY:mem_est
-     use FFT_m,          ONLY:fft_size
      use electrons,      ONLY:levels,n_spin,n_sp_pol
      use R_lattice,      ONLY:nXkbz,bz_samp
      use QP_m,           ONLY:QP_nk
-     use electric,       ONLY:ELECTRIC_alloc
      use xc_functionals, ONLY:V_xc
      !
      implicit none
@@ -199,17 +197,7 @@ module nl_optics
      type(levels),  intent(in) :: en
      type(bz_samp), intent(in) :: q
      !
-     allocate(Ho_plus_Sigma(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
-     call mem_est("Ho_plus_Sigma",(/size(Ho_plus_Sigma)/),(/2*SP/))
-     !
-     allocate(Hk(NL_bands(2),NL_bands(2),n_sp_pol))
-     call mem_est("Hk",(/size(Hk)/),(/2*SP/))
-     !
-     allocate(I_relax(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),en%nbf,QP_nk,n_sp_pol))
-     call mem_est("I_relax",(/size(I_relax)/),(/2*SP/))
-     !
-     allocate(V_bands(1:NL_bands(2),en%nbf,QP_nk,n_sp_pol))
-     call mem_est("V_bands",(/size(V_bands)/),(/2*SP/))
+     ! Allocate all quantities that depend from the fft_size
      !
      allocate(VAL_BANDS(fft_size,en%nbf,QP_nk,n_sp_pol))
      call mem_est("Val_bands",(/size(VAL_BANDS)/),(/2*SP/))
@@ -232,6 +220,37 @@ module nl_optics
      !
      allocate(V_xc_ne(fft_size,n_spin))
      call mem_est('V_xc_ne',(/size(V_xc_ne)/),(/SP/))
+     !
+     allocate(V_hartree_ne(fft_size,n_spin))
+     call mem_est("Hartree_Potential",(/size(V_hartree_ne)/))
+     !
+   end subroutine NL_alloc_real_space_quantities
+   !
+   subroutine NL_alloc(en,q)
+     !
+     use pars,           ONLY:SP
+     use memory_m,       ONLY:mem_est
+     use electrons,      ONLY:levels,n_spin,n_sp_pol
+     use R_lattice,      ONLY:nXkbz,bz_samp
+     use QP_m,           ONLY:QP_nk
+     use electric,       ONLY:ELECTRIC_alloc
+     !
+     implicit none
+     !
+     type(levels),  intent(in) :: en
+     type(bz_samp), intent(in) :: q
+     !
+     allocate(Ho_plus_Sigma(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
+     call mem_est("Ho_plus_Sigma",(/size(Ho_plus_Sigma)/),(/2*SP/))
+     !
+     allocate(Hk(NL_bands(2),NL_bands(2),n_sp_pol))
+     call mem_est("Hk",(/size(Hk)/),(/2*SP/))
+     !
+     allocate(I_relax(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),en%nbf,QP_nk,n_sp_pol))
+     call mem_est("I_relax",(/size(I_relax)/),(/2*SP/))
+     !
+     allocate(V_bands(1:NL_bands(2),en%nbf,QP_nk,n_sp_pol))
+     call mem_est("V_bands",(/size(V_bands)/),(/2*SP/))
      !
      if(Correlation==LSEX.or.Correlation==LHF) then
        allocate(Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
@@ -265,9 +284,6 @@ module nl_optics
      !
      allocate(E_tot_t(NL_steps,3),E_ext_t(NL_steps,3),E_ks_t(NL_steps,3))
      call mem_est("E_tot_t E_ext_t",(/size(E_tot_t),size(E_ext_t),size(E_ks_t)/))
-     !
-     allocate(V_hartree_ne(fft_size,n_spin))
-     call mem_est("Hartree_Potential",(/size(V_hartree_ne)/))
      !
    end subroutine NL_alloc
    
