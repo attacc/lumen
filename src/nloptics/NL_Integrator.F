@@ -332,6 +332,8 @@ subroutine NL_Integrator(E,k,q,X,Integrator,i_time,V_bands)
    enddo
    call PP_redux_wait(V_bands,COMM=PAR_COM_Xk_ibz_INDEX%COMM) 
    !
+   deallocate(U_tot,U_tmp,V_tmp)
+   !
  case(RK4)
    !
    allocate(V_tmp(NL_bands(2),E%nbf,QP_nk,n_sp_pol))
@@ -407,6 +409,8 @@ subroutine NL_Integrator(E,k,q,X,Integrator,i_time,V_bands)
    enddo
    call PP_redux_wait(V_bands,COMM=PAR_COM_Xk_ibz_INDEX%COMM) 
    ! 
+   deallocate(V_tmp)
+   !
  case default
    call error("Unknown integrator! ")
  end select
