@@ -345,8 +345,10 @@ module nl_optics
        call mem_est("V_xc")
      endif
      !
-     deallocate(V_xc_ne)
-     call mem_est("V_xc_ne")
+     if(allocated(V_xc_ne)) then
+       deallocate(V_xc_ne)
+       call mem_est("V_xc_ne")
+     endif
      !
      if(allocated(V_hartree_ne)) then
        deallocate(V_hartree_ne)
