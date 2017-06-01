@@ -307,8 +307,10 @@ module nl_optics
      deallocate(V_bands)
      call mem_est("V_bands")
      !
-     deallocate(VAL_BANDS)
-     call mem_est("Val_bands")
+     if(allocated(VAL_BANDS)) then
+       deallocate(VAL_BANDS)
+       call mem_est("Val_bands")
+     endif
      !
      if(allocated(rho_n)) then
        deallocate(rho_n)
