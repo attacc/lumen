@@ -47,7 +47,6 @@ integer function io_NL(ID)
  !
  ! Work Space
  !
- real(SP),allocatable :: disk_data(:,:,:)
  integer              :: i_fragment
  character(lchlen)    :: local_description(100)
  character(schlen)    :: VAR_name
@@ -76,8 +75,6 @@ integer function io_NL(ID)
  i_fragment=maxval(io_sec(ID,:))-1
  !
  if (i_fragment==0) goto 1
- !
- allocate(disk_data(3,NL_steps,2))
  !
  if(read_is_on(ID)) then
    !  
@@ -127,29 +124,21 @@ integer function io_NL(ID)
  !
  ! E_ext
  ! 
- if (write_is_on(ID)) call mat_c2r(E_ext_t,disk_data)
  write (VAR_name,'(a,i4.4)') 'E_ext_freq_',i_fragment
- call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(disk_data))
- call io_bulk(ID,R3=disk_data)
- if (read_is_on(ID))  call mat_r2c(disk_data,E_ext_t)
+ call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(E_ext_t))
+ call io_bulk(ID,R2=E_ext_t)
  !
  ! E_tot
  ! 
- if (write_is_on(ID)) call mat_c2r(E_tot_t,disk_data)
  write (VAR_name,'(a,i4.4)') 'E_tot_freq_',i_fragment
- call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(disk_data))
- call io_bulk(ID,R3=disk_data)
- if (read_is_on(ID))  call mat_r2c(disk_data,E_tot_t)
+ call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(E_tot_t))
+ call io_bulk(ID,R2=E_tot_t)
  !
  ! E_ks
  ! 
- if (write_is_on(ID)) call mat_c2r(E_ks_t,disk_data)
  write (VAR_name,'(a,i4.4)') 'E_ks_freq_',i_fragment
- call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(disk_data))
- call io_bulk(ID,R3=disk_data)
- if (read_is_on(ID))  call mat_r2c(disk_data,E_ks_t)
- !
- deallocate(disk_data)
+ call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(E_ks_t))
+ call io_bulk(ID,R2=E_ks_t)
  !
 1 call io_disconnect(ID=ID)
  !

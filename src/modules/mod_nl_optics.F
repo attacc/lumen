@@ -154,7 +154,7 @@ module nl_optics
  ! IO variables
  !
  real(SP),     allocatable :: NL_P_t(:,:)
- complex(SP),  allocatable :: E_tot_t(:,:),E_ext_t(:,:), E_ks_t(:,:)
+ real(SP),     allocatable :: E_tot_t(:,:),E_ext_t(:,:), E_ks_t(:,:)
  complex(SP)               :: E_tot(3),E_ext(3),E_ks(3)
  logical,      allocatable :: runs_done(:)
  integer                   :: n_NL_descriptions

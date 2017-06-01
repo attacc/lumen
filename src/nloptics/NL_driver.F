@@ -236,9 +236,9 @@ subroutine NL_driver(E,X,k,q,Xw)
      ! Store Variables
      !
      NL_P_t (NL_i_time,:)=real(NL_P,SP)
-     E_ext_t(NL_i_time,:)=E_ext
-     E_tot_t(NL_i_time,:)=E_tot
-     E_ks_t (NL_i_time,:)=E_ks
+     E_ext_t(NL_i_time,:)=real(E_ext)
+     E_tot_t(NL_i_time,:)=real(E_tot)
+     E_ks_t (NL_i_time,:)=real(E_ks)
      !
      call NL_output(NL_i_time,i_r) 
      !
