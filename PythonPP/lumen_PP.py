@@ -128,7 +128,33 @@ XHI2[:,0]=XHI[0,1,:,0]
 XHI3[:,0]=XHI[0,1,:,0]
 KERR[:,0]=XHI[0,1,:,0]
 
-np.savetxt("xhi2.dat",XHI2)
-np.savetxt("xhi3.dat",XHI3)
-np.savetxt("kerr.dat",KERR)
+
+xhi2_header="""
+
+ Second Harmonic Generatio\n")
+ corrected with Richardson extrapolation\n")
+
+E[eV] Im[Xhi2_x]  Re[Xhi2_x]  Im[Xhi2_y]  Re[Xhi2_y]  Im[Xhi2_z]  Re[Xhi2_z]
+"""
+np.savetxt("xhi2.dat",XHI2,header=xhi2_header)
+
+
+xhi3_header="""
+
+ Third Harmonic Generation
+ corrected with Richardson extrapolation
+
+E[eV] Im[Xhi3_x]  Re[Xhi3_x]  Im[Xhi3_y]  Re[Xhi3_y]  Im[Xhi3_z]  Re[Xhi3_z]
+"""
+np.savetxt("xhi3.dat",XHI3,header=xhi3_header)
+
+
+kerr_header="""
+
+ Kerr and Two-Photon absorption (TPA)
+ obtained by Richardson extrapolation
+
+E[eV] Im[Xhi3_x]  Re[Xhi3_x]  Im[Xhi3_y]  Re[Xhi3_y]  Im[Xhi3_z]  Re[Xhi3_z]
+"""
+np.savetxt("kerr.dat",KERR,header=kerr_header)
 
