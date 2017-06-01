@@ -40,21 +40,22 @@ try:
 except:
     print("Error reading nfreqs !!")
     sys.exit(1)
+
+print("Number of frequency step: %d \n " % nfreqs)
 #
 # Read efield intensity
 #
-#pattern=r'Number of freqs  :\s*(\d*)'
-#try:
-#    match = re.search(pattern, lines, re.MULTILINE)
-#    nfreqs= int(match.group(1))
-#except:
-#    print("Error reading nfreqs !!")
-#    sys.exit(1)
+pattern=r'#[FIELDs] Intensity     [kWCMm2]:\s*(\d*)'
+try:
+    match = re.search(pattern, lines, re.MULTILINE)
+    intensity= int(match.group(1))
+except:
+    print("Error reading nfreqs !!")
+    sys.exit(1)
 #
+print("Efield Intensity: %d \n " % intensity)
 xhi0.close()
 
-
-print("Number of frequency step: %d \n " % nfreqs)
 
 XHI=np.zeros([args.nR,args.nX,nfreqs,7],dtype=float)
 
