@@ -228,10 +228,6 @@ subroutine NL_driver(en)
      !
      deallocate(Susceptibility,Harmonic_frequency,Probe_frequency)
      !
-     ! Richardson extrapolation
-     !
-!     call NL_richardson(Susc_vs_field,Susc_extrapolated)
-     !
      ! Plot
      !
      if(n_intensities==1) then
