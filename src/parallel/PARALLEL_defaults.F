@@ -240,15 +240,16 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
     if(K_range==1) then
        ncpu_q=1
        ncpu_k=1
-       if(c_bands>ncpu) then
-         ncpu_c=ncpu
-         ncpu_v=1
+       !
+       ncpu_v=2
+       ncpu_rest=ncpu/2
+       !
+       if(c_bands>ncpu_rest) then
+         call error('Error in default parallelization')  
        else
-         ncpu_c       =GreatestCommonDivisor(ncpu,c_bands)
-         ncpu_v       =ncpu/ncpu_c
-       if(ncpu_v>v_bands) &
-&         call error('Number of processors > n_conduction * n_valence')  
+         ncpu_c=ncpu_rest
        endif
+       !
     else
       !  
       ncpu_q=2

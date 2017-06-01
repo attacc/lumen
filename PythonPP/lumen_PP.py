@@ -26,11 +26,13 @@ if args.jobname == None:
 else:
     file_begin="o-"+args.jobnem+".YPP-X_probe"
 
+xhi0=open(file_begin+"_int_1_order_0","r")
+lines=xhi0.read()
+
 #
 # Read the number of frequencies
 #
-xhi0=open(file_begin+"_int_1_order_0","r")
-lines=xhi0.read()
+
 pattern=r'Number of freqs  :\s*(\d*)'
 try:
     match = re.search(pattern, lines, re.MULTILINE)
@@ -38,7 +40,19 @@ try:
 except:
     print("Error reading nfreqs !!")
     sys.exit(1)
+#
+# Read efield intensity
+#
+#pattern=r'Number of freqs  :\s*(\d*)'
+#try:
+#    match = re.search(pattern, lines, re.MULTILINE)
+#    nfreqs= int(match.group(1))
+#except:
+#    print("Error reading nfreqs !!")
+#    sys.exit(1)
+#
 xhi0.close()
+
 
 print("Number of frequency step: %d \n " % nfreqs)
 
