@@ -49,7 +49,7 @@ subroutine NL_driver(en)
  real(SP) :: W_step,T_period,time_range_save(2)
  real(SP),    allocatable  :: NL_P(:,:,:),Harmonic_Frequency(:,:),Probe_frequency(:),Freqs(:)
  complex(SP), allocatable  :: X_effective(:,:,:),Susceptibility(:,:,:)
- complex(SP), allocatable ::  Susc_vs_field(:,:,:,:),Susc_extrapolated(:,:,:)
+ complex(SP), allocatable ::  Susc_vs_field(:,:,:,:)
  logical  :: Probe_consistency_error
  type(ext_field)   :: Efield_probe
  real(SP) :: NL_tot_time
@@ -64,7 +64,7 @@ subroutine NL_driver(en)
  !
  n_runs=n_frequencies*n_intensities
  !
- allocate(NL_P(NL_steps,n_runs,3),Probe_frequency(n_runs))
+ allocate(NL_P(NL_steps,n_runs,3),Probe_frequency(n_runs),Freqs(n_frequencies))
  !
  ! Reads the polarization from dbs containing simulation at different frequencies 
  !
@@ -154,7 +154,6 @@ subroutine NL_driver(en)
      allocate(X_effective(0:X_order,n_runs,3))
      allocate(Susceptibility(0:X_order,3,n_runs),Harmonic_Frequency(0:X_order,n_runs))
      allocate(Susc_vs_field(0:X_order,3,n_frequencies,n_intensities))
-     allocate(Susc_extrapolated(0:X_order,3,n_runs),Freqs(n_frequencies))
      !
      do i_order=0,X_order
        Harmonic_Frequency(i_order,:)=real(i_order,SP)*Probe_frequency(:)
@@ -231,14 +230,14 @@ subroutine NL_driver(en)
      ! Plot
      !
      if(n_intensities==1) then
-       call NL_plot_X_effective(Susc_extrapolated,Freqs,0)
+       call NL_plot_X_effective(Susc_vs_field(:,:,:,1),Freqs,0)
      else
        do i_i=1,n_intensities
          call NL_plot_X_effective(Susc_vs_field(:,:,:,i_i),Freqs,i_i)
        enddo
      endif
      !
-     deallocate(X_effective,Susc_vs_field,Susc_extrapolated)
+     deallocate(X_effective,Susc_vs_field,Freqs)
      !
   case ('DELTA')
     !
