@@ -237,6 +237,11 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
     c_bands=n_c_bands(2)-n_c_bands(1)+1
     v_bands=n_v_bands(2)-n_v_bands(1)+1
     !
+    ncpu_q=1
+    ncpu_k=1
+    ncpu_v=1
+    ncpu_c=1
+    !
     if(K_range==1) then
        ncpu_q=1
        ncpu_k=1
