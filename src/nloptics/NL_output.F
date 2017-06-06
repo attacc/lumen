@@ -21,35 +21,35 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston,       _
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_output(i_time,i_freq)
+subroutine NL_output(i_time,i_run)
  !
  use pars,         ONLY:SP,schlen
  use units,        ONLY:FS2AUT,HA2EV,SPEED_OF_LIGHT
  use fields,       ONLY:A_vecpot,A_ext
  use com,          ONLY:msg,of_open_close
  use stderr,       ONLY:intc
- use nl_optics,    ONLY:NL_er,NL_estep,NL_steps,NL_step,NL_P,VER_LOW,NL_verbosity
+ use nl_optics,    ONLY:NL_er,NL_estep,NL_steps,NL_step,NL_P,VER_LOW,NL_verbosity,EF_parms
  use stderr,       ONLY:set_real_printed_length
  use parallel_m,   ONLY:master_cpu
  !
  implicit none
  !
- integer, intent(in) :: i_time,i_freq
+ integer, intent(in) :: i_time,i_run
  !
  ! Working space
  !
  character(schlen)  :: file_name(3),short_file_name(3)
  character(schlen)  :: headings(3,10)
  real(SP)           :: data_to_dump(3,11)
- integer            :: n_files,n_headings(3),i_f
+ integer            :: n_files,n_headings(3),i_file,i_f,i_i
  !
  if(NL_verbosity==VER_LOW.and..not.master_cpu) return
  !
  call set_real_printed_length(f_length=18,g_length=18)
  !
- file_name(1)='external_potential_F'//intc(i_freq)
- file_name(2)='polarization_F'//intc(i_freq)
- file_name(3)='e_total_F'//intc(i_freq)
+ file_name(1)='external_potential_F'//intc(i_run)
+ file_name(2)='polarization_F'//intc(i_run)
+ file_name(3)='e_total_F'//intc(i_run)
  !
  short_file_name(1)='external_potential'
  short_file_name(2)='polarization'
@@ -60,6 +60,9 @@ subroutine NL_output(i_time,i_freq)
  n_headings(1)=10
  n_headings(2)=4
  n_headings(3)=4
+ !
+ i_f=EF_parms(i_run)%indexes(1)
+ i_i=EF_parms(i_run)%indexes(2)
  !
  ! Open files if i_time==1
  !
@@ -75,14 +78,15 @@ subroutine NL_output(i_time,i_freq)
    !
    headings(3, 2:4)=(/"Etot_x","Etot_y","Etot_z"/)
    !
-   do i_f=1,n_files
-     call of_open_close(trim(file_name(i_f)),'ot')
-     call msg('o '//trim(short_file_name(i_f)),'#')
-     call msg('o '//trim(short_file_name(i_f)),'# Frequency number '//intc(i_freq))
-     call msg('o '//trim(short_file_name(i_f)),'# Frequency value  ',(NL_er(1)+real((i_freq-1),SP)*NL_estep)*HA2EV)
-     call msg('o '//trim(short_file_name(i_f)),'#')
-     call msg('o '//trim(short_file_name(i_f)),'#',headings(i_f,1:n_headings(i_f)),INDENT=0,USE_TABS=.TRUE.)
-     call msg('o '//trim(short_file_name(i_f)),'#')
+   do i_file=1,n_files
+     call of_open_close(trim(file_name(i_file)),'ot')
+     call msg('o '//trim(short_file_name(i_file)),'#')
+     call msg('o '//trim(short_file_name(i_file)),'#',' Run number : '//intc(i_run))
+     call msg('o '//trim(short_file_name(i_file)),'#',' Frequency index : '//intc(i_f))
+     call msg('o '//trim(short_file_name(i_file)),'#',' Intensity index : '//intc(i_i))
+     call msg('o '//trim(short_file_name(i_file)),'#')
+     call msg('o '//trim(short_file_name(i_file)),'#',headings(i_file,1:n_headings(i_file)),INDENT=0,USE_TABS=.TRUE.)
+     call msg('o '//trim(short_file_name(i_file)),'#')
    enddo
  endif
  !

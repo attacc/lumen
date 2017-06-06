@@ -9,6 +9,13 @@ Analise ypp output to extract Kerr, two-photon absorption by means of Richardson
 Author:  C. Attaccalite and M. Grüning
 """
 #
+# Units
+#
+SVCMm12VMm1=29.98*10**3.0
+AU2VMm1    =5.14220632*10**11.0
+
+#
+
 # parse command line
 #
 parser = argparse.ArgumentParser(prog='lumen_PP',description='Analise ypp output to extract Kerr and two-photon absorption',epilog="Copyright C. Attaccalite and M. Grüning 2017")
@@ -63,6 +70,13 @@ for i_order in range(0,args.nX+1):
     print("Efield denominator %d: %s " % (i_order,str(Divid_Efield[i_order])))
     xhi_file.close()
 
+#
+# Put units
+#
+Divid_Efield[0]=Divid_Efield[0]*SVCMm12VMm1/AU2VMm1
+for iX in range(2,args.nX+1):
+    Divid_Efield[iX]=Divid_Efield[iX]*(SVCMm12VMm1/AU2VMm1)**(iX-1.0)
+
 print("\nReading ypp response functions... \n")
 
 XHI=np.zeros([args.nR,args.nX+1,nfreqs,7],dtype=float)
@@ -84,6 +98,8 @@ for iR in range(0,args.nR):
 #
 P  =np.zeros([nfreqs,3,args.nX+1],dtype=complex)
 P_2=np.zeros([nfreqs,3,args.nX+1],dtype=complex)
+if args.nR == 3:
+    P_4=np.zeros([nfreqs,3,args.nX+1],dtype=complex)
 #
 # P(w=0, E ) = P[:,:,0]
 # P(  w, E ) = P[:,:,1]
@@ -96,23 +112,23 @@ for iX in range(0,args.nX+1):
     #
     # P(w; E)
     # 
-    P[:,0,iX]=XHI[0,iX,:,1]+1j*XHI[0,iX,:,2] # x
-    P[:,1,iX]=XHI[0,iX,:,3]+1j*XHI[0,iX,:,4] # y
-    P[:,2,iX]=XHI[0,iX,:,5]+1j*XHI[0,iX,:,6] # z
-    P[:,:,iX]=P[:,:,iX]/Divid_Efiled[iX]
+    P[:,0,iX]=1j*XHI[0,iX,:,1]+XHI[0,iX,:,2] # x
+    P[:,1,iX]=1j*XHI[0,iX,:,3]+XHI[0,iX,:,4] # y
+    P[:,2,iX]=1j*XHI[0,iX,:,5]+XHI[0,iX,:,6] # z
+    P[:,:,iX]=P[:,:,iX]/Divid_Efield[iX]
     #
     # P(w; E/2)
     # 
-    P_2[:,0,iX]=XHI[1,iX,:,1]+1j*XHI[1,iX,:,2] # x
-    P_2[:,1,iX]=XHI[1,iX,:,3]+1j*XHI[1,iX,:,4] # y
-    P_2[:,2,iX]=XHI[1,iX,:,5]+1j*XHI[1,iX,:,6] # z
-    P_2[:,:,iX]=P_2[:,:,iX]/Divid_Efiled[iX]
+    P_2[:,0,iX]=1j*XHI[1,iX,:,1]+XHI[1,iX,:,2] # x
+    P_2[:,1,iX]=1j*XHI[1,iX,:,3]+XHI[1,iX,:,4] # y
+    P_2[:,2,iX]=1j*XHI[1,iX,:,5]+XHI[1,iX,:,6] # z
+    P_2[:,:,iX]=P_2[:,:,iX]/Divid_Efield[iX]
     #
     if args.nR == 3:
-        P_4[:,0,iX]=XHI[2,iX,:,1]+1j*XHI[2,iX,:,2] # x
-        P_4[:,1,iX]=XHI[2,iX,:,3]+1j*XHI[2,iX,:,4] # y
-        P_4[:,2,iX]=XHI[2,iX,:,5]+1j*XHI[2,iX,:,6] # z
-        P_4[:,:,iX]=P_4[:,:,iX]/Divid_Efiled[iX]
+        P_4[:,0,iX]=1j*XHI[2,iX,:,1]+XHI[2,iX,:,2] # x
+        P_4[:,1,iX]=1j*XHI[2,iX,:,3]+XHI[2,iX,:,4] # y
+        P_4[:,2,iX]=1j*XHI[2,iX,:,5]+XHI[2,iX,:,6] # z
+        P_4[:,:,iX]=P_4[:,:,iX]/Divid_Efield[iX]
 #
 # Apply Richardson to correct XHI2(2w) 
 # XHI2(2w: w, w )
@@ -167,31 +183,29 @@ elif args.nR == 3:
 #
 # Copy energy coloumn
 #
-KERR_out[:,1]=imag(KERR[:,0])
-KERR_out[:,2]=real(KERR[:,0])
-KERR_out[:,3]=imag(KERR[:,1])
-KERR_out[:,4]=real(KERR[:,1])
-KERR_out[:,5]=imag(KERR[:,2])
-KERR_out[:,6]=real(KERR[:,2])
+KERR_out[:,1]=KERR[:,0].imag
+KERR_out[:,2]=KERR[:,0].real
+KERR_out[:,3]=KERR[:,1].imag
+KERR_out[:,4]=KERR[:,1].real
+KERR_out[:,5]=KERR[:,2].imag
+KERR_out[:,6]=KERR[:,2].real
 KERR_out[:,0]=XHI[0,1,:,0]  # copy energies
 
-XHI2_out[:,1]=imag(XHI2[:,0])
-XHI2_out[:,2]=real(XHI2[:,0])
-XHI2_out[:,3]=imag(XHI2[:,1])
-XHI2_out[:,4]=real(XHI2[:,1])
-XHI2_out[:,5]=imag(XHI2[:,2])
-XHI2_out[:,6]=real(XHI2[:,2])
-XHI2_out[:,0]=XHI[0,1,:,0]
+XHI2_out[:,1]=XHI2[:,0].imag
+XHI2_out[:,2]=XHI2[:,0].real
+XHI2_out[:,3]=XHI2[:,1].imag
+XHI2_out[:,4]=XHI2[:,1].real
+XHI2_out[:,5]=XHI2[:,2].imag
+XHI2_out[:,6]=XHI2[:,2].real
+XHI2_out[:,0]=XHI[0,1,:,0]  # copy energies
 
-XHI3_out[:,1]=imag(XHI3[:,0])
-XHI3_out[:,2]=real(XHI3[:,0])
-XHI3_out[:,3]=imag(XHI3[:,1])
-XHI3_out[:,4]=real(XHI3[:,1])
-XHI3_out[:,5]=imag(XHI3[:,2])
-XHI3_out[:,6]=real(XHI3[:,2])
-XHI3_out[:,0]=XHI[0,1,:,0]
-
-xhi2_header="""
+XHI3_out[:,1]=XHI3[:,0].imag
+XHI3_out[:,2]=XHI3[:,0].real
+XHI3_out[:,3]=XHI3[:,1].imag
+XHI3_out[:,4]=XHI3[:,1].real
+XHI3_out[:,5]=XHI3[:,2].imag
+XHI3_out[:,6]=XHI3[:,2].real
+XHI3_out[:,0]=XHI[0,1,:,0]  # copy energies
 
 xhi2_header="""
 

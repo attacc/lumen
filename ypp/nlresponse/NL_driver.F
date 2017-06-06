@@ -201,13 +201,9 @@ subroutine NL_driver(en)
          Efield(i_Probe)%amplitude=EF_parms(i_r)%amplitude
          Efield(i_Probe)%intensity=EF_parms(i_r)%intensity
          Efield(i_Probe)%frequency=EF_parms(i_r)%frequency
+         write(*,*) 'passo qui ',i_r,EF_parms(i_r)%amplitude
          !
-!         if (i_order==1) then
-!           Susceptibility(i_order,1,i_r)=4._SP*pi*dot_product( Efield(i_Probe)%versor(:),X_effective(i_order,i_r,:) )*&
-!                &                                                   Divide_by_Field(Efield(i_Probe),i_order)
-!         else 
-           Susceptibility(i_order,:,i_r)=4._SP*pi*X_effective(i_order,i_r,:)*Divide_by_Field(Efield(i_Probe),i_order)
-!         end if
+         Susceptibility(i_order,:,i_r)=4._SP*pi*X_effective(i_order,i_r,:)*Divide_by_Field(Efield(i_Probe),i_order)
          !
        enddo
        ! 
@@ -230,7 +226,7 @@ subroutine NL_driver(en)
      ! Save Efield denominators
      ! 
      do i_order=0,X_order
-       Div_Efield(i_order)=Divide_by_Field(Efield(i_Probe),i_order)
+       Div_Efield(i_order)=Divide_by_Field(Efield_probe,i_order)
      enddo
      !
      ! Plot
