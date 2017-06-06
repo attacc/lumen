@@ -154,7 +154,7 @@ module nl_optics
  ! IO variables
  !
  real(SP),     allocatable :: NL_P_t(:,:)
- complex(SP),  allocatable :: E_tot_t(:,:),E_ext_t(:,:), E_ks_t(:,:)
+ real(SP),     allocatable :: E_tot_t(:,:),E_ext_t(:,:), E_ks_t(:,:)
  complex(SP)               :: E_tot(3),E_ext(3),E_ks(3)
  logical,      allocatable :: runs_done(:)
  integer                   :: n_NL_descriptions
@@ -307,8 +307,10 @@ module nl_optics
      deallocate(V_bands)
      call mem_est("V_bands")
      !
-     deallocate(VAL_BANDS)
-     call mem_est("Val_bands")
+     if(allocated(VAL_BANDS)) then
+       deallocate(VAL_BANDS)
+       call mem_est("Val_bands")
+     endif
      !
      if(allocated(rho_n)) then
        deallocate(rho_n)
@@ -343,8 +345,10 @@ module nl_optics
        call mem_est("V_xc")
      endif
      !
-     deallocate(V_xc_ne)
-     call mem_est("V_xc_ne")
+     if(allocated(V_xc_ne)) then
+       deallocate(V_xc_ne)
+       call mem_est("V_xc_ne")
+     endif
      !
      if(allocated(V_hartree_ne)) then
        deallocate(V_hartree_ne)
