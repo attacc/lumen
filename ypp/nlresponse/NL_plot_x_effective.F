@@ -46,7 +46,7 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
  integer           :: i_order,i_dsc,i_f
  real(SP)          :: Unit_of_Measure,VALUEs(11)
  integer           :: n_headings
- character(schlen) :: headings(11)
+ character(schlen) :: headings(11),dump_ch
  !
  n_headings=7
  !
@@ -75,8 +75,8 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
    !
    call msg('o '//X_file_name,'#')
    !
-   call msg('o '//X_file_name,'#  Efield Denominator = ', &
-&       (/real(Div_Efield(i_order)),aimag(Div_Efield(i_order))/),INDENT=0)
+   write(dump_ch,'(a,2e18.10)') "#  Efield Denominator = ",real(Div_Efield(i_order)),aimag(Div_Efield(i_order))
+   call msg('o '//X_file_name,'',dump_ch,USE_TABS=.TRUE.)
    !
    if(extra_idx==1.or.extra_idx==0) then
       call msg('o '//X_file_name,'#','  Amplitude rescale: 1 ',INDENT=0)
