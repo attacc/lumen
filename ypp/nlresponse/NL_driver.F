@@ -23,7 +23,7 @@
 !
 subroutine NL_driver(en)
  !
- use YPP_non_linear, ONLY:X_order,NL_response,W_minimal_step
+ use YPP_non_linear, ONLY:X_order,NL_response,W_minimal_step,Div_Efield
  use pars,           ONLY:SP,pi,cZERO,lchlen
  use units,          ONLY:HA2EV,AUT2FS
  use electrons,      ONLY:levels
@@ -151,7 +151,7 @@ subroutine NL_driver(en)
    !
  case('SIN','SOFTSIN','ANTIRES')
      !  
-     allocate(X_effective(0:X_order,n_runs,3))
+     allocate(X_effective(0:X_order,n_runs,3),Div_Efield(0:X_order))
      allocate(Susceptibility(0:X_order,3,n_runs),Harmonic_Frequency(0:X_order,n_runs))
      allocate(Susc_vs_field(0:X_order,3,n_frequencies,n_intensities))
      !
@@ -226,6 +226,12 @@ subroutine NL_driver(en)
      enddo
      !
      deallocate(Susceptibility,Harmonic_frequency,Probe_frequency)
+     !
+     ! Save Efield denominators
+     ! 
+     do i_order=0,X_order
+       Div_Efield(i_order)=Divide_by_Field(Efield(i_Probe),i_order)
+     enddo
      !
      ! Plot
      !

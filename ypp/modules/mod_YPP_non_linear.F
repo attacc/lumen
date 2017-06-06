@@ -51,4 +51,6 @@ module YPP_non_linear
  !
  type(NL_resp), save :: NL_response
  !
+ complex(SP), allocatable :: Div_Efield(:)
+ !
 end module YPP_non_linear

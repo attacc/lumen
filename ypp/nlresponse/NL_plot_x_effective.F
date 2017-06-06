@@ -29,7 +29,7 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
  use units,          ONLY:HA2EV,SVCMm12VMm1,AU2VMm1
  use com,            ONLY:msg,of_open_close
  use vec_operate,    ONLY:sort
- use YPP_non_linear, ONLY:X_order
+ use YPP_non_linear, ONLY:X_order,Div_Efield
  use stderr,         ONLY:set_real_printed_length
  use nl_optics,      ONLY:n_NL_descriptions,NL_description,n_frequencies
  use stderr,         ONLY:intc,real2ch
@@ -74,6 +74,9 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
    enddo
    !
    call msg('o '//X_file_name,'#')
+   !
+   call msg('o '//X_file_name,'#  Efield Denominator = ', &
+&       (/real(Div_Efield(i_order)),aimag(Div_Efield(i_order))/),INDENT=0)
    !
    if(extra_idx==1.or.extra_idx==0) then
       call msg('o '//X_file_name,'#','  Amplitude rescale: 1 ',INDENT=0)
