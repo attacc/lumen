@@ -201,7 +201,6 @@ subroutine NL_driver(en)
          Efield(i_Probe)%amplitude=EF_parms(i_r)%amplitude
          Efield(i_Probe)%intensity=EF_parms(i_r)%intensity
          Efield(i_Probe)%frequency=EF_parms(i_r)%frequency
-         write(*,*) 'passo qui ',i_r,EF_parms(i_r)%amplitude
          !
          Susceptibility(i_order,:,i_r)=4._SP*pi*X_effective(i_order,i_r,:)*Divide_by_Field(Efield(i_Probe),i_order)
          !

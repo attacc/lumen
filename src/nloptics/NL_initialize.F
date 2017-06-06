@@ -68,6 +68,7 @@ subroutine NL_initialize(E,k,q)
  if(DP/=SP)      call error(" Non-linear optics works only in double precision, configure with --enable-dp flag")
  if(n_sp_pol/=1) call error(" Spin-polarized systems not full implemented")
  if(any(NL_bands(:)==0)) call error(" Error set NLBands /= 0 ! ")
+ if(NL_bands(1)>E%nbf.or.NL_bands(2)<=E%nbf) call error(" Error in bands range! ")
  !
  ! Integrator ! ============
  !

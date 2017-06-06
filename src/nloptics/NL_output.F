@@ -102,15 +102,15 @@ subroutine NL_output(i_time,i_run)
  !
  data_to_dump(3,2:4) =-real(A_vecpot%vecpot_vel(:))/SPEED_OF_LIGHT
  !
- do i_f=1,n_files
-   call msg('o '//trim(file_name(i_f)),'',data_to_dump(i_f,1:n_headings(i_f)),USE_TABS=.TRUE.)
+ do i_file=1,n_files
+   call msg('o '//trim(file_name(i_file)),'',data_to_dump(i_file,1:n_headings(i_file)),USE_TABS=.TRUE.)
  enddo
  !
  ! Close files if i_time==NL_steps
  !
  if(i_time==NL_steps) then
-   do i_f=1,n_files
-     call of_open_close(trim(short_file_name(i_f)))
+   do i_file=1,n_files
+     call of_open_close(trim(short_file_name(i_file)))
    enddo
  endif
  !
