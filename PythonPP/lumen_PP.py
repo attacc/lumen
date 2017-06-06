@@ -57,6 +57,8 @@ xhi0.close()
 real_sn=r'[+\-]?\d*\.\d*[E][+\-]\d\d?'
 #
 Divid_Efield=np.zeros([args.nX+1],dtype=complex)
+Scale_factor=np.zeros([args.nX+1],dtype=float)
+
 for i_order in range(0,args.nX+1):
     xhi_file=open(file_begin+"_int_1_order_"+str(i_order),"r")
     lines=xhi_file.read()
@@ -116,19 +118,31 @@ for iX in range(0,args.nX+1):
     P[:,1,iX]=1j*XHI[0,iX,:,3]+XHI[0,iX,:,4] # y
     P[:,2,iX]=1j*XHI[0,iX,:,5]+XHI[0,iX,:,6] # z
     P[:,:,iX]=P[:,:,iX]/Divid_Efield[iX]
+
+Scale_factor[0]=1.0/2.0
+for iX in range(1,args.nX+1):
+    Scale_factor[iX]=(1.0/2.0)**(iX-1.0)
+
+for iX in range(0,args.nX+1):
     #
     # P(w; E/2)
     # 
     P_2[:,0,iX]=1j*XHI[1,iX,:,1]+XHI[1,iX,:,2] # x
     P_2[:,1,iX]=1j*XHI[1,iX,:,3]+XHI[1,iX,:,4] # y
     P_2[:,2,iX]=1j*XHI[1,iX,:,5]+XHI[1,iX,:,6] # z
-    P_2[:,:,iX]=P_2[:,:,iX]/Divid_Efield[iX]
+    P_2[:,:,iX]=P_2[:,:,iX]/(Divid_Efield[iX]/Scale_factor[iX])
     #
-    if args.nR == 3:
+
+if args.nR == 3:
+    Scale_factor[0]=1.0/4.0
+    for iX in range(1,args.nX+1):
+        Scale_factor[iX]=(1.0/4.0)**(iX-1.0)
+
+    for iX in range(0,args.nX+1):
         P_4[:,0,iX]=1j*XHI[2,iX,:,1]+XHI[2,iX,:,2] # x
         P_4[:,1,iX]=1j*XHI[2,iX,:,3]+XHI[2,iX,:,4] # y
         P_4[:,2,iX]=1j*XHI[2,iX,:,5]+XHI[2,iX,:,6] # z
-        P_4[:,:,iX]=P_4[:,:,iX]/Divid_Efield[iX]
+        P_4[:,:,iX]=P_4[:,:,iX]/(Divid_Efield[iX]/Scale_factor[iX])
 #
 # Apply Richardson to correct XHI2(2w) 
 # XHI2(2w: w, w )
