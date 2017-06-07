@@ -30,7 +30,7 @@ subroutine NL_oscillators(q,k,en)
  use pars,                ONLY:SP,cZERO
  use R_lattice,           ONLY:bz_samp,qindx_S
  use electrons,           ONLY:levels
- use wave_func,           ONLY:WF
+ use wave_func,           ONLY:WF,wf_ng
  use interfaces,          ONLY:WF_load
  use QP_m,                ONLY:QP_nk
  use collision,           ONLY:elemental_collision,elemental_collision_free, &
@@ -51,15 +51,8 @@ subroutine NL_oscillators(q,k,en)
  type(elemental_collision)            :: isc 
  integer :: i_k,i_m,i_n,i_q,iqbz,i_kmq_G0,iqs,i_kmq,i_kmq_s,i_k_s
  integer :: i_k_sp,i_kmq_sp,iqibz,ig,i_np,i_mp,io,ic,i_sp_pol
- integer :: ID,io_err
+ integer :: ID,io_err,iGo_max
  integer, external :: io_OSCLL
- !
- call elemental_collision_free(isc)
- !
- isc%iqref =0
- isc%ngrho =ng_oscll  ! only G=1 is required for local-SEX
- !
- call elemental_collision_alloc(isc,NG=isc%ngrho,TITLE="OSCLL")
  !
  OSCLL=cZERO
  !
@@ -93,6 +86,16 @@ subroutine NL_oscillators(q,k,en)
    endif
    !
  endif
+ !
+ iGo_max=maxval(qindx_S(:,:,2)) 
+ call WF_load(WF,wf_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
+ !
+ call elemental_collision_free(isc)
+ !
+ isc%iqref =0
+ isc%ngrho =ng_oscll  ! only G=1 is required for local-SEX
+ !
+ call elemental_collision_alloc(isc,NG=isc%ngrho,TITLE="OSCLL")
  !
  call live_timing('[OSC] Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
  !
