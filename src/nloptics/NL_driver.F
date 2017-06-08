@@ -31,7 +31,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  use X_m,            ONLY:X_t,Dipole_approach,X_alloc
  use wave_func,      ONLY:WF,wf_ng
  use interfaces,     ONLY:WF_load
- use R_lattice,      ONLY:bz_samp,qindx_free,qindx_S
+ use R_lattice,      ONLY:bz_samp,qindx_free
  use memory_m,       ONLY:mem_est
  use fields,         ONLY:Efield
  use QP_m,           ONLY:QP_nk
@@ -126,8 +126,6 @@ subroutine NL_driver(E,X,k,q,Xw)
    ! not implemented yet!!
    !
    call PARALLEL_WF_distribute(CLEAN_UP=.TRUE.)
-   iGo_max=maxval(qindx_S(:,:,2))
-   call WF_load(WF,wf_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
    !
    call NL_oscillators(q,k,E)
    !
@@ -268,6 +266,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  contains
    !
    subroutine setup_DIPOLES_parallelization()
+     use parallel_m,       ONLY:CPU_and_ROLE_strings_save
      use nl_optics,        ONLY:eval_OVERLAPS
      implicit none
      !
@@ -284,13 +283,17 @@ subroutine NL_driver(E,X,k,q,Xw)
      n_runs   =1
      eval_OVERLAPS   =.TRUE.
      !
+     ! Save user-defined parallel structure
+     ! and force parallelization on k-points (for dipoles and overlaps)
+     call CPU_and_ROLE_strings_save()
+     !
      call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
      call PARALLEL_global_indexes(E,k,q,"Non_Linear",RESET=.FALSE.,X=X(1))
      !
    end subroutine setup_DIPOLES_parallelization
    !
    subroutine setup_NL_parallelization
-     use parallel_m,       ONLY:PAR_IND_Xk_ibz
+     use parallel_m,       ONLY:PAR_IND_Xk_ibz,CPU_and_ROLE_strings_restore
      use nl_optics,        ONLY:eval_OVERLAPS
      implicit none
      !
@@ -303,6 +306,9 @@ subroutine NL_driver(E,X,k,q,Xw)
      !
      n_runs =N_runs_save
      eval_OVERLAPS   =.FALSE.
+     !
+     ! Restore user-defined parallel structure
+     call CPU_and_ROLE_strings_restore()
      !
      call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
      call PARALLEL_global_indexes(E,k,q,"Non_Linear",X=X(1))

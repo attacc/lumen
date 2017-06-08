@@ -140,6 +140,9 @@ module parallel_m
  integer,parameter   :: n_CPU_str_max=20
  type(CPU_stru),SAVE :: CPU_structure(n_CPU_str_max)
  !
+ character(schlen)   :: CPU_string_save(n_CPU_str_max)
+ character(schlen)   :: ROLE_string_save(n_CPU_str_max)
+ !
  !... Running values ...
  !
  integer          :: PARALLEL_CPU_used(MAX_N_OF_CHAINS) = 1
@@ -447,6 +450,22 @@ module parallel_m
      endif
      !
    end function
+   !
+   subroutine CPU_and_ROLE_strings_save()
+     implicit none
+     !
+     CPU_string_save =CPU_structure(:)%CPU_string
+     ROLE_string_save=CPU_structure(:)%ROLE_string
+     ! 
+   end subroutine CPU_and_ROLE_strings_save
+   !
+   subroutine CPU_and_ROLE_strings_restore()
+     implicit none
+     !
+     CPU_structure(:)%CPU_string =CPU_string_save
+     CPU_structure(:)%ROLE_string=ROLE_string_save
+     ! 
+   end subroutine CPU_and_ROLE_strings_restore
    !
    subroutine CPU_str_reset()
      CPU_structure(1)%Long_Description="Response_G_space_Zero_Momentum"
