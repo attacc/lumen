@@ -223,8 +223,8 @@ XHI3_out[:,0]=XHI[0,1,:,0]  # copy energies
 
 xhi2_header="""
 
- Second Harmonic Generatio\n")
- corrected with Richardson extrapolation\n")
+ Second Harmonic Generation
+ corrected with Richardson extrapolation
 
 E[eV] Im[Xhi2_x]  Re[Xhi2_x]  Im[Xhi2_y]  Re[Xhi2_y]  Im[Xhi2_z]  Re[Xhi2_z]
 """
