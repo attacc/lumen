@@ -96,7 +96,9 @@ for iR in range(0,args.nR):
 # Define Polarization
 #
 # Polarizations
-# P(E), P(E/2),  P(E/4)
+# P   = P(E)
+# P_2 = P(E/2)
+# P_4 = P(E/4)
 #
 P  =np.zeros([nfreqs,3,args.nX+1],dtype=complex)
 P_2=np.zeros([nfreqs,3,args.nX+1],dtype=complex)
@@ -130,7 +132,7 @@ for iX in range(0,args.nX+1):
     P_2[:,0,iX]=1j*XHI[1,iX,:,1]+XHI[1,iX,:,2] # x
     P_2[:,1,iX]=1j*XHI[1,iX,:,3]+XHI[1,iX,:,4] # y
     P_2[:,2,iX]=1j*XHI[1,iX,:,5]+XHI[1,iX,:,6] # z
-    P_2[:,:,iX]=P_2[:,:,iX]/(Divid_Efield[iX])*Scale_factor[iX]
+    P_2[:,:,iX]=P_2[:,:,iX]/Divid_Efield[iX]*Scale_factor[iX]
     #
 
 if args.nR == 3:
@@ -142,7 +144,7 @@ if args.nR == 3:
         P_4[:,0,iX]=1j*XHI[2,iX,:,1]+XHI[2,iX,:,2] # x
         P_4[:,1,iX]=1j*XHI[2,iX,:,3]+XHI[2,iX,:,4] # y
         P_4[:,2,iX]=1j*XHI[2,iX,:,5]+XHI[2,iX,:,6] # z
-        P_4[:,:,iX]=P_4[:,:,iX]/(Divid_Efield[iX]/Scale_factor[iX])
+        P_4[:,:,iX]=P_4[:,:,iX]/Divid_Efield[iX]*Scale_factor[iX]
 #
 # Apply Richardson to correct XHI2(2w) 
 # XHI2(2w: w, w )
