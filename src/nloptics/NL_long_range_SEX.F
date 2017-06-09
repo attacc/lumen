@@ -91,4 +91,15 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  enddo
 !$omp end parallel do
  !
+ ! Symmetrization
+ !
+!$omp parallel do default(shared), private(i_n,i_m)
+ do i_n=NL_bands(1),NL_bands(2)
+   Hk(i_n,i_n,:)=real(Hk(i_n,i_n,:),SP)
+   do i_m=1,i_n-1
+     Hk(i_n,i_m,:)=conjg(Hk(i_m,i_n,:))
+   enddo
+ enddo
+!$omp end parallel do
+ !
 end subroutine NL_long_range_SEX
