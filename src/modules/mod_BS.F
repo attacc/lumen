@@ -166,7 +166,7 @@ module BS
      !
      if (EXCHANGE) then
        allocate(BS_T_grp(iG)%O_x(BS_n_g_exch,BS_T_grp(iG)%size))
-       if(iG==1) call mem_est("BS_T_group_X_oscillators",(/BS_n_g_exch*sum(BS_T_grp(:)%size)/))
+       call mem_est("BS_T_group_X_oscillators_"//intc(iG),(/BS_n_g_exch*BS_T_grp(iG)%size/))
      endif
      !
      if (CORRELATION) then
@@ -180,10 +180,10 @@ module BS
      use memory_m,   ONLY:mem_est
      integer :: iG,iB
      integer :: i_g,i_b,ik_loop,ip_loop,ik_now,ip_now
-     if (iG==BS_nT_grps) call mem_est("BS_T_group_X_oscillators")
      do i_g=iG,1,-1
        if (.not.allocated(BS_T_grp(i_g)%O_x)) exit
        if (     allocated(BS_T_grp(i_g)%O_x)) deallocate(BS_T_grp(i_g)%O_x)
+       call mem_est("BS_T_group_X_oscillators_"//intc(i_g))
      enddo
      if(iB==0) return
      ik_now=BS_blk(iB)%ik
