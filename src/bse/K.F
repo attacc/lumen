@@ -1,5 +1,5 @@
 !
-!        Copyright (C) 2000-2016 the YAMBO team
+!        Copyright (C) 2000-2017 the YAMBO team
 !              http://www.yambo-code.org
 !
 ! Authors (see AUTHORS file for details): AM
@@ -25,7 +25,7 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
  !
  ! K = <2V-W>
  !
- use pars,         ONLY:IP,SP,schlen,pi,cZERO,cI,cONE
+ use pars,         ONLY:IP,SP,schlen,pi,cZERO,cI
  use LOGO,         ONLY:pickup_a_random
  use memory_m,     ONLY:mem_est
  use drivers,      ONLY:l_bs_fxc,l_col_cut,l_td_hf,l_bss
@@ -57,8 +57,6 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
  use wrapper_omp,   ONLY:V_dot_V_omp,Vstar_dot_V_omp,M_by_V_omp
  use global_XC,     ONLY:WF_kind,WF_xc_functional
  use wave_func,     ONLY:WF
- use matrix_operate,ONLY:hermitian
- use linear_algebra,ONLY:DIAGO,LINEAR_ALGEBRA_driver
 #if defined _TIMING
  use timing_m,      ONLY:timing
 #endif
@@ -79,13 +77,12 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
  !
  integer    :: i_block,i_block_vv,i_block_cc,i_block_vc,i_block_cv,i_k_bz,i_p_bz,i_c_k,i_v_k,i_c_p,i_v_p,i_k_s,i_p_s,&
 &              i_Tgrp_k,i_Tgrp_p,i_Tp,i_Tk,i_k_spin,i_p_spin,i_k,i_p,H_pos(2),i_k_s_m1,&
-&              i_k_p_s,i_g1,ig_W,iq_W,iq_W_s,i_g2,i_g3,alloc_err,i1,&
+&              i_k_p_s,i_g1,ig_W,iq_W,iq_W_s,i_g2,i_g3,alloc_err,&
 &              bands_to_load(2),iOvv,iOcc,iOvc,iOcv,is(4),os(4),isp(4),osp(4)
  complex(SP):: Co,H_x,H_c,PHASE_1,PHASE_2
  real(SP)   :: sqrt_f_itk,sqrt_f_itp
  !
  complex(SP),allocatable ::BS_W(:,:,:)
- complex(SP),allocatable ::temp_BS_W(:,:)
  complex(SP),   external ::TDDFT_ALDA_R_space
  logical                 ::W_is_em1s,W_is_pp
  !
@@ -94,7 +91,6 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
  logical    :: load_O_X
  complex(SP),allocatable  ::Ovv(:),Occ(:),O_times_W(:)
  complex(SP),allocatable  ::Ovc(:),Ocv(:)
- real(SP),   allocatable  ::BS_W_e_real(:)
  type(elemental_collision)::isc
  !
  ! I/O
@@ -606,8 +602,6 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
    enddo
    !
    call BS_oscillators_free(0,i_block)
-   call BS_oscillators_free(i_Tgrp_p,0)
-   call BS_oscillators_free(i_Tgrp_k,0)
    !
    call io_control(ACTION=OP_APP_WR_CL,COM=REP,SEC=(/i_block+1/),ID=ID)
    io_BS_err=io_BS(iq,X,ID)

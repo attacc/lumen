@@ -1,5 +1,5 @@
 !
-!        Copyright (C) 2000-2016 the YAMBO team
+!        Copyright (C) 2000-2017 the YAMBO team
 !              http://www.yambo-code.org
 !
 ! Authors (see AUTHORS file for details): AM, MG
@@ -171,6 +171,7 @@ module BS
      !
      if (CORRELATION) then
        allocate(BS_blk(iB)%O_c(O_ng,BS_blk(iB)%N_oscillators))
+       call mem_est("BS_bkl_O_c_"//intc(iB),(/size(BS_blk(iB)%O_c)/))
      endif
      !
    end subroutine
@@ -199,7 +200,9 @@ module BS
        if (.not.allocated(BS_blk(i_b)%O_c)) exit
        if (     allocated(BS_blk(i_b)%O_c)) then
          deallocate(BS_blk(i_b)%O_c)
+         call mem_est("BS_bkl_O_c_"//intc(i_b))
          deallocate(BS_blk(i_b)%O_table)
+         call mem_est("BS_bkl_table_"//intc(i_b))
        endif
      enddo
      !

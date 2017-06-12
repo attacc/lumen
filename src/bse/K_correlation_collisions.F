@@ -1,5 +1,5 @@
 !
-!        Copyright (C) 2000-2016 the YAMBO team
+!        Copyright (C) 2000-2017 the YAMBO team
 !              http://www.yambo-code.org
 !
 ! Authors (see AUTHORS file for details): AM
@@ -39,9 +39,11 @@ subroutine K_correlation_collisions(i_block,Xk,q)
  !
  ! where |k2 ib s1^{-1} x s2 > = PHASE * |k2 ib is_in_the_star_of_k2>
  !
- use pars,          ONLY:SP
+ use pars,          ONLY:SP,IP
+ use stderr,        ONLY:intc
  use D_lattice,     ONLY:nsym,sop_inv,sop_tab
  use R_lattice,     ONLY:qindx_B,bz_samp
+ use memory_m,      ONLY:mem_est
  use BS,            ONLY:WF_phase,BS_bands,BS_res_K_corr,BS_blk,&
 &                        BS_oscillators_alloc,K_CORR_collision,BS_T_grp
  use electrons,     ONLY:n_sp_pol
@@ -77,6 +79,7 @@ subroutine K_correlation_collisions(i_block,Xk,q)
  !------------------
  !
  allocate(BS_blk(i_block)%O_table(2,nsym,BS_bands(1):BS_bands(2),BS_bands(1):BS_bands(2),n_sp_pol))
+ call mem_est("BS_bkl_table_"//intc(i_block),(/size(BS_blk(i_block)%O_table)/),(/IP/))
  !
  do i_cycle=1,2
    !
