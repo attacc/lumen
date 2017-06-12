@@ -31,7 +31,7 @@ args = parser.parse_args()
 if args.jobname == None:
     file_begin="o.YPP-X_probe"
 else:
-    file_begin="o-"+args.jobnem+".YPP-X_probe"
+    file_begin="o-"+args.jobname+".YPP-X_probe"
 
 xhi0=open(file_begin+"_int_1_order_0","r")
 lines=xhi0.read()
