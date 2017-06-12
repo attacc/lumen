@@ -64,31 +64,32 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
    endif
    !
    X_file_name=trim(X_file_name)
+   short_X_file_name=X_file_name
    !
    call set_real_printed_length(f_length=15,g_length=15)
    !
    call of_open_close(X_file_name,'ot')
    !
    do i_dsc=1,n_NL_descriptions
-     call msg('o '//X_file_name,'#',trim(NL_description(i_dsc)),INDENT=0)
+     call msg('o '//short_X_file_name,'#',trim(NL_description(i_dsc)),INDENT=0)
    enddo
    !
-   call msg('o '//X_file_name,'#')
+   call msg('o '//short_X_file_name,'#')
    !
-   write(dump_ch,'(a,2e18.10)') "#  Efield Denominator = ",real(Div_Efield(i_order)),aimag(Div_Efield(i_order))
-   call msg('o '//X_file_name,'',dump_ch,USE_TABS=.TRUE.)
+   write(dump_ch,'(a,2e18.10)') " Efield Denominator = ",real(Div_Efield(i_order)),aimag(Div_Efield(i_order))
+   call msg('o '//short_X_file_name,'#',dump_ch,USE_TABS=.TRUE.)
    !
    if(extra_idx==1.or.extra_idx==0) then
-      call msg('o '//X_file_name,'#','  Amplitude rescale: 1 ',INDENT=0)
+      call msg('o '//short_X_file_name,'#','  Amplitude rescale factor: 1 ',INDENT=0)
    elseif(extra_idx==2) then
-      call msg('o '//X_file_name,'#','  Amplitude resclae: 0.5 ',INDENT=0)
+      call msg('o '//short_X_file_name,'#','  Amplitude rescale factor: 0.5 ',INDENT=0)
    elseif(extra_idx==3) then
-      call msg('o '//X_file_name,'#','  Amplitude rescale: 0.25 ',INDENT=0)
+      call msg('o '//short_X_file_name,'#','  Amplitude rescale factor: 0.25 ',INDENT=0)
    endif
    !
-   call msg('o '//X_file_name,'#')
+   call msg('o '//short_X_file_name,'#')
    !
-   call msg('o '//X_file_name,'',headings(1:n_headings),USE_TABS=.TRUE.)
+   call msg('o '//short_X_file_name,'',headings(1:n_headings),USE_TABS=.TRUE.)
    !
    do i_f=1,n_frequencies
      !
@@ -105,7 +106,7 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
 &                  aimag(Susc(i_order,3,i_f)*Unit_of_Measure),&
 &                   real(Susc(i_order,3,i_f)*Unit_of_Measure)/)
      !
-    call msg('o '//X_file_name,'',VALUEs(1:n_headings),USE_TABS=.TRUE.)
+    call msg('o '//short_X_file_name,'',VALUEs(1:n_headings),USE_TABS=.TRUE.)
      !
    enddo 
    !
