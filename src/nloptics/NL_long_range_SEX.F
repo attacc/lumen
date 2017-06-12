@@ -74,7 +74,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  !
 !$omp parallel do default(shared), private(i_n,i_m,ig1,ig2,qGG_sum,val_sum)
  do i_n=NL_bands(1),NL_bands(2)
-   do i_m=NL_bands(1),NL_bands(2)
+   do i_m=i_n,NL_bands(2)
      !
      qGG_sum=cZERO
      !

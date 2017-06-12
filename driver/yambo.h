@@ -77,4 +77,4 @@
   {NULL,NULL,NULL,0,0,0,0,0}
  };
  char *tool="lumen";
- char *tdesc="A shiny pot of fun and happiness [C.D.Hogan]";
+ char *tdesc="Fortunately, we are living in a nonlinear world.[Y.R. Shen]";
