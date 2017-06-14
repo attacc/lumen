@@ -601,12 +601,13 @@ subroutine K(iq,Ken,Xk,q,X,Xw,W_bss)
      !
    enddo
    !
-   call BS_oscillators_free(0,i_block)
    call BS_oscillators_free(i_Tgrp_p,0)
    call BS_oscillators_free(i_Tgrp_k,0)
    !
    call io_control(ACTION=OP_APP_WR_CL,COM=REP,SEC=(/i_block+1/),ID=ID)
    io_BS_err=io_BS(iq,X,ID)
+   !
+   call BS_oscillators_free(0,i_block)
    !
    call live_timing(steps=BS_Block_size(i_block))
    !

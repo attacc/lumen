@@ -33,6 +33,7 @@ integer function io_BS(iq,X,ID)
  use IO_m,          ONLY:io_connect,io_disconnect,io_sec,io_elemental,io_bulk,frag_BS_K,&
 &                        read_is_on,write_is_on,io_header,io_mode,VERIFY,&
 &                        io_fragment,IO_NOT_ALLOWED,io_BS_K,manage_OP_IF_START_and_CL_IF_END
+ use memory_m,     ONLY:mem_est
  implicit none
  type(X_t):: X 
  integer  :: iq,ID
@@ -104,6 +105,7 @@ integer function io_BS(iq,X,ID)
  call io_fragment(ID,i_fragment=i_block)
  !
  allocate(BS_mat_disk(BS_blk(i_block)%size(1),BS_blk(i_block)%size(2),2))
+ call mem_est("BS_mat_disk",(/size(BS_mat_disk)/),(/SP/))
  !
  if (BS_blk(i_block)%mode=="R") ch="BSE_RESONANT_BLOCK_"//trim(intc(i_block))
  if (BS_blk(i_block)%mode=="A") ch="BSE_ANTIRESONANT_BLOCK_"//trim(intc(i_block))
@@ -117,6 +119,7 @@ integer function io_BS(iq,X,ID)
  if (read_is_on(ID)) call mat_r2c(BS_mat_disk,BS_blk(i_block)%mat)
  !
  deallocate(BS_mat_disk)
+ call mem_est("BS_mat_disk")
  !
 1 continue
  !
