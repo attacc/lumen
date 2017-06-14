@@ -1,5 +1,5 @@
 !
-!        Copyright (C) 2000-2016 the YAMBO team
+!        Copyright (C) 2000-2017 the YAMBO team
 !              http://www.yambo-code.org
 !
 ! Authors (see AUTHORS file for details): AM
@@ -35,7 +35,7 @@ subroutine K_driver(Xen,Ken,Xk,q,X_static_pp,Xw)
 &                         BSS_uses_DbGd,BSS_q0,BSS_eval_JDOS
  use BS,             ONLY:BS_bands,BS_q,BS_n_g_exch,BS_K_coupling,BS_res_K_corr,BS_res_K_exchange,&
 &                         BS_W_is_diagonal,BS_res_mode,BS_n_g_W,BS_K_is_ALDA,BS_cpl_mode,BS_cpl_K_corr,BS_cpl_K_exchange,&
-&                         BSE_mode,BS_Blocks_and_Transitions_free
+&                         BSE_mode,BS_Blocks_and_Transitions_free,BS_gamma_point
  use TDDFT,          ONLY:FXC_per_memstps,FXC_n_mem_freqs,FXC_is_retarded,FXC_n_g_corr
  use drivers,        ONLY:l_rpa_IP,l_alda_fxc,l_bs_fxc,l_bss
  use parallel_m,     ONLY:PP_redux_wait,PAR_IND_WF_b_and_k
@@ -61,6 +61,13 @@ subroutine K_driver(Xen,Ken,Xk,q,X_static_pp,Xw)
  call section('*','Response Functions in Transition space')
  !=========================================================
  !
+ ! Check if it is a calculation at Gamma Points
+ !==============================================
+ BS_gamma_point=.FALSE.
+ if(Xk%nibz==1) then
+   BS_gamma_point=.TRUE.
+   call msg('s','[BSE] BSE at gamma point: uses less memory but slightly slower')
+ endif
  !
  ! Joint DOS
  !===========
