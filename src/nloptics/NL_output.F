@@ -30,7 +30,6 @@ subroutine NL_output(i_time,i_run)
  use stderr,       ONLY:intc
  use nl_optics,    ONLY:NL_er,NL_estep,NL_steps,NL_step,NL_P,VER_LOW,NL_verbosity,EF_parms
  use stderr,       ONLY:set_real_printed_length
- use parallel_m,   ONLY:master_cpu
  !
  implicit none
  !
@@ -43,7 +42,7 @@ subroutine NL_output(i_time,i_run)
  real(SP)           :: data_to_dump(3,11)
  integer            :: n_files,n_headings(3),i_file,i_f,i_i
  !
- if(NL_verbosity==VER_LOW.and..not.master_cpu) return
+ if(NL_verbosity==VER_LOW) return
  !
  call set_real_printed_length(f_length=18,g_length=18)
  !

@@ -197,7 +197,7 @@ module BS
      do i_b=iB,1,-1
        ik_loop=BS_blk(i_b)%ik
        ip_loop=BS_blk(i_b)%ip
-       if ( ik_now==ik_loop .and.ip_now==ip_loop.and.i_b==iB.and..not.BS_gamma_point) cycle
+       if ( ik_now==ik_loop .and.ip_now==ip_loop.and..not.BS_gamma_point) cycle
        if (.not.allocated(BS_blk(i_b)%O_c)) exit
        if (     allocated(BS_blk(i_b)%O_c)) then
          deallocate(BS_blk(i_b)%O_c)

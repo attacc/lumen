@@ -128,6 +128,7 @@ subroutine K_correlation_collisions(i_block,Xk,q)
          i_block_ref=-1
          do i_block_p=i_block,1,-1
            if(BS_blk(i_block_p)%ik/=BS_blk(i_block)%ik .or. BS_blk(i_block_p)%ip/=BS_blk(i_block)%ip) exit
+           if(.not.allocated(BS_blk(i_block_p)%O_table)) cycle
            if(BS_blk(i_block_p)%O_table(1,i_s_collision,i_v_k,i_v_p,i_k_sp)==0) cycle
            i_block_ref=i_block_p
            exit
@@ -148,6 +149,7 @@ subroutine K_correlation_collisions(i_block,Xk,q)
          i_block_ref=-1
          do i_block_p=i_block,1,-1
            if(BS_blk(i_block_p)%ik/=BS_blk(i_block)%ik .or. BS_blk(i_block_p)%ip/=BS_blk(i_block)%ip) exit
+           if(.not.allocated(BS_blk(i_block_p)%O_table)) cycle
            if(BS_blk(i_block_p)%O_table(1,i_s_collision,i_c_k,i_c_p,i_k_sp)==0) cycle
            i_block_ref=i_block_p
            exit
@@ -170,6 +172,7 @@ subroutine K_correlation_collisions(i_block,Xk,q)
          i_block_ref=-1
          do i_block_p=i_block,1,-1
            if(BS_blk(i_block_p)%ik/=BS_blk(i_block)%ik .or. BS_blk(i_block_p)%ip/=BS_blk(i_block)%ip) exit
+           if(.not.allocated(BS_blk(i_block_p)%O_table)) cycle
            if(BS_blk(i_block_p)%O_table(1,i_s_collision,i_v_k,i_c_p,i_k_sp)==0) cycle
            i_block_ref=i_block_p
            exit
@@ -190,6 +193,7 @@ subroutine K_correlation_collisions(i_block,Xk,q)
          i_block_ref=-1
          do i_block_p=i_block,1,-1
            if(BS_blk(i_block_p)%ik/=BS_blk(i_block)%ik .or. BS_blk(i_block_p)%ip/=BS_blk(i_block)%ip) exit
+           if(.not.allocated(BS_blk(i_block_p)%O_table)) cycle
            if(BS_blk(i_block_p)%O_table(1,i_s_collision,i_c_k,i_v_p,i_k_sp)==0) cycle
            i_block_ref=i_block_p
            exit
