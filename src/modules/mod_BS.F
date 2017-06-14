@@ -40,6 +40,7 @@ module BS
  logical :: BS_K_is_ALDA
  logical :: BS_not_const_eh_f
  logical :: BS_K_has_been_calculated_loaded=.FALSE.
+ logical :: BS_gamma_point
  character(schlen) :: BSE_mode
  character(schlen) :: BSK_mode
  character(schlen) :: BS_res_mode
@@ -196,7 +197,7 @@ module BS
      do i_b=iB,1,-1
        ik_loop=BS_blk(i_b)%ik
        ip_loop=BS_blk(i_b)%ip
-       if ( ik_now==ik_loop .and. ip_now==ip_loop ) cycle
+       if ( ik_now==ik_loop .and.ip_now==ip_loop.and.i_b==iB.and..not.BS_gamma_point) cycle
        if (.not.allocated(BS_blk(i_b)%O_c)) exit
        if (     allocated(BS_blk(i_b)%O_c)) then
          deallocate(BS_blk(i_b)%O_c)
