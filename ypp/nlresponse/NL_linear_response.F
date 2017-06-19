@@ -216,34 +216,40 @@ subroutine NL_linear_response(en)
      !
      character(schlen) :: eps_file_name,eels_file_name,efield_file_name, &
 &                         pol_file_name
+     character(schlen) :: short_eps,short_eels,short_efield,short_pol
      character(schlen) :: headings(11)
      integer           :: i_t
      !
      call set_real_printed_length(f_length=15,g_length=15)
      !
      eps_file_name  ="YPP-eps_along_E"
+     short_eps=eps_file_name
+     !
      eels_file_name ="YPP-eels_along_E"
+     short_eels=eels_file_name
+     !
      efield_file_name="YPP-efield_along_E"
+     short_efield=efield_file_name
      !
      headings(1)="E [eV]"
      !
      call of_open_close(eps_file_name,'ot')
      headings(2:7)=(/'Im/eps_d1','Re/eps_d1','Im/eps_d2','Re/eps_d2','Im/eps_d3','Re/eps_d3'/)
-     call msg('o '//trim(eps_file_name),'#')
-     call msg('o '//trim(eps_file_name),'#',headings(1:7),INDENT=0,USE_TABS=.TRUE.)
-     call msg('o '//trim(eps_file_name),'#')
+     call msg('o '//trim(short_eps),'#')
+     call msg('o '//trim(short_eps),'#',headings(1:7),INDENT=0,USE_TABS=.TRUE.)
+     call msg('o '//trim(short_eps),'#')
      !
      call of_open_close(eels_file_name,'ot') 
      headings(2:7)=(/'Im/eel_d1','Re/eel_d1','Im/eel_d2','Re/eel_d2','Im/eel_d3','Re/eel_d3'/)
-     call msg('o '//trim(eels_file_name),'#')
-     call msg('o '//trim(eels_file_name),'#',headings(1:7),INDENT=0,USE_TABS=.TRUE.)
-     call msg('o '//trim(eels_file_name),'#')
+     call msg('o '//trim(short_eels),'#')
+     call msg('o '//trim(short_eels),'#',headings(1:7),INDENT=0,USE_TABS=.TRUE.)
+     call msg('o '//trim(short_eels),'#')
      !
      call of_open_close(efield_file_name,'ot')
      headings(2:7)=(/"E_x/Re[V/m]","E_x/Im[V/m]","E_y/Re[V/m]","E_y/Im[V/m]","E_z/Re[V/m]","E_z/Im[V/m]"/)
-     call msg('o '//trim(efield_file_name),'#')
-     call msg('o '//trim(efield_file_name),'#',headings(1:7),INDENT=0,USE_TABS=.TRUE.)
-     call msg('o '//trim(efield_file_name),'#')
+     call msg('o '//trim(short_efield),'#')
+     call msg('o '//trim(short_efield),'#',headings(1:7),INDENT=0,USE_TABS=.TRUE.)
+     call msg('o '//trim(short_efield),'#')
      !
      do i_w = 1, NL_response%W_n_steps
       !
@@ -255,43 +261,44 @@ subroutine NL_linear_response(en)
       !
       outdata(2:4)=(/ real(E_w_SP(1) ),aimag(E_w_SP(1) ),real(E_w_SP(2) ) /)
       outdata(5:7)=(/ aimag(E_w_SP(2)),real(E_w_SP(3)),aimag(E_w_SP(3)) /)
-      call msg('o '//trim(efield_file_name),'',outdata(1:7),USE_TABS=.TRUE.)
+      call msg('o '//trim(short_efield),'',outdata(1:7),USE_TABS=.TRUE.)
       !
       outdata(2:4)=(/ aimag(EPS(i_w,1) ),real(EPS(i_w,1) ),aimag(EPS(i_w,2) ) /)
       outdata(5:7)=(/ real( EPS(i_w,2) ),aimag( EPS(i_w,3) ),real( EPS(i_w,3) ) /)
-      call msg('o '//trim(eps_file_name),'',outdata(1:7),USE_TABS=.TRUE.)
+      call msg('o '//trim(short_eps),'',outdata(1:7),USE_TABS=.TRUE.)
       !
       outdata(2:4)=(/ aimag(EELS(i_w,1) ), real(EELS(i_w,1) ),aimag(EELS(i_w,2) ) /)
       outdata(5:7)=(/ real( EELS(i_w,2) ),aimag(EELS(i_w,3) ),real( EELS(i_w,3) ) /)
-      call msg('o '//trim(eels_file_name),'',outdata(1:7),USE_TABS=.TRUE.)
+      call msg('o '//trim(short_eels),'',outdata(1:7),USE_TABS=.TRUE.)
       !
     enddo
     !
     if(trim(NL_response%damping) /= "NONE") then
        !     
        pol_file_name   ="YPP-damped_polarization"
+       short_pol=pol_file_name
        !
        headings(1)="TimeE [fs]"
        !
        call of_open_close(pol_file_name,'ot')
        headings(2:4)=(/'Pol_x','Pol_y','Pol_z'/)
-       call msg('o '//trim(pol_file_name),'#')
-       call msg('o '//trim(pol_file_name),'#',headings(1:4),INDENT=0,USE_TABS=.TRUE.)
-       call msg('o '//trim(pol_file_name),'#')
+       call msg('o '//trim(short_pol),'#')
+       call msg('o '//trim(short_pol),'#',headings(1:4),INDENT=0,USE_TABS=.TRUE.)
+       call msg('o '//trim(short_pol),'#')
        !
        do i_t = NL_response%i_T_range(1),NL_response%i_T_range(2)
          outdata(1)=(i_t-1.0)*NL_step*AUT2FS
          outdata(2:4)=(/ NL_P_t(i_t,1), NL_P_t(i_t,2),NL_P_t(i_t,3) /)
-         call msg('o '//trim(pol_file_name),'',outdata(1:7),USE_TABS=.TRUE.)
+         call msg('o '//trim(short_pol),'',outdata(1:7),USE_TABS=.TRUE.)
        enddo
        !
-       call of_open_close(pol_file_name)
+       call of_open_close(short_pol)
        !
     endif
     !
-    call of_open_close(eps_file_name)
-    call of_open_close(eels_file_name)
-    call of_open_close(efield_file_name)
+    call of_open_close(short_eps)
+    call of_open_close(short_eels)
+    call of_open_close(short_efield)
     call set_real_printed_length()
    end subroutine LR_write_output
   !

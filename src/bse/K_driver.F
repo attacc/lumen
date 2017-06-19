@@ -66,7 +66,7 @@ subroutine K_driver(Xen,Ken,Xk,q,X_static_pp,Xw)
  BS_gamma_point=.FALSE.
  if(Xk%nibz==1) then
    BS_gamma_point=.TRUE.
-   call msg('s','[BSE] BSE at gamma point: uses less memory but slightly slower')
+   call msg('s','[BSE] BSE at Gamma point: uses less memory but slightly slower')
  endif
  !
  ! Joint DOS
