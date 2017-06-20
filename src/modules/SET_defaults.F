@@ -57,7 +57,7 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
 &                     cutoff_presets,k_map
  use electrons,  ONLY:n_spin,n_sp_pol,n_spinor,BZ_DbGd_nbands,BZ_DbGd_tot_nkpts,&
 &                     filled_tresh,l_spin_orbit,n_spin_den,BZ_ASSOCIATED_nkpts,&
-&                     eval_magn,E_SOC_nbands,n_bands
+&                     eval_magn,E_SOC_nbands,n_bands,nel_cond
  use parallel_m, ONLY:ncpu,CPU_str_reset
  use com,        ONLY:isec,depth,secnm,previous_secmode,of,opened_of,of_unit,max_open_ofs,&
 &                     more_io_path,core_io_path,jobstr,com_path,alt_jobstr,repfile,n_alt_jobstr,&
@@ -221,6 +221,11 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  !functions
  !
  bose_E_cut=0.1_SP
+ !
+ ! Luminescence
+ !
+ nel_cond=0._SP
+ !
  !
  !D_lattice
  !

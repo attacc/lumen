@@ -27,6 +27,7 @@ module electrons
  implicit none
  !
  real(SP) :: nel
+ real(SP) :: nel_cond
  real(SP) :: default_nel
  real(SP) :: spin_occ
  real(SP) :: filled_tresh

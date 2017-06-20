@@ -24,7 +24,7 @@
 subroutine INIT_load(defs,en,q,k,X,Xw)
  !
  use pars,          ONLY:schlen,SP
- use electrons,     ONLY:levels,nel,filled_tresh
+ use electrons,     ONLY:levels,nel,nel_cond,filled_tresh
  use frequency,     ONLY:w_samp
  use it_m,          ONLY:it,initdefs,E_unit,G_unit,T_unit,Bfield_unit,&
 &                        Time_unit,I_unit,Angle_unit,V_parallel,initmode,&
@@ -132,6 +132,11 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  call it(defs,'OccTresh','Occupation treshold (metallic bands)',filled_tresh,verb_level=V_general)
  call it(defs,'BoseTemp','Bosonic Temperature',Bose_Temp,T_unit,verb_level=V_general)
  call it(defs,'BoseCut', '[BOSE] Finite T Bose function cutoff',bose_E_cut,verb_level=V_general)
+ !
+ ! Luminescence
+ !
+ call it(defs,'Nelcond','Number of electrons in conduction',nel_cond,verb_level=V_general)
+ !
 #if defined _ELPH 
  call it('f',defs,'BSEscatt', '[KPT] Compute extended k/q scatering',verb_level=V_kpt)
  call it(defs,'ElPhRndNq',  '[ELPH] Read random Q-points',elph_nDBs_used,verb_level=V_kpt) 
