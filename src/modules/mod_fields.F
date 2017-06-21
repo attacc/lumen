@@ -113,7 +113,7 @@ module fields
      complex(SP), dimension(2) :: small_a
      !
      integer           ::i_fr,i_field,n_fields
-     real(SP)          ::T_0,W_0,W_i,sigma,WT_i,EXPf,fr_shift(2)
+     real(SP)          ::T_0,W_0,W_i,sigma,WT_i,EXPf,fr_shift(2),T_eff
      complex(SP)       ::f_t(2),f_tmp(3)
      !
      small_a=cZERO
@@ -206,15 +206,28 @@ module fields
          if (order==2 ) f_t(i_field)=(W_0*cos(WT_i)-(T_i-T_0)*sin(WT_i)/sigma**2)*EXPf
          ! 
        case('PULSE')
-         f_t(i_field)= 0._SP
-         if(abs((T_i-T_0))< sigma) then
-           WT_i=W_0*(T_i-T_0)+fr_shift(i_field)
-           if (order==0 ) f_t(i_field)= 0._SP
-           if (order==1 ) f_t(i_field)=       (T_i-T_0 + sigma)**2 *(T_i-T_0 -sigma)**2/sigma**4      *cos(WT_i)
-           if (order==2 ) f_t(i_field)=(2._SP*(T_i-T_0 + sigma)    *(T_i-T_0 -sigma)**2/sigma**4                 &
-&                                      +2._SP*(T_i-T_0 + sigma)**2 *(T_i-T_0 -sigma)   /sigma**4 )    *cos(WT_i) &
-&                                      -      (T_i-T_0 + sigma)**2 *(T_i-T_0 -sigma)**2/sigma**4  *W_0*sin(WT_i)
+         !
+         T_0=sigma
+         !
+         a =  3._SP/(T_0/2._SP)**4 
+         b = -8._SP/(T_0/2._SP)**3
+         c =  6._SP/(T_0/2._SP)**2
+         !
+         if(real(T_i)<=T_0/2._SP) then
+           damp_func=(a*T_i**4 + b*T_i**3 + c*T_i**2)       
+         else if(real(T_i)>T_0/2._SP.and.real(T_i)<=T_0) then 
+           damp_func=(a*(T_0-T_i)**4 + b*(T_0-T_i)**3 + c*(T_0-T_i)**2)       
+         else
+           damp_func=0._SP
          endif
+         !
+         W_i=E_field%frequency
+         WT_i=W_i*T_i+fr_shift(i_field)
+         !
+         if (order==0 ) f_t(i_field)=f_t(i_field)- damp_func*(cos(WT_i)-1._SP)/W_i
+         if (order==1 ) f_t(i_field)=f_t(i_field)+ damp_func*sin(WT_i)
+         if (order==2 ) f_t(i_field)=f_t(i_field)+ damp_func*W_0*cos(WT_i)
+         if (order==-1) f_t(i_field)=-2
          !
        end select
        !
