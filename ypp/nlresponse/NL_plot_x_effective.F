@@ -51,8 +51,8 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
  n_headings=7
  !
  headings(1)="# E [eV]"
- headings(2:7)=(/'X/Im[cm/stV](x)','X/Re[cm/stV](x)','X/Im[cm/stV](y)','X/Re[cm/stV](y)',&
-&                          'X/Im[cm/stV](z)','X/Re[cm/stV](z)'/)
+ headings(2:7)=(/'X/Im[esu](x)','X/Re[esu](x)','X/Im[esu](y)','X/Re[esu](y)',&
+&                          'X/Im[esu](z)','X/Re[esu](z)'/)
  !
  do i_order=0,X_order,1
    !
@@ -88,6 +88,7 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
    endif
    !
    call msg('o '//short_X_file_name,'#')
+   call msg('o '//short_X_file_name,'# for nth order susceptibility, esu = (cm/statV)^{n-1} 
    !
    call msg('o '//short_X_file_name,'',headings(1:n_headings),USE_TABS=.TRUE.)
    !
