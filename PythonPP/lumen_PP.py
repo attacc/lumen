@@ -5,7 +5,7 @@ import re
 import sys
 
 """
-Analise ypp output to extract Kerr, two-photon absorption by means of Richardson extrapolation
+Analyse ypp output to extract nonlinear reflective index, two-photon absorption by means of Richardson extrapolation
 Author:  C. Attaccalite and M. Grüning
 """
 #
@@ -15,13 +15,12 @@ SVCMm12VMm1=29.98*10**3.0
 AU2VMm1    =5.14220632*10**11.0
 
 #
-
 # parse command line
 #
-parser = argparse.ArgumentParser(prog='lumen_PP',description='Analise ypp output to extract Kerr and two-photon absorption',epilog="Copyright C. Attaccalite and M. Grüning 2017")
+parser = argparse.ArgumentParser(prog='lumen_PP',description='Analyse ypp output to extract nonlinear refractive index and two-photon absorption',epilog="Copyright C. Attaccalite and M. Grüning 2017")
 parser.add_argument('-nx', help="number of harmonics", type=int , default=5, dest="nX")
 parser.add_argument('-nr', help="number of intensities",type=int , default=2, dest="nR")
-parser.add_argument('-J', help="job identifies",type=str , default=None, dest="jobname")
+parser.add_argument('-J', help="job identifier",type=str , default=None, dest="jobname")
 args = parser.parse_args()
 
 print("\n * * * Analize ypp output to extract Kerr and two-photon absorption * * * \n\n")
@@ -197,7 +196,7 @@ elif args.nR == 3:
     KERR    = 8.0/3.0*(P[:,:,1] - 6.0*P_2[:,:,1] + 8.0*P_4[:,:,1])*Divid_Efield[3]
     #
 #
-# Copy energy coloumn
+# Copy energy column
 #
 KERR_out[:,1]=KERR[:,0].imag
 KERR_out[:,2]=KERR[:,0].real
