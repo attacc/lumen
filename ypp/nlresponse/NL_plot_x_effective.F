@@ -88,7 +88,7 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
    endif
    !
    call msg('o '//short_X_file_name,'#')
-   call msg('o '//short_X_file_name,'# for nth order susceptibility, esu = (cm/statV)^{n-1} 
+   call msg('o '//short_X_file_name,'#','   For nth order susceptibility, esu = (cm/statV)^{n-1} ',INDENT=0) 
    !
    call msg('o '//short_X_file_name,'',headings(1:n_headings),USE_TABS=.TRUE.)
    !
