@@ -98,7 +98,7 @@ print("\nWriting refined response functions... \n")
 XHI_out=np.zeros([nfreqs,N_Col,N_harm],dtype=float)
 for iX in range(2,N_harm):
     XHI_out[:,0,iX]=XHI[0,1,:,0]  # copy energies
-    for dim in range(N_Col):
+    for dim in range(1,N_Col):
         for freq in range(nfreqs):
             XHI_out[freq,dim,iX]=Eliminate_lower_harmonics(XHI[:,iX,freq,dim],iX)
 #
