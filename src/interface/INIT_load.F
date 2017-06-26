@@ -133,9 +133,11 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  call it(defs,'BoseTemp','Bosonic Temperature',Bose_Temp,T_unit,verb_level=V_general)
  call it(defs,'BoseCut', '[BOSE] Finite T Bose function cutoff',bose_E_cut,verb_level=V_general)
  !
+#if defined _LU
  ! Luminescence
  !
- call it(defs,'Nelcond','Number of electrons in conduction',nel_cond,verb_level=V_general)
+ call it(defs,'NelCond','Number of electrons in conduction',nel_cond,verb_level=V_general)
+#endif
  !
 #if defined _ELPH 
  call it('f',defs,'BSEscatt', '[KPT] Compute extended k/q scatering',verb_level=V_kpt)

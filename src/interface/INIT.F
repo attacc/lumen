@@ -393,9 +393,11 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
  !
  call initactivate(1,'StdoHash Nelectro ElecTemp BoseTemp OccTresh NLogCPUs DBsIOoff DBsFRAGpm EvalMagn')
  !
+#if defined _LU
  ! Luminescence
  !
- call initactivate(1,'Nelcond')
+ call initactivate(1,'NelCond')
+#endif
  !
  !
  !FFT

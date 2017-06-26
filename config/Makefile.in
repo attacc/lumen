@@ -76,7 +76,7 @@ YPPPH_LIBS      = modules interpolate init qp plotting electrons elph excitons s
 #
 YPP_MAIN_LIBS      = $(BASIC_LIBS) coulomb bz_ops qp_control setup interface tddft pol_function bse nloptics
 #
-PROJECTS = lumen_ph ypp_ph
+PROJECTS = lumen_ph lumen_lu ypp_ph
 EXE      = $(TARGETS) $(PROJECTS)
 #
 nothing: 
@@ -123,6 +123,10 @@ lumen: libs
 lumen_ph: libs
 	@+LIBS2DO="$(MAIN_LIBS)"; XPATH="src"; VPATH="$(topdir)/src"; ADF="-D_ELPH"; $(mksrc)
 	@+X2DO="lumen_ph"; XPATH="driver"; VPATH="$(topdir)/driver"; XLIBS="$(MAIN_LIBS)"; ADF="-D_ELPH"; $(mkx)
+
+lumen_lu: libs
+	@+LIBS2DO="$(MAIN_LIBS)"; XPATH="src"; VPATH="$(topdir)/src"; ADF="-D_LU"; $(mksrc)
+	@+X2DO="lumen_lu"; XPATH="driver"; VPATH="$(topdir)/driver"; XLIBS="$(MAIN_LIBS)"; ADF="-D_LU"; $(mkx)
 
 #
 # Interfaces #
