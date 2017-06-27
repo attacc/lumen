@@ -35,17 +35,50 @@ subroutine OCCUPATIONS_Quasi_Fermi(E,K,mode)
  !  Full report of system electronic character
  !
  use pars,          ONLY:SP,DP
- use electrons,     ONLY:levels,nel_cond
+ use electrons,     ONLY:levels,nel_cond,nel,E_duplicate
  use R_lattice,     ONLY:bz_samp
+ use IO_m,          ONLY:IO_and_Messaging_switch
+ use com,           ONLY:error
+ !
  implicit none
  !
  type(levels) ::E
  type(bz_samp)::K
  integer      ::mode
  !
- if(nel_cond==0._SP) then
-   call  OCCUPATIONS_Fermi(E,K,mode)
-   return
- endif
+ ! Work Space
+ !
+ type(levels) :: E_plus,E_minus
+ real(SP) :: nel_save
+ integer  :: nbf_save,nbm_save
+ integer  :: nval
+ !
+ call  OCCUPATIONS_Fermi(E,K,mode)
+ !
+ if(nel_cond==0._SP) return
+ !
+ nel_save=nel
+ nbf_save=E%nbf
+ nbm_save=E%nbm
+ !
+ call E_duplicate(E,E_plus)
+ call E_duplicate(E,E_minus)
+ !
+ if(E%nbf/=E%nbm) call error("Quasi-Fermi distribution only for insulators/semiconductors")
+ !
+ nval=E%nbf
+ nel =nel+nel_cond
+ !
+ call OCCUPATIONS_Fermi(E_plus,K,mode)
+ !
+ nel =nel_save
+ nel =nel-nel_cond
+ !
+ call OCCUPATIONS_Fermi(E_minus,K,mode)
+ !
+ call OCCUPATIONS_Merge(E,E_minus,E_plus,K,mode) ! Generate a Quasi-Fermi distribution in E using E_minus and E_plus
+ !
+ call IO_and_Messaging_switch("-report -log -io_in -io_out")
+ call IO_and_Messaging_switch("+report +log +io_in +io_out")
  !
 end subroutine
