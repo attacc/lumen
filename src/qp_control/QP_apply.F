@@ -265,7 +265,13 @@ subroutine QP_apply(band_range,en,k,object,msg_fmt,qp_impose,QP_ctl_impose)
    !
    if (input_Tel_is_negative) nbf_m_SAVE=(/en%nbf,en%nbm/)
    !
-   if (.not.associated(en%fo) .and. .not. l_sc_run) call OCCUPATIONS_Fermi(en,k,1)
+   if (.not.associated(en%fo) .and. .not. l_sc_run) then
+#if defined _LU
+     call OCCUPATIONS_Quasi_Fermi(en,k,1)
+#else
+     call OCCUPATIONS_Fermi(en,k,1)
+#endif
+   endif
    !
    if (input_Tel_is_negative) then
      en%nbf=nbf_m_SAVE(1)
@@ -281,7 +287,11 @@ subroutine QP_apply(band_range,en,k,object,msg_fmt,qp_impose,QP_ctl_impose)
    !
    call E_duplicate(en,Fermi_en)
    !
+#if defined _LU
+   call OCCUPATIONS_Quasi_Fermi(Fermi_en,k,1)
+#else
    call OCCUPATIONS_Fermi(Fermi_en,k,1)
+#endif
    !
    ! In OCCUPATIONS_Fermi the Fermi_en the %E and CBm and VMB are coherent. 
    ! Instead the en%E are out-of-date and are not shifted in OCCUPATIONS_Extend.

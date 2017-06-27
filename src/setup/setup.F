@@ -38,6 +38,9 @@ subroutine setup(en,Xen,Ken,k,Xk)
  use IO_m,           ONLY:REP,DUMP,NONE
  use vec_operate,    ONLY:cross_product,c2a
  use zeros,          ONLY:k_iku_zero,k_rlu_zero,G_iku_zero,define_zeros
+#if defined _LU
+ use electrons,      ONLY:nel_cond
+#endif
  !
  implicit none
  type(levels)    ::en,Xen,Ken
@@ -278,13 +281,21 @@ subroutine setup(en,Xen,Ken,k,Xk)
  if (input_Tel_is_negative) then
    call E_duplicate(Xen,Xen_COPY)
    Tel=0._SP
+#if defined _LU
+   call OCCUPATIONS_Quasi_Fermi(Xen_COPY,Xk,1)
+#else
    call OCCUPATIONS_Fermi(Xen_COPY,Xk,1)
+#endif
    nbf_m_SAVE=(/Xen_COPY%nbf,Xen_COPY%nbm/)
    call E_reset(Xen_COPY)
  endif
  !
  Tel=Tel_SAVE
+#if defined _LU
+ call OCCUPATIONS_Quasi_Fermi(Xen,Xk,2)
+#else
  call OCCUPATIONS_Fermi(Xen,Xk,2)
+#endif
  call OCCUPATIONS_Extend(Xen,en)
  !
  if (input_Tel_is_negative) then
