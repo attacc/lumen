@@ -1,5 +1,5 @@
 #if defined _LU
-LU_objects = OCCUPATION_Quasi_Fermi.o
+LU_objects = OCCUPATIONS_Quasi_Fermi.o
 #endif
 objs = eval_G_minus_G.o G_rot_grid.o G_index.o \
        FREQUENCIES_damping.o FREQUENCIES_setup.o FREQUENCIES_coarse_grid.o \
