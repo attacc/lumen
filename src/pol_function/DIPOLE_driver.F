@@ -67,6 +67,7 @@ subroutine Dipole_driver(Xen,Xk,X,field_dir)
 &                         PP_redux_wait,PAR_COM_PLASMA_INDEX,PAR_COM_Q_INDEX,l_par_RT
  use X_m,            ONLY:DIP_S
  use parser_m,       ONLY:parser
+ use nl_optics,      ONLY:eval_OVERLAPS
 #if defined _TIMING
  use timing_m,       ONLY:timing
 #endif
@@ -126,7 +127,10 @@ subroutine Dipole_driver(Xen,Xk,X,field_dir)
  Dipole_bands_ordered=.true.
  !
  l_evaluating_em1s=index(secnm,"Dielectric")/=0
- if ((l_nl_optics).and..not.l_evaluating_em1s) Dipole_bands_ordered=.false.
+ if (use_covariant_approach) then
+    Dipole_bands_ordered=.false.
+    eval_OVERLAPS=.true.
+ endif
  !
  ! Set up band limits
  !
