@@ -35,10 +35,10 @@ subroutine OCCUPATIONS_Quasi_Fermi(E,K,mode)
  !  Full report of system electronic character
  !
  use pars,          ONLY:SP,DP
- use electrons,     ONLY:levels,nel_cond,nel,E_duplicate
+ use electrons,     ONLY:levels,nel_cond,nel,E_duplicate,E_reset
  use R_lattice,     ONLY:bz_samp
  use IO_m,          ONLY:IO_and_Messaging_switch
- use com,           ONLY:error
+ use com,           ONLY:error,msg
  !
  implicit none
  !
@@ -51,16 +51,16 @@ subroutine OCCUPATIONS_Quasi_Fermi(E,K,mode)
  type(levels) :: E_plus,E_minus
  real(SP) :: nel_save
  integer  :: nbf_save,nbm_save
- integer  :: nval
+ integer  :: nval 
  !
  call  OCCUPATIONS_Fermi(E,K,mode)
  !
  if(nel_cond==0._SP) return
  !
  nel_save=nel
- nbf_save=E%nbf
- nbm_save=E%nbm
  !
+ call E_reset(E_plus)
+ call E_reset(E_minus)
  call E_duplicate(E,E_plus)
  call E_duplicate(E,E_minus)
  !
@@ -69,16 +69,33 @@ subroutine OCCUPATIONS_Quasi_Fermi(E,K,mode)
  nval=E%nbf
  nel =nel+nel_cond
  !
+ call IO_and_Messaging_switch("-report -log -io_in -io_out")
  call OCCUPATIONS_Fermi(E_plus,K,mode)
+ !
+ nbm_save=E_plus%nbm
  !
  nel =nel_save
  nel =nel-nel_cond
  !
  call OCCUPATIONS_Fermi(E_minus,K,mode)
+ call IO_and_Messaging_switch("+report +log +io_in +io_out")
+ !
+ nbf_save=E_minus%nbf
+ !
+ nel  =nel_save
+ E%nbf=nbf_save
+ E%nbm=nbm_save
  !
  call OCCUPATIONS_Merge(E,E_minus,E_plus,K,mode) ! Generate a Quasi-Fermi distribution in E using E_minus and E_plus
  !
- call IO_and_Messaging_switch("-report -log -io_in -io_out")
- call IO_and_Messaging_switch("+report +log +io_in +io_out")
+ call msg('rsn','Number of metalic bands : ',E%nbm)
+ call msg('rsn','Number of filled  bands : ',E%nbf)
+ call msg('rsn','Number of valence bands : ',nval)
+ !
+ call REPORT_all_Occupations(E,k,'E')
+ stop
+ !
+ call E_reset(E_plus)
+ call E_reset(E_minus)
  !
 end subroutine

@@ -1,1 +1,6 @@
-objs = acknowledge_yambo.o REPORT_Occupations.o section.o REPORT_Energies.o
+#if defined _LU
+LU_objects = REPORT_all_Occupations.o
+#endif
+
+
+objs = acknowledge_yambo.o REPORT_Occupations.o section.o REPORT_Energies.o $(LU_objects)

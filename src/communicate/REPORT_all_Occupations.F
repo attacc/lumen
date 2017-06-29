@@ -44,7 +44,7 @@ subroutine REPORT_all_Occupations(E,k,what)
  character(schlen) :: dumb_ch1,dumb_ch2
  real(SP)      :: k_cc(3),k_al(3)
  !
- call section('Occupations Report')
+ call section('=','Occupations Report')
  !
  do ik=1,E%nk
    !
@@ -67,9 +67,9 @@ subroutine REPORT_all_Occupations(E,k,what)
    !
    do is_pol=1,n_sp_pol
      !
-     do i1=1,E%nb,8
+     do i1=1,min(2*E%nbm,E%nb),8
        if (n_sp_pol==1) then
-         call msg('r',what//' ',(/(E%E(ib,ik,1),ib=i1,min(i1+7,E%nb))/))
+         call msg('r',what//' ',(/(E%f(ib,ik,1),ib=i1,min(i1+7,E%nb))/))
        else
          if (i1==1) then
            if (is_pol==1) call msg('r','[up] '//what//' ',(/(E%f(ib,ik,1),ib=i1,min(i1+7,E%nb))/))

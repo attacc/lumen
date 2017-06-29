@@ -136,7 +136,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
 #if defined _LU
  ! Luminescence
  !
- call it(defs,'NelCond','Number of electrons in conduction',nel_cond,verb_level=V_general)
+ call it(defs,'NelCond','Number of electrons in conduction',nel_cond)
 #endif
  !
 #if defined _ELPH 
