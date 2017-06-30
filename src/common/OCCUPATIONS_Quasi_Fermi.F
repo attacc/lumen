@@ -82,18 +82,20 @@ subroutine OCCUPATIONS_Quasi_Fermi(E,K,mode)
  !
  nbf_save=E_minus%nbf
  !
+ call REPORT_all_Occupations(E_minus,k,'E_minus')
+ call REPORT_all_Occupations(E_plus,k,'E_plus')
+ !
+ call OCCUPATIONS_Merge(E,E_minus,E_plus,K,mode) ! Generate a Quasi-Fermi distribution in E using E_minus and E_plus
+ !
  nel  =nel_save
  E%nbf=nbf_save
  E%nbm=nbm_save
- !
- call OCCUPATIONS_Merge(E,E_minus,E_plus,K,mode) ! Generate a Quasi-Fermi distribution in E using E_minus and E_plus
  !
  call msg('rsn','Number of metalic bands : ',E%nbm)
  call msg('rsn','Number of filled  bands : ',E%nbf)
  call msg('rsn','Number of valence bands : ',nval)
  !
  call REPORT_all_Occupations(E,k,'E')
- stop
  !
  call E_reset(E_plus)
  call E_reset(E_minus)

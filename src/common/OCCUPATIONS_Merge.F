@@ -24,7 +24,7 @@ subroutine OCCUPATIONS_Merge(E,E_minus,E_plus,K,mode)
  !
  use pars,          ONLY:SP,DP
  use electrons,     ONLY:levels
- use com,           ONLY:error
+ use com,           ONLY:msg
  use R_lattice,     ONLY:bz_samp
  !
  implicit none
@@ -52,12 +52,13 @@ subroutine OCCUPATIONS_Merge(E,E_minus,E_plus,K,mode)
  !
  ! Check number of electorns
  !
+ call msg("sr","Number of electrons in Quasi-Fermi: ",N_electrons(E,k))
+ !
  contains 
    !  
    real(SP) function N_electrons(E_in,K_in)
      !  
      use electrons,     ONLY:n_sp_pol,spin_occ
-     use com,           ONLY:msg
      !
      implicit none
      !
@@ -73,12 +74,10 @@ subroutine OCCUPATIONS_Merge(E,E_minus,E_plus,K,mode)
      do ib=1,E_in%nb
        do ik=1,E_in%nk
          do is=1,n_sp_pol
-           N_electrons=N_electrons+spin_occ*E_in%f(ib,ik,is)*K_in%weights(ik)
+           N_electrons=N_electrons+E_in%f(ib,ik,is)*K_in%weights(ik)
          enddo
        enddo
      enddo
-     !
-     call msg("sr","Number of electrons in Quasi-Fermi: ",N_electrons)
      !
    end function N_electrons
  !

@@ -37,7 +37,7 @@ subroutine OCCUPATIONS_Extend(Xe,E)
  use pars,       ONLY:SP
  use units,      ONLY:HA2EV
  use electrons,  ONLY:levels,n_sp_pol,spin_occ,BZ_DbGd_nbands,&
-&                     BZ_DbGd_tot_nkpts
+&                     BZ_DbGd_tot_nkpts,nel_cond
  use com,        ONLY:warning
  use D_lattice,  ONLY:Tel
  use functions,  ONLY:Fermi_fnc
@@ -63,6 +63,14 @@ subroutine OCCUPATIONS_Extend(Xe,E)
  ! If Xe and E have same metallic character then
  ! simply shift E components (Xe have been already shifted
  ! in the Fermi routine)
+ !
+#if defined _LU
+ if(nel_cond>0._SP) then
+   call warning("Global and response function energy levels forced to be the same!")
+   E%nbf=Xe%nbf
+   E%nbm=Xe%nbm
+ endif
+#endif
  !
  if (E%nbf==Xe%nbf.and.E%nbm==Xe%nbm) then
    E%E=E%E-E%E_Fermi
