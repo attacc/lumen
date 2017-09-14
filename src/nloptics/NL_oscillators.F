@@ -54,14 +54,14 @@ subroutine NL_oscillators(q,k,en)
  integer :: ID,io_err,iGo_max
  integer, external :: io_OSCLL
  !
+ call PP_redux_wait() 
+ !
  OSCLL=cZERO
  !
  i_sp_pol=1
  call msg('s','[OSC] Checking oscillators header ')
  call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1/),MODE=VERIFY,ID=ID)
  io_err=io_OSCLL(q,ID)
- !
- call PP_redux_wait(COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
  ! 
  if(io_err==0) then
    !

@@ -39,6 +39,7 @@ subroutine NL_lsex_potential(q,X,Xw)
  use com,                 ONLY:error
  use matrix_operate,      ONLY:hermitian
  use stderr,              ONLY:intc
+ use parallel_m,          ONLY:PP_redux_wait
  !
  implicit none
  !
@@ -51,6 +52,8 @@ subroutine NL_lsex_potential(q,X,Xw)
  integer                    :: iqbz,iqibz,iqs,io_err,ID,ig1,ig2
  integer, external          :: io_X
  type(elemental_collision)  :: isc 
+ !
+ call PP_redux_wait()   
  !
  isc%iqref =0
  isc%ngrho =X%ng  ! only G=1 is required for local-SEX 

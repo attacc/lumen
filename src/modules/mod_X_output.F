@@ -35,6 +35,10 @@ module X_output
  character(schlen) :: eps_file_name,eel_file_name,alpha_file_name,fxc_file_name,jdos_file_name,pl_file_name
  character(schlen) :: off_file_name,beta_file_name,moke_file_name,refl_file_name
  !
+#if defined _LU
+ character(schlen) :: lum_file_name
+#endif
+ !
  contains
    !
    subroutine X_write_messages_before_headers(iq,GreenF,Vnl_included,ordering)
@@ -143,6 +147,9 @@ module X_output
      refl_file_name ='refl_q'//trim(intc(iq))
      eel_file_name  ='eel_q'//trim(intc(iq))
      alpha_file_name='alpha_q'//trim(intc(iq))
+#if defined _LU
+     lum_file_name  ='lum_q'//trim(intc(iq))
+#endif
      !
      off_file_name  ='off_q'//trim(intc(iq))
      beta_file_name ='beta_q'//trim(intc(iq))
@@ -168,6 +175,9 @@ module X_output
        beta_file_name =  trim(beta_file_name)//'_'//solver
        moke_file_name =  trim(moke_file_name)//'_'//solver
        jdos_file_name =  trim(jdos_file_name)//'_'//solver
+#if defined _LU
+       lum_file_name  =  trim(lum_file_name)//'_'//solver
+#endif
      endif
      !
      if (len_trim(approx)>0) then
@@ -179,6 +189,9 @@ module X_output
        off_file_name  =  trim(off_file_name)//'_'//approx
        beta_file_name =  trim(beta_file_name)//'_'//approx
        jdos_file_name =  trim(jdos_file_name)//'_'//approx
+#if defined _LU
+       lum_file_name  =  trim(lum_file_name)//'_'//approx
+#endif
      endif
      !
      if (len_trim(equation)>0) then
@@ -190,6 +203,9 @@ module X_output
        off_file_name  =  trim(off_file_name)//'_'//equation
        beta_file_name =  trim(beta_file_name)//'_'//equation
        jdos_file_name =  trim(jdos_file_name)//'_'//equation
+#if defined _LU
+       lum_file_name  =  trim(lum_file_name)//'_'//equation
+#endif
      endif
      !
      if (.not.l_kerr) then
