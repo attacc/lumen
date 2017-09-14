@@ -68,6 +68,7 @@ subroutine NL_oscillators(q,k,en)
    !
    ! Load Oscillators
    !
+   call IO_and_Messaging_switch("SAVE")
    call IO_and_Messaging_switch("+io_out",CONDITION=.TRUE.)
    !   
    call live_timing('[OSC] Load Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
@@ -80,7 +81,7 @@ subroutine NL_oscillators(q,k,en)
    enddo
    call live_timing()
    !
-   call IO_and_Messaging_switch("+io_out",CONDITION=master_cpu)
+   call IO_and_Messaging_switch("RESTORE")
    !
    do ig=1,ng_oscll
      call PP_redux_wait(OSCLL(:,:,:,:,ig),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
@@ -158,6 +159,7 @@ subroutine NL_oscillators(q,k,en)
  !
  i_sp_pol=1
  !
+ call IO_and_Messaging_switch("SAVE")
  call IO_and_Messaging_switch("+io_out",CONDITION=.TRUE.)
  !
  do i_k=1,QP_nk
@@ -169,6 +171,6 @@ subroutine NL_oscillators(q,k,en)
    !
  enddo
  !
- call IO_and_Messaging_switch("+io_out",CONDITION=master_cpu)
+ call IO_and_Messaging_switch("RESTORE")
  !
 end subroutine NL_oscillators
