@@ -205,7 +205,7 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
     implicit none
     integer :: ncpu_f,ncpu_k,ncpu_sndchain
     !
-    if(n_ef_steps>ncpu) then
+    if(n_ef_steps>=ncpu) then
       ncpu_f=ncpu
       ncpu_k=1
     else
