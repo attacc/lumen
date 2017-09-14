@@ -67,10 +67,23 @@ subroutine NL_oscillators(q,k,en)
  if(io_err==0) then
    !
    ! Load Oscillators
+   !
+   call IO_and_Messaging_switch("+io_out",CONDITION=.TRUE.)
    !   
+   call live_timing('[OSC] Load Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
+   !
    do i_k=1,QP_nk
+     if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
      call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
      io_err=io_OSCLL(q,ID)
+     call live_timing(steps=1)
+   enddo
+   call live_timing()
+   !
+   call IO_and_Messaging_switch("+io_out",CONDITION=master_cpu)
+   !
+   do ig=1,ng_oscll
+     call PP_redux_wait(OSCLL(:,:,:,:,ig),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
    enddo
    !
    call msg('rs','[OSC] Oscillators loaded')
