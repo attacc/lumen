@@ -40,6 +40,7 @@ subroutine NL_oscillators(q,k,en)
  use IO_m,                ONLY:io_control,OP_RD_CL,VERIFY,REP,OP_WR_CL,OP_APP_WR_CL 
  use com,                 ONLY:msg
  use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu
+ use IO_m,                ONLY:IO_and_Messaging_switch
  !
  implicit none
  !
@@ -142,12 +143,19 @@ subroutine NL_oscillators(q,k,en)
  !
  ! Write Oscillators on disk
  !
+ i_sp_pol=1
+ !
+ call IO_and_Messaging_switch("+io_out",CONDITION=.TRUE.)
+ !
  do i_k=1,QP_nk
    !
-   i_sp_pol=1
+   if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
+   !
    call io_control(ACTION=OP_APP_WR_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
    io_err=io_OSCLL(q,ID)
    !
  enddo
+ !
+ call IO_and_Messaging_switch("+io_out",CONDITION=master_cpu)
  !
 end subroutine NL_oscillators
