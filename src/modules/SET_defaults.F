@@ -222,10 +222,13 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  !
  bose_E_cut=0.1_SP
  !
+#if defined _LU
+ !
  ! Luminescence
  !
  nel_cond=0._SP
  !
+#endif
  !
  !D_lattice
  !

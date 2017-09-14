@@ -117,63 +117,53 @@ subroutine NL_oscillators(q,k,en)
  !
  call live_timing('[OSC] Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
  !
- do i_k=1,QP_nk
-   !
-   if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
-   ! 
-   do iqbz=1,q%nbz
-   !
-   i_kmq_G0  =qindx_S(i_k,iqbz,2)
-   iqibz     =q%sstar(iqbz,1)
-   iqs       =q%sstar(iqbz,2)
-   isc%qs  =(/i_kmq_G0,iqibz,iqs/)
-   !
-   i_k_s=1
-   i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
-   i_kmq_s = k%sstar(qindx_S(i_k,iqbz,1),2)
-   !
-   !  Spin-Polarization not supported!!
-   ! 
-   i_k_sp  = 1
-   i_kmq_sp= 1
-   !
-   do i_n=NL_bands(1),NL_bands(2)
-     do i_m=NL_bands(1),NL_bands(2)
-       isc%is  =(/i_n,i_k,i_k_s,i_k_sp/)
-       isc%os  =(/i_m,i_kmq,i_kmq_s,i_kmq_sp/)
-       call scatter_Bamp(isc)            
-       OSCLL(i_n,i_m,i_k,iqbz,:)=isc%rhotw(:)
-     enddo
-   enddo
-   !
-   enddo
-   !
-   call live_timing(steps=1)
-   !
- enddo
- !
- call live_timing()
- !
- do ig=1,ng_oscll
-   call PP_redux_wait(OSCLL(:,:,:,:,ig),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
- enddo
- !
- ! Write Oscillators on disk
- !
- i_sp_pol=1
- !
  call IO_and_Messaging_switch("SAVE")
  call IO_and_Messaging_switch("+io_out",CONDITION=.TRUE.)
  !
  do i_k=1,QP_nk
    !
    if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
+   ! 
+   do iqbz=1,q%nbz
+     !
+     i_kmq_G0  =qindx_S(i_k,iqbz,2)
+     iqibz     =q%sstar(iqbz,1)
+     iqs       =q%sstar(iqbz,2)
+     isc%qs  =(/i_kmq_G0,iqibz,iqs/)
+     !
+     i_k_s=1
+     i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
+     i_kmq_s = k%sstar(qindx_S(i_k,iqbz,1),2)
+     !
+     !  Spin-Polarization not supported!!
+     ! 
+     i_k_sp  = 1
+     i_kmq_sp= 1
+     !
+     do i_n=NL_bands(1),NL_bands(2)
+       do i_m=NL_bands(1),NL_bands(2)
+         isc%is  =(/i_n,i_k,i_k_s,i_k_sp/)
+         isc%os  =(/i_m,i_kmq,i_kmq_s,i_kmq_sp/)
+         call scatter_Bamp(isc)            
+         OSCLL(i_n,i_m,i_k,iqbz,:)=isc%rhotw(:)
+       enddo
+     enddo
+     !
+   enddo
    !
    call io_control(ACTION=OP_APP_WR_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
    io_err=io_OSCLL(q,ID)
    !
+   call live_timing(steps=1)
+   !
  enddo
  !
  call IO_and_Messaging_switch("RESTORE")
+ !
+ call live_timing()
+ !
+ do ig=1,ng_oscll
+   call PP_redux_wait(OSCLL(:,:,:,:,ig),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
+ enddo
  !
 end subroutine NL_oscillators

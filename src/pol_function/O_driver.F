@@ -48,6 +48,7 @@ subroutine O_driver(Xen,Xk,q,wv,X)
 &                        X_setup_headers
 #if defined _LU
  use X_output,      ONLY:lum_file_name
+ use electrons,     ONLY:nel_cond
 #endif
  use interfaces,    ONLY:PARALLEL_global_indexes,PARALLEL_WF_index,PARALLEL_WF_distribute,WF_load
  !
@@ -158,6 +159,13 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    ! ... open ...
    !
    call of_open_close(eps_file_name,'ot')
+#if defined _LU
+   if(nel_cond/=0._SP) then
+     call of_open_close(lum_file_name,'ot')
+   else
+     lum_file_name=' '
+   endif
+#endif
    if (eval_eels)       call of_open_close(eel_file_name,'ot')
    if (.not.eval_eels)  eel_file_name=' '
    if (eval_alpha)      call of_open_close(alpha_file_name,'ot')
@@ -197,6 +205,9 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    call of_open_close(eel_file_name)
    call of_open_close(alpha_file_name)
    call of_open_close(fxc_file_name)
+#if defined _LU
+   call of_open_close(lum_file_name)
+#endif
    !
    ! e Table
    ! 1:e0     2:e     ==> Epsilon_ii(iw,1:2)
@@ -226,6 +237,9 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    call of_open_close(eps_file_name,'oa')
    call of_open_close(eel_file_name,'oa')
    call of_open_close(alpha_file_name,'oa')
+#if defined _LU
+   call of_open_close(lum_file_name,'oa')
+#endif
    !
    ! Unfortunately some of the variables need in this second bunch of messages is setup only in X_os
    !
