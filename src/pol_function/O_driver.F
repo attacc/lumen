@@ -149,6 +149,10 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    !
    call X_alloc('X',(/X%ng,X%ng,wv%n_freqs/))
    !
+#if defined _LU
+   if(nel_cond>0._SP) allocate(Lum_mat(wv%n_freqs))
+#endif
+   !
    ! Frequencies (AFTER TDDFT SETUP!)
    !
    call FREQUENCIES_setup(wv)
@@ -244,7 +248,7 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    !
    if(nel_cond>0._SP) then
      !  
-     Luminescence(:,1)=Lum_mat(i_G_shift,i_G_shift,:)*4.0_SP*pi/Q_plus_G_sq_modulus
+     Luminescence(:,1)=Lum_mat(:)*4.0_SP*pi/Q_plus_G_sq_modulus
      !
    endif
    !
@@ -383,6 +387,9 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    ! CLEAN (each q)
    !
    call X_alloc('X')
+#if defined _LU
+   if(nel_cond>0._SP) deallocate(Lum_mat)
+#endif
    !
    deallocate(Epsilon_ii,EEL,Alpha)
 #if defined _LU

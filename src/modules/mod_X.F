@@ -96,6 +96,7 @@ module X_m
  integer ,    allocatable :: X_poles_tab(:,:)
  integer ,    allocatable :: X_RLcomp_ig(:)
  complex(SP), allocatable :: X_mat(:,:,:)
+ complex(SP), allocatable :: Lum_mat(:)
  integer :: current_iq
  integer :: iw_ref
  integer :: X_DbGd_nkpts

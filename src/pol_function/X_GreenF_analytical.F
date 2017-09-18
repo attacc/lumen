@@ -61,7 +61,7 @@ subroutine X_GreenF_analytical(iq,transitions,Xw,Xen,Xk,GreenF,ordering,space,no
  X_os_run =trim(space)=="G"
  K_inv_run=trim(space)=="eh"
 #if defined _LU
- LU_is_run=trim(space)=="ls"
+ LU_is_run=trim(space)=="LU"
 #endif
  !
  ! Transitions
@@ -93,14 +93,22 @@ subroutine X_GreenF_analytical(iq,transitions,Xw,Xen,Xk,GreenF,ordering,space,no
  ! Thus I have to multiply by them the Green function
  !
  if( K_inv_run      ) ffac = ( Xen%f(iv,ikp,i_spin) - Xen%f(ic,ik,i_spin) )/spin_occ*real(Z_)
-#if defined _LU
- if( Lu_is_run      ) ffac = ( spin_occ - Xen%f(iv,ikp,i_spin)) * Xen%f(ic,ik,i_spin) /spin_occ*real(Z_)
-#endif
  if( X_os_run       ) ffac = 1._SP
  if( no_occupations ) ffac = 1._SP
+#if defined _LU
+ if( LU_is_run      ) then
+   ffac = ( spin_occ - Xen%f(iv,ikp,i_spin)) * Xen%f(ic,ik,i_spin) /spin_occ*real(Z_)
+   if(iv>=ic) return
+   write(100,*) iv,ic,ik,ffac
+ endif
+#endif
  !
  if (X_os_run .and.(.not.use_X_DbGd.or.ic>BZ_DbGd_nbands).or. &
+#if defined _LU
+&    K_inv_run.and.(.not.BSS_uses_DbGd).or.LU_is_run          ) then
+#else
 &    K_inv_run.and.(.not.BSS_uses_DbGd)                       ) then
+#endif
     !
     do iw=1,Xw%n_freqs
       !

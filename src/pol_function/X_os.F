@@ -41,8 +41,8 @@ subroutine X_os(Xo,iq,Xen,Xk,Xw,X)
  use parallel_m,    ONLY:PP_redux_wait,PAR_COM_DIPOLES,myid
  use frequency,     ONLY:w_samp,bare_grid_N,coarse_grid_N,coarse_grid_Pt
  use interfaces,    ONLY:WF_load
- use D_lattice,     ONLY:i_space_inv
- use electrons,     ONLY:levels
+ use D_lattice,     ONLY:i_space_inv,DL_vol
+ use electrons,     ONLY:levels,nel_cond
  use R_lattice,     ONLY:qindx_X,bz_samp,G_m_G
  use memory_m,      ONLY:mem_est
  use collision,     ONLY:elemental_collision,elemental_collision_free,elemental_collision_alloc
@@ -51,6 +51,9 @@ subroutine X_os(Xo,iq,Xen,Xk,Xw,X)
 &                        l_X_terminator,X_terminator_E,X_term_E
 #if defined _TIMING
  use timing_m,      ONLY:timing
+#endif
+#if defined _LU
+ use X_m,           ONLY:Lum_mat,DIP_projected
 #endif
  implicit none
  type(levels)         :: Xen
@@ -71,17 +74,27 @@ subroutine X_os(Xo,iq,Xen,Xk,Xw,X)
  complex(SP),allocatable  :: Xo_res(:,:)
  integer,    external     :: X_eh_setup
  type(elemental_collision):: Xo_scatt
-
+#if defined _LU
+ character(2)             :: LU_ordering="ls"
+ integer                  :: ic,iv,ik,ikbz,i_spin
+#endif
  !
  ! Defaults & Setups
  !===================
  Xo             = cZERO
  GreenF         = cZERO
  drude_GreenF   = cZERO
+#if defined _LU
+ if(nel_cond>0._SP) Lum_mat        = cZERO
+#endif
  !
  ! Logicals to use bare or Double Grid GF (no poles accumulation)
  !=======================================================
  force_bare_X_G=use_X_DbGd.or.associated(Xen%W).or.associated(Xen%GreenF)
+ !
+#if defined _LU
+ force_bare_X_G=force_bare_X_G.or.nel_cond>0._SP
+#endif
  !
  skip_WF_load= (iq==1.and.X%ng==1)
  !
@@ -207,6 +220,26 @@ subroutine X_os(Xo,iq,Xen,Xk,Xw,X)
      enddo
      !
    enddo
+   !
+#if defined _LU
+   !
+   ! If the system is in an excited states evaluate luminescence
+   !
+   if(nel_cond>0._SP) then  
+     !  
+     call X_GreenF_analytical(iq,X_poles_tab(i_bg,:),Xw,Xen,Xk,GreenF,X%ordering,'LU',.FALSE.)
+     !
+     ikbz   = X_poles_tab(i_bg,1)
+     iv     = X_poles_tab(i_bg,2)
+     ic     = X_poles_tab(i_bg,3)
+     i_spin = X_poles_tab(i_bg,4)
+     ik = Xk%sstar(ikbz,1)
+     !
+     Lum_mat(:)=Lum_mat(:)-GreenF(:)*abs(DIP_projected(ic,iv,ik,i_spin))**2/DL_vol
+     !
+   endif
+   !
+#endif
    !
    call live_timing(steps=1)
    !

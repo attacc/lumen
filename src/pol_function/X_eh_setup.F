@@ -26,7 +26,7 @@ integer function X_eh_setup(iq,X,Xen,Xk,minmax_ehe)
  use pars,          ONLY:SP
  use X_m,           ONLY:X_t,X_poles,X_Ein_poles,X_poles_tab,l_X_terminator,X_term_E
  use R_lattice,     ONLY:qindx_X,bz_samp
- use electrons,     ONLY:levels,n_sp_pol,spin_occ
+ use electrons,     ONLY:levels,n_sp_pol,spin_occ,nel_cond
  use frequency,     ONLY:ordered_grid_index
  use parallel_m,    ONLY:PAR_IND_CON_BANDS_X,PAR_IND_Xk_bz,PAR_IND_VAL_BANDS_X
  !
@@ -129,7 +129,17 @@ integer function X_eh_setup(iq,X,Xen,Xk,minmax_ehe)
            f_eh=Xen%f(iv,ikp,i_sp)*Xen%f(ic,ik,i_sp)/spin_occ
          endif
          !
-         if (abs(f_eh)<local_tresh)  cycle  
+#if defined _LU
+         if (nel_cond>0._SP) then
+             if(abs(f_eh)<local_tresh.and.iv>ic)  cycle  
+         else
+#else
+             if(abs(f_eh)<local_tresh)  cycle  
+#endif
+#if defined _LU
+         endif
+#endif
+         ! 
          ! When iv--> iv transitions are counted, f_eh=0. 
          ! Therefore  if (abs(f_eh)<local_tresh) cycle hold only 
          ! when the terminator  is off 
