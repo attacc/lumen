@@ -49,7 +49,8 @@ subroutine O_driver(Xen,Xk,q,wv,X)
 #if defined _LU
  use X_output,      ONLY:lum_file_name
  use electrons,     ONLY:nel_cond
- use X_m,           ONLY:Luminescence
+ use X_m,           ONLY:Luminescence,Lum_mat
+ use com,           ONLY:error
 #endif
  use interfaces,    ONLY:PARALLEL_global_indexes,PARALLEL_WF_index,PARALLEL_WF_distribute,WF_load
  !
@@ -114,6 +115,9 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    endif
    !
    if (iq>1) then
+#if defined _LU
+     call error("Luminescence only at q=0")
+#endif
      if (.not.PAR_IND_Q%element_1D(iq)) cycle
    endif
    !
@@ -198,6 +202,9 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    ! BZ Double Grid
    !
    if (use_X_DbGd) then
+#if defined _LU
+     if(nel_cond>0._SP) call error("Double-grid not implemented yet in luminescence!")
+#endif
      call msg('o eps_q eel_q fxc alpha lum','#')
      call msg('o eps_q eel_q fxc alpha','# BZ Energy DbGd points:',BZ_DbGd_tot_nkpts,INDENT=0)
    endif
@@ -233,9 +240,25 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    !
    ! X Dyson equation solver
    !
+#if defined _LU
+   !
+   if(nel_cond>0._SP) then
+     !  
+     Luminescence(:,1)=Lum_mat(i_G_shift,i_G_shift,:)*4.0_SP*pi/Q_plus_G_sq_modulus
+     !
+   endif
+   !
+#endif
+   !
    if(l_rpa_IP) then
      Epsilon_ii(:,2)=Epsilon_ii(:,1)
+#if defined _LU
+     Luminescence(:,2)=Luminescence(:,1)
+#endif
    else
+#if defined _LU
+    call error("RPA not implemented yet in luminescence! ")
+#endif
      call X_s(iq,X,wv,(/1,wv%n_freqs/))
      !
      Epsilon_ii(:,2)=1._SP/(X_mat(i_G_shift,i_G_shift,:)*bare_qpg(iq,i_G_shift)**2/Q_plus_G_sq_modulus+1._SP)
@@ -281,14 +304,13 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    enddo
    !
 #if defined _LU
-   if(nel_cond/=0._SP) then
+   if(nel_cond>0._SP) then
      !  
      ! Luminescence
      !
      do iw=1,wv%n_freqs
        !
-       output_data=(/real(wv%p(iw))*HA2EV,aimag(Luminescence(iw,2)),real(Luminescence(iw,2)),&
-&                  aimag(Luminescence(iw,1)),real(Luminescence(iw,1))/)
+       output_data(:n_output)=(/real(wv%p(iw))*HA2EV,aimag(Luminescence(iw,2)),aimag(Luminescence(iw,1))/)
        call msg('o lum','',output_data(:n_output),INDENT=-2,USE_TABS=.true.)
        !
      enddo

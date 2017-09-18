@@ -34,10 +34,7 @@ module X_output
  character(15)     :: headers(7)
  character(schlen) :: eps_file_name,eel_file_name,alpha_file_name,fxc_file_name,jdos_file_name,pl_file_name
  character(schlen) :: off_file_name,beta_file_name,moke_file_name,refl_file_name
- !
-#if defined _LU
  character(schlen) :: lum_file_name
-#endif
  !
  contains
    !
@@ -68,6 +65,9 @@ module X_output
      if (trim(ordering)=='Ta') message='- The Green`s function is T-ordered-antiresonant -'
      if (trim(ordering)=='r')  message='- The Green`s function is Resonant -'
      if (trim(ordering)=='R')  message='- The Green`s function is Retarded -'
+#if defined _LU
+     if (trim(ordering)=='ls') message='- The Green`s function is lesser -'
+#endif
      call msg('o eps refl eel alpha off beta moke jdos','# ',trim(message),INDENT=0)
      !
      ! Gauges

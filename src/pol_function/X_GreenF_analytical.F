@@ -46,7 +46,7 @@ subroutine X_GreenF_analytical(iq,transitions,Xw,Xen,Xk,GreenF,ordering,space,no
  !
  !Work Space
  !
- logical      :: X_os_run,K_inv_run 
+ logical      :: X_os_run,K_inv_run,LU_is_run 
  integer      :: i1,i2,iw,ikbz,ikpbz,iv,ic,i_spin,ik_rand,ikp_rand,ikbz_rand,ikpbz_rand,ik,ikp
  real(SP)     :: ffac,cg_ffac,f_h,weight1,weight2,W_,q_pt_shift(3),q_norm_ref,qsize_fac
  complex(SP)  :: Z_,pole,pole_X_term
@@ -60,6 +60,9 @@ subroutine X_GreenF_analytical(iq,transitions,Xw,Xen,Xk,GreenF,ordering,space,no
  !
  X_os_run =trim(space)=="G"
  K_inv_run=trim(space)=="eh"
+#if defined _LU
+ LU_is_run=trim(space)=="ls"
+#endif
  !
  ! Transitions
  !
@@ -90,6 +93,9 @@ subroutine X_GreenF_analytical(iq,transitions,Xw,Xen,Xk,GreenF,ordering,space,no
  ! Thus I have to multiply by them the Green function
  !
  if( K_inv_run      ) ffac = ( Xen%f(iv,ikp,i_spin) - Xen%f(ic,ik,i_spin) )/spin_occ*real(Z_)
+#if defined _LU
+ if( Lu_is_run      ) ffac = ( spin_occ - Xen%f(iv,ikp,i_spin)) * Xen%f(ic,ik,i_spin) /spin_occ*real(Z_)
+#endif
  if( X_os_run       ) ffac = 1._SP
  if( no_occupations ) ffac = 1._SP
  !
