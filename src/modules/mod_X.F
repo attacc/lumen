@@ -84,6 +84,7 @@ module X_m
  complex(SP), allocatable :: Alpha(:,:)
  complex(SP), allocatable :: X_drude_term(:)
  complex(SP), allocatable :: X_fxc(:)
+ complex(SP), allocatable :: Luminescence(:,:)
  !
  ! Response function
  !

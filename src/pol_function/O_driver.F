@@ -49,6 +49,7 @@ subroutine O_driver(Xen,Xk,q,wv,X)
 #if defined _LU
  use X_output,      ONLY:lum_file_name
  use electrons,     ONLY:nel_cond
+ use X_m,           ONLY:Luminescence
 #endif
  use interfaces,    ONLY:PARALLEL_global_indexes,PARALLEL_WF_index,PARALLEL_WF_distribute,WF_load
  !
@@ -130,6 +131,9 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    ! Arrays to be written in the o. files
    !
    allocate(Epsilon_ii(wv%n_freqs,2))
+#if defined _LU
+   allocate(Luminescence(wv%n_freqs,2))
+#endif
    allocate(EEL(wv%n_freqs,2))
    allocate(Alpha(wv%n_freqs,2))
    if (l_bs_fxc) then
@@ -194,7 +198,7 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    ! BZ Double Grid
    !
    if (use_X_DbGd) then
-     call msg('o eps_q eel_q fxc alpha','#')
+     call msg('o eps_q eel_q fxc alpha lum','#')
      call msg('o eps_q eel_q fxc alpha','# BZ Energy DbGd points:',BZ_DbGd_tot_nkpts,INDENT=0)
    endif
    !
@@ -217,6 +221,9 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    Epsilon_ii=cZERO
    EEL       =cZERO
    Alpha     =cZERO
+#if defined _LU
+   Luminescence =cZERO
+#endif
    !
    call X_os(X_mat,iq,Xen,Xk,wv,X)     
    !
@@ -249,7 +256,7 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    !
    n_output=5
    if(l_rpa_IP.or.l_skip_non_int_eps) n_output=3
-   call msg('o eps_q eel_q fxc alpha','#')
+   call msg('o eps_q eel_q fxc alpha lum','#')
    call X_setup_headers('EPS')
    call msg('o eps_q',  '#',headers(:n_output),INDENT=0,USE_TABS=.true.)    
    call X_setup_headers('EEL')
@@ -257,6 +264,11 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    call X_setup_headers('ALPHA')
    call msg('o alpha','#',headers(:n_output),INDENT=0,USE_TABS=.true.)    
    call msg('o eps_q eel_q alpha','#')
+#if defined _LU
+   call X_setup_headers('PL')
+   call msg('o lum','#',headers(:n_output),INDENT=0,USE_TABS=.true.)    
+   call msg('o lum','#')
+#endif
    !
    do iw=1,wv%n_freqs
      !
@@ -268,9 +280,28 @@ subroutine O_driver(Xen,Xk,q,wv,X)
      !
    enddo
    !
+#if defined _LU
+   if(nel_cond/=0._SP) then
+     !  
+     ! Luminescence
+     !
+     do iw=1,wv%n_freqs
+       !
+       output_data=(/real(wv%p(iw))*HA2EV,aimag(Luminescence(iw,2)),real(Luminescence(iw,2)),&
+&                  aimag(Luminescence(iw,1)),real(Luminescence(iw,1))/)
+       call msg('o lum','',output_data(:n_output),INDENT=-2,USE_TABS=.true.)
+       !
+     enddo
+     !
+   endif
+#endif
+   !
    call of_open_close(eps_file_name)
    call of_open_close(eel_file_name)
    call of_open_close(alpha_file_name)
+#if defined _LU
+   call of_open_close(lum_file_name)
+#endif
    !
    if (eval_eels) then 
      !
@@ -332,6 +363,9 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    call X_alloc('X')
    !
    deallocate(Epsilon_ii,EEL,Alpha)
+#if defined _LU
+   deallocate(Luminescence)
+#endif
    !
    call FREQUENCIES_reset(wv,"all")
    !
