@@ -97,6 +97,9 @@ module BS_solvers
  integer    , allocatable :: BSS_eh_table(:,:)
  real(SP)   , allocatable :: BSS_eh_E(:)
  real(SP)   , allocatable :: BSS_eh_f(:)
+#if defined _LU
+ real(SP)   , allocatable :: BSS_eh_f_lum(:)
+#endif
  real(SP)   , allocatable :: BSS_eh_W(:)
  real(SP)   , allocatable :: BSS_eh_E_SOC_corr(:,:)
  complex(SP), allocatable :: BS_mat(:,:)

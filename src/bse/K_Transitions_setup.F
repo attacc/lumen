@@ -184,7 +184,7 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
              BS_T_grp(i_T_group_now)%f(i_T_in_the_grp) =f_eh
              BS_T_grp(i_T_group_now)%f_RES(i_T_in_the_grp)=f_eh_RES
 #if defined _LU
-             BS_T_grp(i_T_group_now)%f_LESS_RES(i_T_in_the_grp)=f_eh_LESS_RES
+            if(l_BSE_lum) BS_T_grp(i_T_group_now)%f_LUM(i_T_in_the_grp)=f_eh_LESS_RES
 #endif
              !
              if (associated(Ken%Z)) BS_T_grp(i_T_group_now)%Z(i_T_in_the_grp)=Ken%Z(ic,ik,i_sp)*Ken%Z(iv,ikp,i_sp)
