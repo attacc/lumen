@@ -139,6 +139,12 @@ module BS
  !===========
  complex(SP),allocatable :: WF_phase(:,:,:,:)
  !
+ ! Luminescence
+ ! =============
+#if defined _LU
+ logical :: l_BSE_lum
+#endif
+ !
  contains
    !
    integer function T_group(I)

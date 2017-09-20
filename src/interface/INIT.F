@@ -1,4 +1,4 @@
-!
+    !
 !        Copyright (C) 2000-2016 the YAMBO team
 !              http://www.yambo-code.org
 !
@@ -526,6 +526,9 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
    call initactivate(1,'BoseCut ShiftedPaths')
    call initactivate(1,'BEnRange BDmRange BDmERef BEnSteps BLongDir')
    call initactivate(1,'BSEQptR BSEBands BSEEhEny BSehWind')
+#if defined _LU
+   call initactivate(1,'EvalLum')
+#endif
    !
    !
  endif                    

@@ -68,6 +68,9 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
  integer :: ikbz,iv,ic,iv_SOC(2/n_sp_pol),ic_SOC(2/n_sp_pol),ik,ikp,i_sp,i_star,nb(2),&
 &           i_T_group_now,i_T_group_last,i_g,n_loops,i_loop,i_T_in_the_grp,pert_range(2/n_sp_pol,2)
  real(SP):: E_eh,Eo_eh,E_eh_SOC_corr(2/n_sp_pol),E_v_SOC(2/n_sp_pol),E_c_SOC(2/n_sp_pol),f_eh,f_eh_RES,f_eh_REF,f_e,f_h
+#if defined _LU
+ real(SP):: f_eh_LESS_RES
+#endif
  integer, allocatable :: i_T_at_k(:)
  !
  if (FILL_the_groups) then
@@ -180,6 +183,9 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
              BS_T_grp(i_T_group_now)%E(i_T_in_the_grp) =E_eh
              BS_T_grp(i_T_group_now)%f(i_T_in_the_grp) =f_eh
              BS_T_grp(i_T_group_now)%f_RES(i_T_in_the_grp)=f_eh_RES
+#if defined _LU
+             BS_T_grp(i_T_group_now)%f_LESS_RES(i_T_in_the_grp)=f_eh_LESS_RES
+#endif
              !
              if (associated(Ken%Z)) BS_T_grp(i_T_group_now)%Z(i_T_in_the_grp)=Ken%Z(ic,ik,i_sp)*Ken%Z(iv,ikp,i_sp)
              !
@@ -242,6 +248,9 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
      f_eh_REF =(Ken%f(iv,ikp,i_sp)-Ken%f(ic,ik ,i_sp))/spin_occ
      f_eh     =f_eh_REF
      f_eh_RES =f_eh_REF
+#if defined _LU
+     f_eh_LESS_RES =(spin_occ-Ken%f(iv,ikp,i_sp))*Ken%f(ic,ik ,i_sp)/spin_occ
+#endif
      !
      ! f_eh  enter the excitonic Hamiltonian
      ! f_eh_RES enter the residual of the dielectric constant

@@ -44,6 +44,9 @@ subroutine K_driver(Xen,Ken,Xk,q,X_static_pp,Xw)
 #if defined _KERR
  use drivers,        ONLY:l_kerr,l_anomalous_Hall
 #endif
+#if defined _LU
+ use BS,             ONLY:l_BSE_lum
+#endif
  !
  implicit none
  !
@@ -127,6 +130,9 @@ subroutine K_driver(Xen,Ken,Xk,q,X_static_pp,Xw)
  if(l_kerr) call parser('AnHall',l_anomalous_Hall)
 #endif
  !
+#if defined _KERR
+ call parser('EvalLum',l_BSE_lum)
+#endif
  ! Energy points
  !===============
  W_bss%n_freqs=BSS_n_freqs

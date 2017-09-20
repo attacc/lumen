@@ -99,7 +99,6 @@ subroutine X_GreenF_analytical(iq,transitions,Xw,Xen,Xk,GreenF,ordering,space,no
  if( LU_is_run      ) then
    ffac = ( spin_occ - Xen%f(iv,ikp,i_spin)) * Xen%f(ic,ik,i_spin) /spin_occ*real(Z_)
    if(iv>=ic) return
-   write(100,*) iv,ic,ik,ffac
  endif
 #endif
  !
