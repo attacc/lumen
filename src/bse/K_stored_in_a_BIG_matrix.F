@@ -38,7 +38,8 @@ subroutine K_stored_in_a_BIG_matrix(iq)
  use BS_solvers,     ONLY:BS_mat,BSS_eh_E_SOC_corr,BSS_perturbative_width,&
 &                         BSS_dipoles,BSS_eh_table,BSS_eh_E,BSS_eh_f,BSS_eh_W,BSS_eh_Z,BS_mat_alloc
 #if defined _LU
- use BS_solves,      ONLY:BSS_eh_f_lum
+ use BS_solvers,     ONLY:BSS_eh_f_lum
+ use BS,             ONLY:l_BSE_lum
 #endif 
  use BS,             ONLY:BS_K_dim,BS_nT_grps,BS_blk,n_BS_blks,BS_T_grp,BS_K_coupling
  !

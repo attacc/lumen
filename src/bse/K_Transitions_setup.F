@@ -49,6 +49,9 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
  use BS,           ONLY:BS_K_dim,BS_H_dim,T_group,BS_eh_en,BS_K_coupling,&
 &                       BS_bands,BS_nT_at_k,BSE_mode,BS_T_grp,BS_nT_grps,&
 &                       BS_not_const_eh_f,BS_Blocks_and_Transitions_alloc
+#if defined _LU
+ use BS,           ONLY:l_BSE_lum
+#endif
  use X_m,          ONLY:global_gauge,Dipole_Energy_treshold
  use parallel_m,   ONLY:PAR_IND_WF_b_and_k,PAR_IND_T_all,PAR_IND_T_ordered,PAR_IND_T_groups,&
 &                       PAR_IND_T_Haydock
