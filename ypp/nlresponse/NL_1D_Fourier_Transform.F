@@ -83,8 +83,9 @@ subroutine NL_1D_Fourier_Transform(mode,title,freqs,fw,nw,ft,nt,I_sign)
    !
    if (l_live_timing) call live_timing('FT'//title//':',nt)
    do i_t = 1, nt
+     NL_time=(i_t-1)*NL_step
      do i_w = 1, nw
-     !       ft(i_t) = ft(i_t)+fw(i_w)*(freqs(2)-freqs(1))*exp(-cI*freqs(i_w)*RT_time(i_t))
+        ft(i_t) = ft(i_t)+fw(i_w)*(freqs(2)-freqs(1))*exp(-cI*freqs(i_w)*NL_time)
      enddo
      if (l_live_timing) call live_timing(steps=1)
    enddo
