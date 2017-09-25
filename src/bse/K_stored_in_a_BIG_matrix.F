@@ -37,10 +37,7 @@ subroutine K_stored_in_a_BIG_matrix(iq)
 &                         PAR_COM_Xk_ibz_INDEX
  use BS_solvers,     ONLY:BS_mat,BSS_eh_E_SOC_corr,BSS_perturbative_width,&
 &                         BSS_dipoles,BSS_eh_table,BSS_eh_E,BSS_eh_f,BSS_eh_W,BSS_eh_Z,BS_mat_alloc
-#if defined _LU
- use BS_solvers,     ONLY:BSS_eh_f_lum
- use BS,             ONLY:l_BSE_lum
-#endif 
+ use BS_solvers,     ONLY:BSS_eh_f_RES
  use BS,             ONLY:BS_K_dim,BS_nT_grps,BS_blk,n_BS_blks,BS_T_grp,BS_K_coupling
  !
  !
@@ -83,9 +80,8 @@ subroutine K_stored_in_a_BIG_matrix(iq)
      !
      BSS_eh_E(H_pos(1))=BS_T_grp(i_g)%E(i_c)
      BSS_eh_f(H_pos(1))=BS_T_grp(i_g)%f(i_c)
-#if defined _LU
-     if(l_BSE_lum) BSS_eh_f_lum(H_pos(1))=BS_T_grp(i_g)%f_LUM(i_c)
-#endif
+     BSS_eh_f_RES(H_pos(1))=BS_T_grp(i_g)%f_RES(i_c)
+     !
      if (allocated(BS_T_grp(i_g)%Z)) BSS_eh_Z(H_pos(1))=BS_T_grp(i_g)%Z(i_c)
      if (allocated(BS_T_grp(i_g)%W)) BSS_eh_W(H_pos(1))=BS_T_grp(i_g)%W(i_c)
      !
@@ -103,10 +99,8 @@ subroutine K_stored_in_a_BIG_matrix(iq)
  !
  call PP_redux_wait(BSS_eh_E,COMM=PAR_COM_Xk_ibz_INDEX%COMM )
  call PP_redux_wait(BSS_eh_E,COMM=PAR_COM_eh_INDEX%COMM)
-#if defined _LU
- call PP_redux_wait(BSS_eh_f_lum,COMM=PAR_COM_Xk_ibz_INDEX%COMM )
- call PP_redux_wait(BSS_eh_f_lum,COMM=PAR_COM_eh_INDEX%COMM)
-#endif
+ call PP_redux_wait(BSS_eh_f_RES,COMM=PAR_COM_Xk_ibz_INDEX%COMM )
+ call PP_redux_wait(BSS_eh_f_RES,COMM=PAR_COM_eh_INDEX%COMM)
  call PP_redux_wait(BSS_eh_f,COMM=PAR_COM_Xk_ibz_INDEX%COMM )
  call PP_redux_wait(BSS_eh_f,COMM=PAR_COM_eh_INDEX%COMM)
  call PP_redux_wait(BSS_eh_table,COMM=PAR_COM_Xk_ibz_INDEX%COMM )

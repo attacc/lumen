@@ -35,7 +35,7 @@ subroutine K_diago_hermitian_residuals(BS_E_real,BS_R_left,BS_R_right)
  use interfaces,     ONLY:PARALLEL_index
  use LIVE_t,         ONLY:live_timing
  use X_m,            ONLY:global_gauge
- use BS_solvers,     ONLY:BSS_dipoles,BSS_eh_E,BSS_eh_Z,BSS_eh_f,BS_mat
+ use BS_solvers,     ONLY:BSS_dipoles,BSS_eh_E,BSS_eh_Z,BSS_eh_f,BS_mat,BSS_eh_f_RES
  use BS,             ONLY:BS_H_dim
 #if defined _LU
  use BS,             ONLY:l_BSE_lum
@@ -60,7 +60,7 @@ subroutine K_diago_hermitian_residuals(BS_E_real,BS_R_left,BS_R_right)
  BS_R_right=cZERO
  call live_timing('EPS   residuals',px%n_of_elements(myid+1))
  !
- tmp_res = BSS_dipoles*sqrt(BSS_eh_f)
+ tmp_res = BSS_dipoles*sqrt(BSS_eh_f_RES)
  !
  if (trim(global_gauge)=="velocity") tmp_res=tmp_res/BSS_eh_E
  if (allocated(BSS_eh_Z))            tmp_res=tmp_res*sqrt(BSS_eh_Z)

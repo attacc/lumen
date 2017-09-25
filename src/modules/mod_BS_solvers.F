@@ -97,9 +97,7 @@ module BS_solvers
  integer    , allocatable :: BSS_eh_table(:,:)
  real(SP)   , allocatable :: BSS_eh_E(:)
  real(SP)   , allocatable :: BSS_eh_f(:)
-#if defined _LU
- real(SP)   , allocatable :: BSS_eh_f_lum(:)
-#endif
+ real(SP)   , allocatable :: BSS_eh_f_RES(:)
  real(SP)   , allocatable :: BSS_eh_W(:)
  real(SP)   , allocatable :: BSS_eh_E_SOC_corr(:,:)
  complex(SP), allocatable :: BS_mat(:,:)
@@ -151,12 +149,13 @@ module BS_solvers
      allocate(BSS_dipoles(BS_H_dim))
      call mem_est('BSS_dipoles',(/size(BSS_dipoles)/))
      BSS_dipoles = cZERO
-     allocate(BSS_eh_table(BS_K_dim,3+n_sp_pol-1),BSS_eh_E(BS_K_dim),BSS_eh_f(BS_K_dim))
-     call mem_est("BSS_eh_table BSS_eh_E BSS_eh_f",&
-&                 (/(3+n_sp_pol-1)*BS_K_dim,BS_K_dim,BS_K_dim/),(/IP,SP,SP/))
+     allocate(BSS_eh_table(BS_K_dim,3+n_sp_pol-1),BSS_eh_E(BS_K_dim),BSS_eh_f(BS_K_dim),BSS_eh_f_RES(BS_K_dim))
+     call mem_est("BSS_eh_table BSS_eh_E BSS_eh_f BSS_eh_f_RES",&
+&                 (/(3+n_sp_pol-1)*BS_K_dim,BS_K_dim,BS_K_dim,BS_K_dim/),(/IP,SP,SP,SP/))
      BSS_eh_table = 0
      BSS_eh_E     = rZERO
      BSS_eh_f     = rZERO
+     BSS_eh_f_RES = rZERO
      W_is_allocated=.FALSE.
      Z_is_allocated=.FALSE.
      do i_g=1,BS_nT_grps
@@ -187,10 +186,11 @@ module BS_solvers
      if (allocated(BSS_eh_E))          deallocate(BSS_eh_E)
      if (allocated(BSS_eh_W))          deallocate(BSS_eh_W)
      if (allocated(BSS_eh_f))          deallocate(BSS_eh_f)
+     if (allocated(BSS_eh_f_RES))      deallocate(BSS_eh_f_RES)
      if (allocated(BSS_eh_Z))          deallocate(BSS_eh_Z)
      if (allocated(BSS_eh_E_SOC_corr)) deallocate(BSS_eh_E_SOC_corr)
      if (allocated(BS_mat))            deallocate(BS_mat)
-     call mem_est("BSS_eh_table BSS_eh_E BSS_eh_f BSS_eh_W")
+     call mem_est("BSS_eh_table BSS_eh_E BSS_eh_f BSS_eh_W BSS_eh_f_RES")
      call mem_est("BSS_eh_table BSS_eh_Z BS_mat")
    end subroutine
    !
