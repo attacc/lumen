@@ -201,7 +201,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  call it(defs,'BSEEhEny','[BSK] Electron-hole energy range',BS_eh_en,E_unit,verb_level=V_resp)
  !
 #if defined _LU 
- call it('f',defs,'EvalLum', '[BSE] Luminescence from the BSE',verb_level=V_resp)
+ call it('f',defs,'EvalLum', '[BSE] Luminescence from the BSE')
 #endif
  call it(defs,'BSKmod',  '[BSE] IP/Hartree/HF/ALDA/SEX',BSK_mode,protect=.FALSE.)
  

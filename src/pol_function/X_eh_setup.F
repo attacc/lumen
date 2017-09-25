@@ -129,16 +129,7 @@ integer function X_eh_setup(iq,X,Xen,Xk,minmax_ehe)
            f_eh=Xen%f(iv,ikp,i_sp)*Xen%f(ic,ik,i_sp)/spin_occ
          endif
          !
-#if defined _LU
-         if (nel_cond>0._SP) then
-             if(abs(f_eh)<local_tresh.and.iv>ic)  cycle  
-         else
-#else
-             if(abs(f_eh)<local_tresh)  cycle  
-#endif
-#if defined _LU
-         endif
-#endif
+         if(abs(f_eh)<local_tresh)  cycle  
          ! 
          ! When iv--> iv transitions are counted, f_eh=0. 
          ! Therefore  if (abs(f_eh)<local_tresh) cycle hold only 
