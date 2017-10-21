@@ -189,14 +189,14 @@ subroutine k_grids(en,k,Xk,q)
    enddo gw_main_loop
    USER_K%nibz=USER_K%nibz-1
    !
-   do i1=1,USER_K%nibz
-     !      
-     v=USER_K%pt(i1,:)
-     if (trim(coo_in)=="cc")  call c2a(v_in=USER_K%pt(i1,:),v_out=v,mode="kc2i")
-     if (trim(coo_in)=="rlu") call c2a(v_in=USER_K%pt(i1,:),v_out=v,mode="ka2i")
-     USER_K%pt(i1,:)=v      
-     !
-   enddo
+!   do i1=1,USER_K%nibz
+!     !      
+!     v=USER_K%pt(i1,:)
+!     if (trim(coo_in)=="cc")  call c2a(v_in=USER_K%pt(i1,:),v_out=v,mode="kc2i")
+!     if (trim(coo_in)=="rlu") call c2a(v_in=USER_K%pt(i1,:),v_out=v,mode="ka2i")
+!     USER_K%pt(i1,:)=v      
+!     !
+!   enddo
    !
    call msg("s",'User K-points :',USER_K%nibz)
    !
