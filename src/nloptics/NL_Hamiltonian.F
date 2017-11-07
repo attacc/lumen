@@ -33,7 +33,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  use R_lattice,      ONLY:bz_samp
  use zeros,          ONLY:zero_dfl
  use QP_m,           ONLY:QP_nk
- use X_m,            ONLY:X_t
+ use X_m,            ONLY:X_t,global_gauge
  use fields,         ONLY:A_ext,A_vecpot,Efield
  use wave_func,      ONLY:WF
  use xc_functionals, ONLY:V_xc,XC_potential_driver
@@ -91,7 +91,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  ! Evaluate the Polarization 
  ! ===================================================================
  !
- if(l_use_DIPOLES) then
+ if(l_use_DIPOLES.or.trim(global_gauge)=='velocity') then
    call DIP_polarization(E,k,V_bands,NL_P)
  else
    ! This subroutine update also the Sm1_plus,Sm1_minus and All_S_det matrices
@@ -178,7 +178,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
    enddo
 !$omp end parallel do
    ! 
-   if(l_use_DIPOLES) then
+   if(l_use_DIPOLES.or.trim(global_gauge)=='velocity') then
      !    
      call NL_apply_field(ik,Hk,A_vecpot)
      !
