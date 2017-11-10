@@ -1,0 +1,5 @@
+Known bugs
+==========
+
+1) Not sure parallelization is working when dipoles are used instead of the Berry phase
+   due to the PAR_IND_DIPk_ibz, see Dipole_driver.F 

@@ -36,6 +36,7 @@ integer function io_OSCLL(q,ID)
  use IO_m,          ONLY:io_elemental,io_status
  use nl_optics,     ONLY:NL_bands,OSCLL,ng_oscll,NL_nbands
  use memory_m,      ONLY:mem_est
+ use parallel_m,    ONLY:PAR_DIPk_ibz_index,PAR_DIPk_nibz
 #if defined _TIMING
  use timing_m,      ONLY:timing
 #endif
@@ -46,7 +47,7 @@ integer function io_OSCLL(q,ID)
  !
  ! Work Space
  !
- integer :: ik,i_fragment,i_sp_pol,iqbz,ig
+ integer :: ik,ik_mem,i_fragment,i_sp_pol,iqbz,ig
  character(schlen)    :: VAR_name
  real(SP),allocatable :: disk_data(:,:,:)
  !
@@ -88,11 +89,13 @@ integer function io_OSCLL(q,ID)
  !
  if (ik==0) goto 1
  !
+ ik_mem=PAR_DIPk_ibz_index(ik)
+ !
  allocate(disk_data(NL_nbands,NL_nbands,2))
  !
  if (read_is_on(ID)) then
    if(.not.allocated(OSCLL)) then
-     allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,q%nbz,ng_oscll))
+     allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),PAR_DIPk_nibz,q%nbz,ng_oscll))
      call mem_est("OSCLL",(/size(OSCLL)/),(/2*SP/))     
    endif
  endif
@@ -108,11 +111,11 @@ integer function io_OSCLL(q,ID)
  do iqbz=1,q%nbz
    do ig=1,ng_oscll
      !
-     if (write_is_on(ID)) call mat_c2r(OSCLL(:,:,ik,iqbz,ig),disk_data)
+     if (write_is_on(ID)) call mat_c2r(OSCLL(:,:,ik_mem,iqbz,ig),disk_data)
      write (VAR_name,'(3(a,i4.4))') 'OSCLL_',ik,'_iqbz_',iqbz,'_ig_',ig
      call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(disk_data))
      call io_bulk(ID,R3=disk_data)
-     if (read_is_on(ID)) call mat_r2c(disk_data,OSCLL(:,:,ik,iqbz,ig))
+     if (read_is_on(ID)) call mat_r2c(disk_data,OSCLL(:,:,ik_mem,iqbz,ig))
      !
    enddo
  enddo

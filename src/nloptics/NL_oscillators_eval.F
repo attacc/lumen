@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_oscillators(q,k,en) 
+subroutine NL_oscillators_eval(q,k,en) 
  !
  ! Evaluate oscillators for the Local-SEX
  !
@@ -39,7 +39,8 @@ subroutine NL_oscillators(q,k,en)
  use FFT_m,               ONLY:fft_size
  use IO_m,                ONLY:io_control,OP_RD_CL,VERIFY,REP,OP_WR_CL,OP_APP_WR_CL 
  use com,                 ONLY:msg
- use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu
+ use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu, &
+                               PAR_Xk_nibz,PAR_IND_Xk_ibz_index
  use IO_m,                ONLY:IO_and_Messaging_switch
  !
  implicit none
@@ -57,8 +58,6 @@ subroutine NL_oscillators(q,k,en)
  !
  call PP_redux_wait() 
  !
- OSCLL=cZERO
- !
  i_sp_pol=1
  !
  call IO_and_Messaging_switch("SAVE")
@@ -68,41 +67,13 @@ subroutine NL_oscillators(q,k,en)
  call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1/),MODE=VERIFY,ID=ID)
  io_err=io_OSCLL(q,ID)
  ! 
- if(io_err==0) then
-   !
-   ! Load Oscillators
-   !
-   call live_timing('[OSC] Load Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
-   !
-   do i_k=1,QP_nk
-     if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
-     call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
-     io_err=io_OSCLL(q,ID)
-     call live_timing(steps=1)
-   enddo
-   call live_timing()
-   !
-   call IO_and_Messaging_switch("RESTORE")
-   !
-   do ig=1,ng_oscll
-     call PP_redux_wait(OSCLL(:,:,:,:,ig),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
-   enddo
-   !
-   call msg('rs','[OSC] Oscillators loaded')
-   !
-   return
-   !
- else
-   !
-   call msg('rs','[OSC] Oscillators loaded')
-   !
-   ! Oscillators not found, recalculated them
-   !
-   if(master_cpu) then
-     call io_control(ACTION=OP_WR_CL,COM=REP,SEC=(/1/),MODE=VERIFY,ID=ID)
-     io_err=io_OSCLL(q,ID)
-   endif
-   !
+ if(io_err==0)  return
+ !
+ ! Oscillators not found, recalculated them
+ !
+ if(master_cpu) then
+   call io_control(ACTION=OP_WR_CL,COM=REP,SEC=(/1/),MODE=VERIFY,ID=ID)
+   io_err=io_OSCLL(q,ID)
  endif
  !
  iGo_max=maxval(qindx_S(:,:,2)) 
@@ -120,6 +91,9 @@ subroutine NL_oscillators(q,k,en)
  call IO_and_Messaging_switch("SAVE")
  call IO_and_Messaging_switch("+io_out",CONDITION=.TRUE.)
  !
+ allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),PAR_Xk_nibz,q%nbz,ng_oscll))
+ call mem_est("OSCLL",(/size(OSCLL)/),(/2*SP/))
+ !      
  do i_k=1,QP_nk
    !
    if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
@@ -145,7 +119,7 @@ subroutine NL_oscillators(q,k,en)
          isc%is  =(/i_n,i_k,i_k_s,i_k_sp/)
          isc%os  =(/i_m,i_kmq,i_kmq_s,i_kmq_sp/)
          call scatter_Bamp(isc)            
-         OSCLL(i_n,i_m,i_k,iqbz,:)=isc%rhotw(:)
+         OSCLL(i_n,i_m,PAR_Xk_ibz_index(i_k),iqbz,:)=isc%rhotw(:)
        enddo
      enddo
      !
@@ -162,8 +136,7 @@ subroutine NL_oscillators(q,k,en)
  !
  call live_timing()
  !
- do ig=1,ng_oscll
-   call PP_redux_wait(OSCLL(:,:,:,:,ig),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
- enddo
+ deallocate(OSCLL)
+ call mem_est("OSCLL")
  !
-end subroutine NL_oscillators
+end subroutine NL_oscillators_eval

@@ -127,7 +127,8 @@ subroutine NL_driver(E,X,k,q,Xw)
    !
    call PARALLEL_WF_distribute(CLEAN_UP=.TRUE.)
    !
-   call NL_oscillators(q,k,E)
+   ! Evaluate oscillators and write them on disk
+   call NL_oscillators_eval(q,k,E)
    !
    call WF_free(WF)
    !
@@ -141,6 +142,10 @@ subroutine NL_driver(E,X,k,q,Xw)
    call qindx_free()
    !
  endif
+ !
+ ! Generate DIPOLES in all the BZ if required
+ !===================
+ if(l_use_DIPOLES) call Build_DIP_bz(k,E,X)
  !
  ! Non_Linear parallization
  ! ===================================
@@ -171,10 +176,10 @@ subroutine NL_driver(E,X,k,q,Xw)
  !================
  call QP_apply(NL_bands,E,k,"G",msg_fmt='s')
  !
- ! Generate DIPOLES in all the BZ if required
- !===================
- if(l_use_DIPOLES) call Build_DIP_bz(k,E,X)
- !
+ ! Load oscillators
+ ! ===================
+ if(Correlation==LSEX.or.Correlation==LHF) call NL_oscllators_load(q)
+ !    
  ! Initialization
  ! ==================
  call NL_start_and_restart(E,k,X)
