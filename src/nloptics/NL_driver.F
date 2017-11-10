@@ -178,7 +178,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  !
  ! Load oscillators
  ! ===================
- if(Correlation==LSEX.or.Correlation==LHF) call NL_oscllators_load(q)
+ if(Correlation==LSEX.or.Correlation==LHF) call NL_oscillators_load(q,k)
  !    
  ! Initialization
  ! ==================

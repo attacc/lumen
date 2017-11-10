@@ -32,6 +32,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  use QP_m,           ONLY:QP_nk
  use R_lattice,      ONLY:bz_samp,qindx_S
  use wrapper,        ONLY:M_by_M,Vstar_dot_V,M_by_V
+ use parallel_m,     ONLY:PAR_DIPk_ibz_index
  ! 
  implicit none
  !
@@ -45,18 +46,19 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  !
  integer :: i_m,i_mp  ! self-energy external indexes
  integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
- integer :: ig1,ig2,i1
+ integer :: ig1,ig2,i1,ik_mem
  complex(SP) :: OSCLL_val(NL_bands(1):NL_bands(2),E%nbf,ng_oscll,q%nbz)
  complex(SP) :: qGG_sum,val_sum(q%nbz)
  !
  !
  ! Build Oscillators in term of valence bands
  ! 
+ ik_mem=PAR_DIPk_ibz_index(i_k)
 !$omp parallel do default(shared), private(iqbz,i_kmq,ig1)
  do iqbz=1,q%nbz
    i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
    do ig1=1,ng_oscll
-     call M_by_M('N','N',NL_nbands,E%nbf,NL_nbands,cONE,OSCLL(:,:,i_k,iqbz,ig1),&
+     call M_by_M('N','N',NL_nbands,E%nbf,NL_nbands,cONE,OSCLL(:,:,ik_mem,iqbz,ig1),&
 &                 NL_nbands,V_bands(NL_bands(1):,:,i_kmq,1),NL_nbands,cZERO,OSCLL_val(:,:,ig1,iqbz),NL_nbands)
    enddo
  enddo

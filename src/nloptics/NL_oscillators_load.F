@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_oscillators_load(q) 
+subroutine NL_oscillators_load(q,k) 
  !
  ! Evaluate oscillators for the Local-SEX
  !
@@ -33,14 +33,15 @@ subroutine NL_oscillators_load(q)
  use com,                 ONLY:msg
  use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu
  use IO_m,                ONLY:IO_and_Messaging_switch
+ use memory_m,       ONLY:mem_est
  !
  implicit none
  !
- type(bz_samp), intent(in) :: q
+ type(bz_samp), intent(in) :: q,k
  !
  ! Work Space
  !
- integer :: i_k
+ integer :: i_k,i_sp_pol
  integer :: ID,io_err
  integer, external :: io_OSCLL
  !

@@ -40,8 +40,9 @@ subroutine NL_oscillators_eval(q,k,en)
  use IO_m,                ONLY:io_control,OP_RD_CL,VERIFY,REP,OP_WR_CL,OP_APP_WR_CL 
  use com,                 ONLY:msg
  use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu, &
-                               PAR_Xk_nibz,PAR_IND_Xk_ibz_index
+                               PAR_Xk_nibz,PAR_Xk_ibz_index
  use IO_m,                ONLY:IO_and_Messaging_switch
+ use memory_m,            ONLY:mem_est
  !
  implicit none
  !
