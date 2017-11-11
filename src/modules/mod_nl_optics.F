@@ -164,7 +164,6 @@ module nl_optics
  !
  complex(SP), allocatable :: Ho_plus_Sigma(:,:,:,:)   ! Full Hamiltonian
  real(SP),    allocatable :: E_bare(:,:,:)            ! Bare energies
- complex(SP), allocatable :: Vnl_xc(:,:,:,:)          ! Exchange correlation potential
  complex(SP), allocatable :: Hk(:,:,:)
  real(SP),    allocatable :: V_xc_ne(:,:)
  real(SP),    allocatable :: V_hartree_ne(:,:)
@@ -253,14 +252,8 @@ module nl_optics
      call mem_est("V_bands",(/size(V_bands)/),(/2*SP/))
      !
      if(Correlation==LSEX.or.Correlation==LHF) then
-       allocate(Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
-       call mem_est("Vnl_xc",(/size(Vnl_xc)/),(/2*SP/))
-       allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,q%nbz,ng_oscll))
-       call mem_est("OSCLL",(/size(OSCLL)/),(/2*SP/))
        allocate(W(q%nbz,ng_oscll,ng_oscll))
        call mem_est("W",(/size(W)/),(/2*SP/))
-       allocate(Sigma_SEX_EQ(NL_bands(2),NL_bands(2),n_sp_pol,QP_nk))
-       call mem_est("Sigma_SEX_EQ",(/size(Sigma_SEX_EQ)/),(/2*SP/))
      endif          
      !
      ! Reference energies
@@ -286,6 +279,22 @@ module nl_optics
      call mem_est("E_tot_t E_ext_t",(/size(E_tot_t),size(E_ext_t),size(E_ks_t)/))
      !
    end subroutine NL_alloc
+     !
+   subroutine NL_alloc_k_distributed
+     !  
+     use parallel_m,     ONLY:PAR_Xk_nibz,PAR_Xk_ibz_index
+     use pars,           ONLY:SP
+     use memory_m,       ONLY:mem_est
+     use electrons,      ONLY:levels,n_spin,n_sp_pol
+     use R_lattice,      ONLY:nXkbz
+     use QP_m,           ONLY:QP_nk
+     !
+     implicit none
+     if(Correlation==LSEX.or.Correlation==LHF) then
+       allocate(Sigma_SEX_EQ(NL_bands(2),NL_bands(2),n_sp_pol,PAR_Xk_nibz))
+       call mem_est("Sigma_SEX_EQ",(/size(Sigma_SEX_EQ)/),(/2*SP/))
+     endif          
+   end subroutine NL_alloc_k_distributed
    
    subroutine NL_free
      !
@@ -369,8 +378,6 @@ module nl_optics
      call mem_est("E_tot_t E_ext_t E_ks_t")
      !
      if(Correlation==LSEX.or.Correlation==LHF) then
-       deallocate(Vnl_xc)
-       call mem_est("Vnl_xc")
        deallocate(OSCLL)
        call mem_est("OSCLL")
        deallocate(Sigma_SEX_EQ)

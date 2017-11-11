@@ -32,7 +32,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  use QP_m,           ONLY:QP_nk
  use R_lattice,      ONLY:bz_samp,qindx_S
  use wrapper,        ONLY:M_by_M,Vstar_dot_V,M_by_V
- use parallel_m,     ONLY:PAR_DIPk_ibz_index
+ use parallel_m,     ONLY:PAR_Xk_ibz_index
  ! 
  implicit none
  !
@@ -53,7 +53,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  !
  ! Build Oscillators in term of valence bands
  ! 
- ik_mem=PAR_DIPk_ibz_index(i_k)
+ ik_mem=PAR_Xk_ibz_index(i_k)
 !$omp parallel do default(shared), private(iqbz,i_kmq,ig1)
  do iqbz=1,q%nbz
    i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
@@ -66,7 +66,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  !
 !$omp parallel do default(shared), private(i1)
  do i1=1,NL_bands(2)
-   Hk(:,i1,:)=Hk(:,i1,:)-Sigma_SEX_EQ(:,i1,:,i_k)
+   Hk(:,i1,:)=Hk(:,i1,:)-Sigma_SEX_EQ(:,i1,:,ik_mem)
  enddo
 !$omp end parallel do
  !
