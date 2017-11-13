@@ -52,7 +52,7 @@ subroutine NL_oscillators_eval(q,k,en)
  ! Work Space
  !
  type(elemental_collision)            :: isc 
- integer :: i_k,i_m,i_n,i_q,iqbz,i_kmq_G0,iqs,i_kmq,i_kmq_s,i_k_s
+ integer :: i_k,i_m,i_n,i_q,iqbz,i_kmq_G0,iqs,i_kmq,i_kmq_s,i_k_s,ik_mem
  integer :: i_k_sp,i_kmq_sp,iqibz,ig,i_np,i_mp,io,ic,i_sp_pol
  integer :: ID,io_err,iGo_max
  integer, external :: io_OSCLL
@@ -78,7 +78,7 @@ subroutine NL_oscillators_eval(q,k,en)
  endif
  !
  iGo_max=maxval(qindx_S(:,:,2)) 
- call WF_load(WF,wf_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-NL')  
+ call WF_load(WF,wf_ng,iGo_max,(/1,NL_bands(2)/),(/1,k%nibz/),space='R',title='-OSC')  
  !
  call elemental_collision_free(isc)
  !
@@ -115,12 +115,14 @@ subroutine NL_oscillators_eval(q,k,en)
      i_k_sp  = 1
      i_kmq_sp= 1
      !
+     ik_mem=PAR_Xk_ibz_index(i_k)
+     !
      do i_n=NL_bands(1),NL_bands(2)
        do i_m=NL_bands(1),NL_bands(2)
          isc%is  =(/i_n,i_k,i_k_s,i_k_sp/)
          isc%os  =(/i_m,i_kmq,i_kmq_s,i_kmq_sp/)
          call scatter_Bamp(isc)            
-         OSCLL(i_n,i_m,PAR_Xk_ibz_index(i_k),iqbz,:)=isc%rhotw(:)
+         OSCLL(i_n,i_m,ik_mem,iqbz,:)=isc%rhotw(:)
        enddo
      enddo
      !
@@ -139,5 +141,9 @@ subroutine NL_oscillators_eval(q,k,en)
  !
  deallocate(OSCLL)
  call mem_est("OSCLL")
+ call elemental_collision_free(isc)
+ call WF_free(WF)  
+ !
+ call PP_redux_wait() 
  !
 end subroutine NL_oscillators_eval

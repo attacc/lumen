@@ -290,10 +290,14 @@ module nl_optics
      use QP_m,           ONLY:QP_nk
      !
      implicit none
+     !
      if(Correlation==LSEX.or.Correlation==LHF) then
+       !  
        allocate(Sigma_SEX_EQ(NL_bands(2),NL_bands(2),n_sp_pol,PAR_Xk_nibz))
        call mem_est("Sigma_SEX_EQ",(/size(Sigma_SEX_EQ)/),(/2*SP/))
+       !
      endif          
+     !
    end subroutine NL_alloc_k_distributed
    
    subroutine NL_free

@@ -45,7 +45,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
  use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX, &
-&                         PP_redux_wait         
+&                         PP_redux_wait,myid,PAR_Xk_ibz_index 
  !
  implicit none
  !
@@ -59,7 +59,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  ! 
  ! Work Space
  !
- integer           :: i_r,i1,NL_bands1_save,N_runs_save,iGo_max,ik
+ integer           :: i_r,i1,NL_bands1_save,N_runs_save,iGo_max,ik,ik_mem
  real(SP)          :: Time
  integer, external :: eval_G_minus_G
  integer           :: wf_ng_save
@@ -131,8 +131,6 @@ subroutine NL_driver(E,X,k,q,Xw)
    ! Evaluate oscillators and write them on disk
    call NL_oscillators_eval(q,k,E)
    !
-   call WF_free(WF)
-   !
    X(2)%ng=ng_oscll
    call NL_lsex_potential(q,X(2),Xw(2)) 
    !
@@ -197,10 +195,10 @@ subroutine NL_driver(E,X,k,q,Xw)
  if(Correlation==LSEX.or.Correlation==LHF) then
    Sigma_SEX_EQ=cZERO
    do ik=1,QP_nk
+     ik_mem=PAR_Xk_ibz_index(ik)
      if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
-     call NL_long_range_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik),k,q,E,ik)
+     call NL_long_range_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik_mem),k,q,E,ik)
    enddo
-   call PP_redux_wait(Sigma_SEX_EQ,COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
  endif
  !
  ! Check if calculation was already done

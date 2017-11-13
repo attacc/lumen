@@ -28,12 +28,12 @@ subroutine NL_oscillators_load(q,k)
  use LIVE_t,              ONLY:live_timing
  use R_lattice,           ONLY:bz_samp
  use QP_m,                ONLY:QP_nk
- use parallel_m,          ONLY:PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID
- use IO_m,                ONLY:io_control,OP_RD_CL,VERIFY,REP
- use com,                 ONLY:msg
+ use parallel_m,          ONLY:PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID,myid
+ use IO_m,                ONLY:io_control,OP_RD,RD_CL_IF_END,VERIFY,REP
+ use com,                 ONLY:msg,error
  use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu
  use IO_m,                ONLY:IO_and_Messaging_switch
- use memory_m,       ONLY:mem_est
+ use memory_m,            ONLY:mem_est
  !
  implicit none
  !
@@ -45,7 +45,7 @@ subroutine NL_oscillators_load(q,k)
  integer :: ID,io_err
  integer, external :: io_OSCLL
  !
- call PP_redux_wait() 
+ call PP_redux_wait(COMM=PAR_COM_Xk_ibz_INDEX%COMM) 
  !
  i_sp_pol=1
  !
@@ -53,7 +53,7 @@ subroutine NL_oscillators_load(q,k)
  call IO_and_Messaging_switch("+io_in",CONDITION=.TRUE.)
  !   
  call msg('s','[OSC] Checking oscillators header ')
- call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1/),MODE=VERIFY,ID=ID)
+ call io_control(ACTION=OP_RD,COM=REP,SEC=(/1/),MODE=VERIFY,ID=ID)
  io_err=io_OSCLL(q,ID)
  ! 
  ! Load Oscillators
@@ -62,12 +62,14 @@ subroutine NL_oscillators_load(q,k)
  !
  do i_k=1,QP_nk
    if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
-   call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
+   call io_control(ACTION=RD_CL_IF_END,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
    io_err=io_OSCLL(q,ID)
+   if(io_err/=0) call error("Error reading Oscillators!! ")
    call live_timing(steps=1)
  enddo
  call live_timing()
  !
+ call PP_redux_wait(COMM=PAR_COM_Xk_ibz_INDEX%COMM) 
  call IO_and_Messaging_switch("RESTORE")
  !
  call msg('rs','[OSC] Oscillators loaded')

@@ -36,7 +36,7 @@ integer function io_OSCLL(q,ID)
  use IO_m,          ONLY:io_elemental,io_status
  use nl_optics,     ONLY:NL_bands,OSCLL,ng_oscll,NL_nbands
  use memory_m,      ONLY:mem_est
- use parallel_m,    ONLY:PAR_DIPk_ibz_index,PAR_DIPk_nibz
+ use parallel_m,    ONLY:PAR_DIPk_ibz_index,PAR_DIPk_nibz,myid
 #if defined _TIMING
  use timing_m,      ONLY:timing
 #endif
@@ -112,9 +112,14 @@ integer function io_OSCLL(q,ID)
    do ig=1,ng_oscll
      !
      if (write_is_on(ID)) call mat_c2r(OSCLL(:,:,ik_mem,iqbz,ig),disk_data)
+     !
      write (VAR_name,'(3(a,i4.4))') 'OSCLL_',ik,'_iqbz_',iqbz,'_ig_',ig
      call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(disk_data))
      call io_bulk(ID,R3=disk_data)
+     !
+     io_OSCLL=io_status(ID)
+     if (io_OSCLL/=0) goto 1
+     !
      if (read_is_on(ID)) call mat_r2c(disk_data,OSCLL(:,:,ik_mem,iqbz,ig))
      !
    enddo
@@ -122,6 +127,7 @@ integer function io_OSCLL(q,ID)
  !
  deallocate(disk_data)
  !
+
 1 call io_disconnect(ID=ID)
  !
 #if defined _TIMING
