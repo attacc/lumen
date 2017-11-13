@@ -81,10 +81,12 @@ subroutine NL_initialize(E,k,q)
         Integrator=RK2
     case('RK4')
         Integrator=RK4
+        call warning("RK4 not working with k-parallelization!! to be fixed!! ")
     case('RK2EXP')
         Integrator=RK2EXP
     case('RK4EXP')
         Integrator=RK4EXP
+        call warning("RK4EXP not working with k-parallelization!! to be fixed!! ")
     case('HEUN')
         Integrator=HEUN
         call error("HEUN integrator temporarily not available")

@@ -208,11 +208,5 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  !
  call PP_redux_wait(Ho_plus_Sigma,COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
  !
- if(Phase_LifeTime<zero_dfl) then
-   do is=1,n_sp_pol
-      call PP_redux_wait(I_relax(:,:,:,:,is),COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
-   enddo
- endif
- !
 end subroutine NL_Hamiltonian
 

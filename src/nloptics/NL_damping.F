@@ -30,6 +30,7 @@ subroutine NL_damping(E,V_bands,ik)
  use electrons,      ONLY:levels,n_sp_pol
  use QP_m,           ONLY:QP_nk
  use nl_optics,      ONLY:I_relax,Phase_LifeTime,NL_bands
+ use parallel_m,     ONLY:PAR_Xk_ibz_index
  !
  implicit none
  !                      
@@ -39,10 +40,12 @@ subroutine NL_damping(E,V_bands,ik)
  !
  ! Working Space
  !
- integer          :: ib,i1,i2,is
+ integer          :: ib,i1,i2,is,ik_mem
  !
  ! Damping
  !=========
+ !
+ ik_mem=PAR_Xk_ibz_index(ik)
  !
  ! Fictitious lifetime equivalent to the broadening
  ! in linear optics
@@ -52,12 +55,12 @@ subroutine NL_damping(E,V_bands,ik)
  ! the |V_b(t)><V_b(t)| term
  !
  forall(ib=1:E%nbf,i1=NL_bands(1):NL_bands(2),i2=NL_bands(1):NL_bands(2),is=1:n_sp_pol)
-   I_relax(i1,i2,ib,ik,is)=-cI*2._SP/Phase_LifeTime*(conjg(V_bands(i2,ib,ik,is))*V_bands(i1,ib,ik,is))
+   I_relax(i1,i2,ib,ik_mem,is)=-cI*2._SP/Phase_LifeTime*(conjg(V_bands(i2,ib,ik,is))*V_bands(i1,ib,ik,is))
  end forall
  !
  ! the |V_b(t=0)><V_b(t=0)| term 
  !
- forall(ib=NL_bands(1):E%nbf,is=1:n_sp_pol) I_relax(ib,ib,ib,ik,is)=I_relax(ib,ib,ib,ik,is)+cI*2._SP/Phase_LifeTime 
+ forall(ib=NL_bands(1):E%nbf,is=1:n_sp_pol) I_relax(ib,ib,ib,ik_mem,is)=I_relax(ib,ib,ib,ik_mem,is)+cI*2._SP/Phase_LifeTime 
  !
 end subroutine NL_damping
 
