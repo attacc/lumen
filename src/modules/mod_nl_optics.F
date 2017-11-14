@@ -239,14 +239,8 @@ module nl_optics
      type(levels),  intent(in) :: en
      type(bz_samp), intent(in) :: q
      !
-     allocate(Ho_plus_Sigma(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
-     call mem_est("Ho_plus_Sigma",(/size(Ho_plus_Sigma)/),(/2*SP/))
-     !
      allocate(Hk(NL_bands(2),NL_bands(2),n_sp_pol))
      call mem_est("Hk",(/size(Hk)/),(/2*SP/))
-     !
-     allocate(I_relax(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),en%nbf,QP_nk,n_sp_pol))
-     call mem_est("I_relax",(/size(I_relax)/),(/2*SP/))
      !
      allocate(V_bands(1:NL_bands(2),en%nbf,QP_nk,n_sp_pol))
      call mem_est("V_bands",(/size(V_bands)/),(/2*SP/))
@@ -297,6 +291,12 @@ module nl_optics
        call mem_est("Sigma_SEX_EQ",(/size(Sigma_SEX_EQ)/),(/2*SP/))
        !
      endif          
+     !
+     allocate(I_relax(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),en%nbf,PAR_Xk_nibz,n_sp_pol))
+     call mem_est("I_relax",(/size(I_relax)/),(/2*SP/))
+     !
+     allocate(Ho_plus_Sigma(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),PAR_Xk_nibz,n_sp_pol))
+     call mem_est("Ho_plus_Sigma",(/size(Ho_plus_Sigma)/),(/2*SP/))
      !
    end subroutine NL_alloc_k_distributed
    

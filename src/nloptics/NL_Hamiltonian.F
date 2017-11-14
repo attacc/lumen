@@ -42,7 +42,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
 &                         V_hartree_ne,V_xc_ne,rho_n,Hk,eval_DFT,eval_HARTREE,rho_reference,NL_bands,&
 &                         Ho_plus_Sigma,NL_P,Phase_LifeTime,NL_nbands,VAL_BANDS,LSEX,LHF
  use global_XC,      ONLY:WF_KIND,WF_xc_functional 
- use parallel_m,     ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu,myid
+ use parallel_m,     ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu,myid,PAR_Xk_ibz_index
  use IO_m,           ONLY:IO_and_Messaging_switch
  use wrapper_omp,    ONLY:V_by_V_plus_V_omp
  !
@@ -57,7 +57,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  !
  ! Working Space
  !
- integer     :: ik,is,i1
+ integer     :: ik,is,i1,ik_mem
  complex(SP) :: E_vec_pot(3),E_xc_pot(3)
  real(SP) :: alpha_
  !
@@ -149,6 +149,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  do ik=1,QP_nk
    !
    if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
+   ik_mem=PAR_Xk_ibz_index(ik)
    !
    ! Here I fill Hk with...
    !
@@ -200,13 +201,11 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
    ! =====================
 !$omp parallel do default(shared), private(i1)
    do i1=NL_bands(1),NL_bands(2)
-     Ho_plus_Sigma(NL_bands(1):NL_bands(2),i1,ik,:)=Hk(NL_bands(1):NL_bands(2),i1,:)
+     Ho_plus_Sigma(NL_bands(1):NL_bands(2),i1,ik_mem,:)=Hk(NL_bands(1):NL_bands(2),i1,:)
    enddo
 !$omp end parallel do
    !
  enddo  !---- loop on k-point
- !
- call PP_redux_wait(Ho_plus_Sigma,COMM=PAR_COM_Xk_ibz_INDEX%COMM ) 
  !
 end subroutine NL_Hamiltonian
 
