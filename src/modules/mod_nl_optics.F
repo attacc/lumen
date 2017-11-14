@@ -198,9 +198,6 @@ module nl_optics
      !
      ! Allocate all quantities that depend from the fft_size
      !
-     allocate(VAL_BANDS(fft_size,en%nbf,QP_nk,n_sp_pol))
-     call mem_est("Val_bands",(/size(VAL_BANDS)/),(/2*SP/))
-     !
      allocate(rho_reference(fft_size))
      call mem_est("rho_reference",(/fft_size/),(/SP/))
      !
@@ -250,15 +247,6 @@ module nl_optics
        call mem_est("W",(/size(W)/),(/2*SP/))
      endif          
      !
-     ! Reference energies
-     !
-     allocate(E_bare(1:NL_bands(2),QP_nk,n_sp_pol))
-     call mem_est("E_bare",(/size(E_bare)/))
-     E_bare=en%E(:NL_bands(2),:,:)
-     !
-     allocate(E_full(1:NL_bands(2),QP_nk,n_sp_pol))
-     call mem_est("E_full",(/size(E_full)/))
-     !
      if(l_use_DIPOLES) then
        allocate(DIP_bz(3,NL_bands(2),NL_bands(2),nXkbz,n_sp_pol))
        call mem_est("DIP_bz",(/size(DIP_bz)/))
@@ -274,7 +262,7 @@ module nl_optics
      !
    end subroutine NL_alloc
      !
-   subroutine NL_alloc_k_distributed
+   subroutine NL_alloc_k_distributed(en)
      !  
      use parallel_m,     ONLY:PAR_Xk_nibz,PAR_Xk_ibz_index
      use pars,           ONLY:SP
@@ -282,8 +270,16 @@ module nl_optics
      use electrons,      ONLY:levels,n_spin,n_sp_pol
      use R_lattice,      ONLY:nXkbz
      use QP_m,           ONLY:QP_nk
+     use FFT_m,          ONLY:fft_size
      !
      implicit none
+     !
+     type(levels),  intent(in) :: en
+     !
+     ! Valence bands in fft space
+     !
+     allocate(VAL_BANDS(fft_size,en%nbf,PAR_Xk_nibz,n_sp_pol))
+     call mem_est("Val_bands",(/size(VAL_BANDS)/),(/2*SP/))
      !
      if(Correlation==LSEX.or.Correlation==LHF) then
        !  
@@ -297,6 +293,16 @@ module nl_optics
      !
      allocate(Ho_plus_Sigma(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),PAR_Xk_nibz,n_sp_pol))
      call mem_est("Ho_plus_Sigma",(/size(Ho_plus_Sigma)/),(/2*SP/))
+     !
+     !
+     ! Reference energies
+     !
+     allocate(E_bare(1:NL_bands(2),PAR_Xk_nibz,n_sp_pol))
+     call mem_est("E_bare",(/size(E_bare)/))
+     E_bare=en%E(:NL_bands(2),:,:)
+     !
+     allocate(E_full(1:NL_bands(2),PAR_Xk_nibz,n_sp_pol))
+     call mem_est("E_full",(/size(E_full)/))
      !
    end subroutine NL_alloc_k_distributed
    
@@ -340,8 +346,10 @@ module nl_optics
        call mem_est("full_rho")
      endif
      !
-     deallocate(E_bare)
-     call mem_est("E_bare")
+     if(allocated(E_bare)) then
+         deallocate(E_bare)
+         call mem_est("E_bare")
+     endif
      !
      if(allocated(E_full)) then
        deallocate(E_full)

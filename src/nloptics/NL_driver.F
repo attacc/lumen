@@ -41,7 +41,7 @@ subroutine NL_driver(E,X,k,q,Xw)
 &                         Integrator,l_use_DIPOLES,NL_P_t,NL_ng,EF_parms,Sigma_SEX_EQ,ng_oscll,   &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,runs_done,n_runs_todo,LSEX,LHF, &
 &                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_alloc_real_space_quantities, &
-&                         NL_alloc_k_distributed
+&                         NL_alloc_k_distributed,E_bare
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
  use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX, &
@@ -173,7 +173,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  !
  ! Allocation with k-distributed memory
  ! ==================
- call NL_alloc_k_distributed() 
+ call NL_alloc_k_distributed(E) 
  !
  ! QP-corrections 
  !================
@@ -195,8 +195,8 @@ subroutine NL_driver(E,X,k,q,Xw)
  if(Correlation==LSEX.or.Correlation==LHF) then
    Sigma_SEX_EQ=cZERO
    do ik=1,QP_nk
-     ik_mem=PAR_Xk_ibz_index(ik)
      if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
+     ik_mem=PAR_Xk_ibz_index(ik)
      call NL_long_range_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik_mem),k,q,E,ik)
    enddo
  endif

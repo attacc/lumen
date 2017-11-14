@@ -32,24 +32,25 @@ subroutine NL_build_valence_bands(en,V_input,VAL_BANDS,lowest_band)
  use FFT_m,       ONLY:fft_size
  use QP_m,        ONLY:QP_nk
  use wave_func,   ONLY:WF
- use parallel_m,  ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,myid
+ use parallel_m,  ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,myid,PAR_Xk_ibz_index,PAR_Xk_nibz
  !
  implicit none
  !
  type(levels), intent(in)  :: en
  integer,      intent(in)  :: lowest_band
  complex(SP),  intent(in)  :: V_input(NL_bands(2),en%nbf,QP_nk,n_sp_pol)
- complex(SP),  intent(out) :: VAL_BANDS(fft_size,en%nbf,QP_nk,n_sp_pol)
+ complex(SP),  intent(out) :: VAL_BANDS(fft_size,en%nbf,PAR_Xk_nibz,n_sp_pol)
  !
  ! Work Space
  !
- integer :: ib,is,ir,ik,i_wf,i_v
+ integer :: ib,is,ir,ik,i_wf,i_v,ik_mem
  !
  Val_bands=cZERO
  !
  do ik=1,QP_nk
    !
    if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
+   ik_mem=PAR_Xk_ibz_index(ik)
    !
    do is=1,n_sp_pol
      do ib=lowest_band,NL_bands(2)
@@ -57,17 +58,13 @@ subroutine NL_build_valence_bands(en,V_input,VAL_BANDS,lowest_band)
        i_wf=WF%index(ib,ik,is)
 !$omp parallel do default(shared), private(i_v)
        do i_v=1,en%nbf
-         Val_bands(:,i_v,ik,is)=Val_bands(:,i_v,ik,is)+V_input(ib,i_v,ik,is)*WF%c(:,i_wf)
+         Val_bands(:,i_v,ik_mem,is)=Val_bands(:,i_v,ik_mem,is)+V_input(ib,i_v,ik,is)*WF%c(:,i_wf)
        enddo
 !$omp end parallel do
        !
      enddo
    enddo
    !
- enddo
- !
- do is=1,n_sp_pol
-   call PP_redux_wait(Val_bands(:,:,:,is),COMM=PAR_COM_Xk_ibz_INDEX%COMM )
  enddo
  !
 end subroutine NL_build_valence_bands

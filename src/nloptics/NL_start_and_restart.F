@@ -41,7 +41,7 @@ subroutine NL_start_and_restart(E,k,X)
  use memory_m,       ONLY:mem_est
  use global_XC,      ONLY:WF_kind,WF_xc_functional
  use fields,         ONLY:A_vecpot,A_ext,A_vecpot_reset
- use parallel_m,     ONLY:master_cpu
+ use parallel_m,     ONLY:master_cpu,PAR_IND_Xk_ibz,PAR_Xk_ibz_index
  use nl_optics,      ONLY:Correlation,IPA,E_full,full_rho,V_bands,TDDFT,n_runs_todo,NL_LRC_alpha,Alpha_ED,NL_bands,  &
 &                         V_xc_0,NL_initial_P,l_use_DIPOLES,n_runs,runs_done,JGM,E_xc_0,I_relax,l_use_DIPOLES,&
 &                         NL_P,E_full,E_bare,Hk,rho_n,full_rho,rho_reference,V_hartree_ne,V_xc_ne,VAL_BANDS
@@ -58,7 +58,7 @@ subroutine NL_start_and_restart(E,k,X)
  !
  ! Working space
  !
- integer :: i1,ib,i_f
+ integer :: i1,ib,i_f,ik,ik_mem
  integer :: ID,io_NonLinear
  integer, external::io_NL
  !
@@ -115,24 +115,35 @@ subroutine NL_start_and_restart(E,k,X)
  !
  ! Build initial energies
  !=======================
- if(associated(E%Eo)) then
-   E_bare=E%Eo(:NL_bands(2),:,:)
- else
-   E_bare=E%E(:NL_bands(2),:,:)
- endif
+ do ik=1,QP_nk
+   !
+   if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
+   ik_mem=PAR_Xk_ibz_index(ik)
+   ! 
+   if(associated(E%Eo)) then
+     E_bare(:,ik_mem,:)=E%Eo(:NL_bands(2),ik,:)
+   else
+     E_bare(:,ik_mem,:)=E%E(:NL_bands(2),ik,:)
+   endif
+ enddo
  !
  E_full=E_bare
  !
  ! Apply QP Corrections
  ! ====================
- do ib=NL_bands(1),NL_bands(2)
-   E_full(ib,1:QP_nk,1:n_sp_pol)=E_full(ib,1:QP_nk,1:n_sp_pol) &
-&                                 -E_bare(ib,1:QP_nk,1:n_sp_pol)+E%E(ib,1:QP_nk,1:n_sp_pol)
- enddo
- !
- do ib=1,NL_bands(1)-1
-   E_full(ib,1:QP_nk,1:n_sp_pol)=E_full(ib,1:QP_nk,1:n_sp_pol) &
-& -E_bare(NL_bands(1),1:QP_nk,1:n_sp_pol)+E%E(NL_bands(1),1:QP_nk,1:n_sp_pol)
+ do ik=1,QP_nk
+   !
+   if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
+   ik_mem=PAR_Xk_ibz_index(ik)
+   !
+   do ib=NL_bands(1),NL_bands(2)
+     E_full(ib,ik_mem,1:n_sp_pol)=E_full(ib,ik_mem,1:n_sp_pol)-E_bare(ib,ik_mem,1:n_sp_pol)+E%E(ib,ik,1:n_sp_pol)
+   enddo
+   !
+   do ib=1,NL_bands(1)-1
+     E_full(ib,ik_mem,1:n_sp_pol)=E_full(ib,ik_mem,1:n_sp_pol)-E_bare(NL_bands(1),ik_mem,1:n_sp_pol)+E%E(NL_bands(1),ik,1:n_sp_pol)
+   enddo
+   !
  enddo
  !
  ! Evaluate Initial Polarization
@@ -178,6 +189,11 @@ subroutine NL_start_and_restart(E,k,X)
  !
  n_runs_todo=n_runs-count(runs_done)
  if(n_runs_todo/=n_runs) call msg('s','RESTART, remaining runs: ',n_runs_todo)
+ !
+ ! Deallocate useless stuff
+ !
+ deallocate(E_bare)
+ call mem_est("E_bare")
  !
 end subroutine NL_start_and_restart
 

@@ -124,7 +124,8 @@ subroutine NL_Integrator(E,k,q,X,Integrator,i_time,V_bands)
      if(.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle 
      ik_mem=PAR_Xk_ibz_index(ik)
      do is=1,n_sp_pol
-       call INVINT_step(K_all(:,:,ik,is),V_bands(:,:,ik,is),Ho_plus_Sigma(:,:,ik_mem,is),I_relax(:,:,:,ik_mem,is),E%nbf,NL_step/2._SP)
+       call INVINT_step(K_all(:,:,ik,is),V_bands(:,:,ik,is),Ho_plus_Sigma(:,:,ik_mem,is), &
+&                                                                 I_relax(:,:,:,ik_mem,is),E%nbf,NL_step/2._SP)
      enddo
    enddo
    call PP_redux_wait(K_all,COMM=PAR_COM_Xk_ibz_INDEX%COMM) 
@@ -144,7 +145,8 @@ subroutine NL_Integrator(E,k,q,X,Integrator,i_time,V_bands)
      endif
      ik_mem=PAR_Xk_ibz_index(ik)
      do is=1,n_sp_pol
-       call INVINT_step(V_bands(:,:,ik,is),K_all(:,:,ik,is),Ho_plus_Sigma(:,:,ik_mem,is),I_relax(:,:,:,ik_mem,is),E%nbf,NL_step)
+       call INVINT_step(V_bands(:,:,ik,is),K_all(:,:,ik,is),Ho_plus_Sigma(:,:,ik_mem,is), &
+&                                                                 I_relax(:,:,:,ik_mem,is),E%nbf,NL_step)
      enddo
    enddo
    call PP_redux_wait(V_bands,COMM=PAR_COM_Xk_ibz_INDEX%COMM) 

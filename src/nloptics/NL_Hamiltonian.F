@@ -175,7 +175,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
    !==================
 !$omp parallel do default(shared), private(i1,is)
    do i1=NL_bands(1),NL_bands(2)
-     Hk(i1,i1,:)=Hk(i1,i1,:)+E_full(i1,ik,:)
+     Hk(i1,i1,:)=Hk(i1,i1,:)+E_full(i1,ik_mem,:)
    enddo
 !$omp end parallel do
    ! 

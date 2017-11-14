@@ -51,17 +51,17 @@ subroutine el_density_vbands(en,Xk,rho,VAL_BANDS)
  use wave_func,     ONLY:WF
  use QP_m,          ONLY:QP_nk
  use nl_optics,     ONLY:NL_bands
- use parallel_m,    ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX
+ use parallel_m,    ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,PAR_Xk_ibz_index,PAR_Xk_nibz
  !
  implicit none
  type(bz_samp),intent(in)  :: Xk
  type(levels), intent(in)  :: en       
  real(SP),     intent(out) :: rho(fft_size)
- complex(SP),  intent(in)  :: VAL_BANDS(fft_size,en%nbf,QP_nk,n_sp_pol)
+ complex(SP),  intent(in)  :: VAL_BANDS(fft_size,en%nbf,PAR_Xk_nibz,n_sp_pol)
  !
  ! Work Space 
  !
- integer     :: i1,iv,ik,is,rho_syms,ir
+ integer     :: i1,iv,ik,is,rho_syms,ir,ik_mem
  real(SP)    :: rho_no_sym(fft_size)
  !
  rho=rZERO
@@ -70,12 +70,13 @@ subroutine el_density_vbands(en,Xk,rho,VAL_BANDS)
  do ik=1,Xk%nibz
    !  
    if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
+   ik_mem=PAR_Xk_ibz_index(ik)
    !
 !$omp parallel do default(shared), private(ir,is,iv)
    do ir=1,fft_size
      do is=1,n_sp_pol
        do iv=1,en%nbf
-         rho_no_sym(ir)=rho_no_sym(ir)+real(spin_occ,SP)*Xk%weights(ik)*abs(VAL_BANDS(ir,iv,ik,is))**2._SP
+         rho_no_sym(ir)=rho_no_sym(ir)+real(spin_occ,SP)*Xk%weights(ik)*abs(VAL_BANDS(ir,iv,ik_mem,is))**2._SP
        enddo
      enddo
    enddo
