@@ -37,7 +37,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 &                        Q_range,QP_range,n_v_bands,n_c_bands,K_range,n_bands,EH_range
  use parallel_m,    ONLY:& ! LOGICALS
 &                        l_par_X_T,l_par_X_G_q0,l_par_RT,l_par_SE,l_par_X_G_all_q,l_par_X_G_finite_q,&
-&                        HEAD_QP_cpu,HEAD_k_cpu,l_par_SC,l_par_NL
+&                        HEAD_QP_cpu,HEAD_k_cpu,l_par_SC,l_par_NL,l_par_OSCL
  use parallel_m,    ONLY:PAR_IND_runs_ID,PAR_COM_runs_INDEX,PAR_COM_runs_A2A,PAR_nRuns,PAR_runs_index, &
 &                        PAR_IND_runs,PAR_COM_runs,PAR_IND_OVLP_ibz ! Non_Linear optics
  use parallel_m,    ONLY:& ! COMMUNICATORS
@@ -117,6 +117,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  l_par_SE           =ENVIRONMENT=="Self_Energy"
  l_par_RT           =ENVIRONMENT=="Real_Time"
  l_par_NL           =ENVIRONMENT=="Non_Linear"
+ l_par_OSCL         =ENVIRONMENT=="Oscillators"
  !
  X_type=1
  if (present(X)) then
@@ -252,6 +253,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  if (ENVIRONMENT=="Real_Time"                       ) K_range=Xk%nibz
  if (ENVIRONMENT=="Response_G_space"                ) K_range=Xk%nbz
  if (ENVIRONMENT=="Non_Linear"                      ) K_range=Xk%nibz
+ if (ENVIRONMENT=="Oscillators"                     ) K_range=Xk%nibz
  if (ENVIRONMENT=="Response_G_space_Finite_Momentum") K_range=Xk%nbz
  !
  ! COND bands
@@ -309,6 +311,14 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  ! QP states
  !-----------
  if (ENVIRONMENT=="Self_Energy"                     ) QP_range=QP_n_states
+ !
+ !------------
+ ! Oscillators
+ !------------
+ if (ENVIRONMENT=="Oscillators") then
+    n_bands=(/NL_bands(1),NL_bands(2)/)
+    Q_range=(/1,nqbz/)
+ endif
  !
  !------------
  ! Frequencies
@@ -722,6 +732,54 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    ! Io and messaging
    !
    call COMM_copy(PAR_COM_runs_INDEX,PAR_COM_DIPOLES_k_subgroup)
+   !
+   call IO_and_Messaging_switch("+io_out",CONDITION=PAR_COM_Xk_ibz_INDEX%CPU_id==0)
+   !
+   call IO_and_Messaging_switch("+output",CONDITION=PAR_COM_Xk_ibz_INDEX%CPU_id==0)
+   !
+ endif
+  !
+  !==============================
+ if (ENVIRONMENT=="Oscillators") then
+   !=================================
+   !
+   CALL PARALLEL_structure(2,(/"q ","k "/))
+   !
+   call PARALLEL_assign_chains_and_COMMs(2,ROLE=(/"q","k"/),&
+&                                        COMM_index_1=PAR_COM_Q_INDEX,COMM_index_2=PAR_COM_Xk_ibz_INDEX,&
+&                                        COMM_A2A_1=PAR_COM_Q_A2A)
+   !
+   ! K-points
+   !
+   call PARALLEL_index(PAR_IND_Xk_ibz,(/Xk%nibz/),COMM=PAR_COM_Xk_ibz_INDEX)
+   PAR_IND_Xk_ibz_ID=PAR_COM_Xk_ibz_INDEX%CPU_id
+   PAR_Xk_nibz=PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1)
+   !
+   call PARALLEL_live_message("H(ibz)",ENVIRONMENT=ENVIRONMENT,&
+&           LOADED=PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1),TOTAL=Xk%nibz,&
+&           NCPU=PAR_COM_Xk_ibz_INDEX%n_CPU)
+!  !
+   ! Q-points
+   !
+   call PARALLEL_index(PAR_IND_Q,(/q%nbz/),COMM=PAR_COM_Q_INDEX)
+   PAR_IND_Q_ID=PAR_COM_Q_INDEX%CPU_id
+   PAR_nQ=PAR_IND_Q%n_of_elements(PAR_IND_Q_ID+1)
+   !
+   call PARALLEL_live_message("Q(bz)",ENVIRONMENT=ENVIRONMENT,&
+&          LOADED=PAR_IND_Q%n_of_elements(PAR_IND_Q_ID+1),TOTAL=Q_range(2),&
+&          NCPU=PAR_COM_Q_INDEX%n_CPU)
+   !
+   ! Add k+q to the k-point list
+   !
+   call PARALLEL_add_Q_to_K_list("k_ibz_q_bz",PAR_IND_Xk_bz,PAR_IND_Xk_bz_ID,PAR_IND_OVLP_ibz,PAR_IND_Xk_ibz_ID,&
+&                                PAR_IND_Q,PAR_COM_Xk_ibz_INDEX,Q_range,Xk,q)
+   !
+   ! Copy to WF
+   !
+   call COMM_copy(PAR_COM_Xk_ibz_INDEX,PAR_COM_WF_k_INDEX)
+   PAR_IND_WF_k_ID=PAR_COM_WF_k_INDEX%CPU_id
+   !
+   ! Io and messaging
    !
    call IO_and_Messaging_switch("+io_out",CONDITION=PAR_COM_Xk_ibz_INDEX%CPU_id==0)
    !
