@@ -38,6 +38,7 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
  ! Work Space
  ! 
  integer :: N_fields,CPU_s(4),i_c,NC,N_basis,i1
+ integer :: ncpu_q
  !
  if (ncpu==1) return
  !
@@ -110,6 +111,11 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
              N_fields=N_fields+1
              CPU_s(N_fields)=PARALLEL_CPU_used(i_c)
            endif
+         case("Oscillators") 
+           if (trim(PARALLEL_CPU_role(i_c))=="q".or.trim(PARALLEL_CPU_role(i_c))=="k") then
+             N_fields=N_fields+1
+             CPU_s(N_fields)=PARALLEL_CPU_used(i_c)
+           endif
 #if defined _SCALAPACK
          case("ScaLapacK") 
            if (trim(PARALLEL_CPU_role(i_c))=="p".or.trim(PARALLEL_CPU_role(i_c))=="d") then
@@ -131,10 +137,17 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
            CPU_structure(i_PAR_structure)%ROLE(3)="k"
            CPU_structure(i_PAR_structure)%CPU(3)=assign_cpu(K_range)
            CPU_structure(i_PAR_structure)%N_chains=3
-         case("Response_G_space_Finite_Momentum","Response_G_space") 
+        case("Response_G_space_Finite_Momentum","Response_G_space") 
            call default_G_finite_Momentum()
         case("Non_Linear") 
            call default_Non_Linear()
+        case("Oscillators") 
+           CPU_structure(i_PAR_structure)%ROLE(1)="q"
+           ncpu_q=ncpu/2
+           CPU_structure(i_PAR_structure)%CPU(1)=ncpu_q
+           CPU_structure(i_PAR_structure)%ROLE(2)="k"
+           CPU_structure(i_PAR_structure)%CPU(2)=ncpu-ncpu_q
+           CPU_structure(i_PAR_structure)%N_chains=2
 #if defined _SCALAPACK
          case("ScaLapacK") 
            CPU_structure(i_PAR_structure)%ROLE(1)="p"
