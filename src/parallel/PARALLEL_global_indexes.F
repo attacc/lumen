@@ -743,11 +743,12 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  if (ENVIRONMENT=="Oscillators") then
    !=================================
    !
-   CALL PARALLEL_structure(2,(/"q ","k "/))
+   CALL PARALLEL_structure(2,(/"k ","q "/))
    !
-   call PARALLEL_assign_chains_and_COMMs(2,ROLE=(/"q","k"/),&
-&                                        COMM_index_1=PAR_COM_Q_INDEX,COMM_index_2=PAR_COM_Xk_ibz_INDEX,&
-&                                        COMM_A2A_1=PAR_COM_Q_A2A)
+   call PARALLEL_assign_chains_and_COMMs(2,ROLE=(/"k","q"/),&
+&                                        COMM_index_1=PAR_COM_Xk_ibz_INDEX,&
+&                                        COMM_index_2=PAR_COM_Q_INDEX, &
+&                                        COMM_A2A_1=PAR_COM_Xk_ibz_A2A)
    !
    ! K-points
    !
@@ -774,8 +775,8 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    !
    ! Add k+q to the k-point list
    !
-   call PARALLEL_add_Q_to_K_list("k_ibz_q_bz",PAR_IND_Xk_bz,PAR_IND_Xk_bz_ID,PAR_IND_OVLP_ibz,PAR_IND_Xk_ibz_ID,&
-&                                PAR_IND_Q,PAR_COM_Xk_ibz_INDEX,Q_range,Xk,q)
+   call PARALLEL_add_Q_to_K_list("k_ibz_q_bz",PAR_IND_Xk_bz,PAR_IND_Xk_bz_ID,PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID,&
+&                                PAR_IND_Q,PAR_COM_Xk_bz_INDEX,Q_range,Xk,q)
    !
    ! Copy to WF
    !

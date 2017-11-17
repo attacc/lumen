@@ -123,10 +123,11 @@ subroutine NL_driver(E,X,k,q,Xw)
  ! =============================
  if(Correlation==LSEX.or.Correlation==LHF) then
    !
-   ! I need all wave-functions parallel distribution on bands or q
-   ! not implemented yet!!
+   ! Parallelization on k and q
    !
-   call PARALLEL_WF_distribute(CLEAN_UP=.TRUE.)
+   call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
+   call PARALLEL_global_indexes(E,k,q,"Oscillators",X=X(1))
+   call PARALLEL_WF_distribute(K_index=PAR_IND_Xk_ibz,CLEAN_UP=.TRUE.)
    !
    ! Evaluate oscillators and write them on disk
    call NL_oscillators_eval(q,k,E)

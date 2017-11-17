@@ -484,6 +484,8 @@ module parallel_m
      CPU_structure(7)%Short_Description="SLK"
      CPU_structure(8)%Long_Description="Non_Linear"
      CPU_structure(8)%Short_Description="NL"
+     CPU_structure(9)%Long_Description="Oscillators"
+     CPU_structure(9)%Short_Description="OSCL"
    end subroutine
    !
    subroutine COMM_reset(COMM)

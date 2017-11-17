@@ -40,7 +40,7 @@ subroutine NL_oscillators_eval(q,k,en)
  use IO_m,                ONLY:io_control,OP_RD_CL,VERIFY,REP,OP_WR_CL,OP_APP_WR_CL 
  use com,                 ONLY:msg
  use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu, &
-                               PAR_Xk_nibz,PAR_Xk_ibz_index
+                               PAR_Xk_nibz,PAR_Xk_ibz_index,PAR_COM_Q_INDEX,PAR_IND_Q
  use IO_m,                ONLY:IO_and_Messaging_switch
  use memory_m,            ONLY:mem_est
  !
@@ -94,12 +94,16 @@ subroutine NL_oscillators_eval(q,k,en)
  !
  allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),PAR_Xk_nibz,q%nbz,ng_oscll))
  call mem_est("OSCLL",(/size(OSCLL)/),(/2*SP/))
+ !
+ OSCLL=cZERO
  !      
  do i_k=1,QP_nk
    !
    if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
    ! 
    do iqbz=1,q%nbz
+     !
+     if (.not.PAR_IND_Q%element_1D(iqbz)) cycle
      !
      i_kmq_G0  =qindx_S(i_k,iqbz,2)
      iqibz     =q%sstar(iqbz,1)
@@ -127,6 +131,8 @@ subroutine NL_oscillators_eval(q,k,en)
      enddo
      !
    enddo
+   !
+   call PP_redux_wait(OSCLL(:,:,ik_mem,:,:),COMM=PAR_COM_Q_INDEX%COMM)
    !
    call io_control(ACTION=OP_APP_WR_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
    io_err=io_OSCLL(q,ID)

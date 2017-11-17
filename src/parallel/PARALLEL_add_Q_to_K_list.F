@@ -111,11 +111,11 @@ subroutine PARALLEL_add_Q_to_K_list(ZONE,IND_in,IND_in_ID,IND_k_out,IND_k_out_ID
    !
  else if (ZONE=="k_ibz_q_bz") then
    !
-   do ikbz=1,nkibz
+   do ik=1,nkibz
      !
-     if (.not.IND_in%element_1D(ikbz)) cycle
+     if (.not.IND_in%element_1D(ik)) cycle
      !
-     if (.not.IND_k_out%element_1D(ikbz)) then
+     if (.not.IND_k_out%element_1D(ik)) then
        IND_k_out%element_1D(ik)=.TRUE.
        IND_k_out%n_of_elements(IND_k_out_ID+1)=IND_k_out%n_of_elements(IND_k_out_ID+1)+1
      endif 
@@ -124,8 +124,7 @@ subroutine PARALLEL_add_Q_to_K_list(ZONE,IND_in,IND_in_ID,IND_k_out,IND_k_out_ID
        !
        if (.not.IND_q%element_1D(iq)) cycle
        !
-       ikpbz=qindx_B(ikbz,iq,1)
-       ikp  =k%sstar(ikpbz,1)
+       ikp       =k%sstar(qindx_S(ik,iq,1),1)
        !
        if (.not.IND_k_out%element_1D(ikp)) then
          IND_k_out%element_1D(ikp)=.TRUE.
