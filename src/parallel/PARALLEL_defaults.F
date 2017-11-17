@@ -148,6 +148,7 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
            CPU_structure(i_PAR_structure)%ROLE(2)="q"
            CPU_structure(i_PAR_structure)%CPU(2)=ncpu-ncpu_k
            CPU_structure(i_PAR_structure)%N_chains=2
+           write(*,*) 'passo qui xx',CPU_structure(i_PAR_structure)%CPU(2),CPU_structure(i_PAR_structure)%CPU(1)
 #if defined _SCALAPACK
          case("ScaLapacK") 
            CPU_structure(i_PAR_structure)%ROLE(1)="p"

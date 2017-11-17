@@ -125,9 +125,7 @@ subroutine NL_driver(E,X,k,q,Xw)
    !
    ! Parallelization on k and q
    !
-   call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
-   call PARALLEL_global_indexes(E,k,q,"Oscillators",X=X(1))
-   call PARALLEL_WF_distribute(K_index=PAR_IND_Xk_ibz,CLEAN_UP=.TRUE.)
+   call setup_OSCL_parallelization()
    !
    ! Evaluate oscillators and write them on disk
    call NL_oscillators_eval(q,k,E)
@@ -300,6 +298,25 @@ subroutine NL_driver(E,X,k,q,Xw)
      call PARALLEL_global_indexes(E,k,q,"Non_Linear",RESET=.FALSE.,X=X(1))
      !
    end subroutine setup_DIPOLES_parallelization
+   !
+   subroutine setup_OSCL_parallelization
+     use parallel_m,       ONLY:PAR_IND_Xk_ibz,CPU_and_ROLE_strings_restore
+     use nl_optics,        ONLY:eval_OVERLAPS
+     implicit none
+     !
+     ! Restore original number of bands
+     !
+     X(1)%ib       =(/NL_bands(1),NL_bands(2)/)
+     !
+     ! Restore user-defined parallel structure
+     call CPU_and_ROLE_strings_restore()
+     !
+     call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
+     call PARALLEL_global_indexes(E,k,q,"Oscillators",X=X(1))
+     call PARALLEL_WF_distribute(K_index=PAR_IND_Xk_ibz,CLEAN_UP=.TRUE.)
+     call PARALLEL_WF_index( )
+     !
+   end subroutine setup_OSCL_parallelization
    !
    subroutine setup_NL_parallelization
      use parallel_m,       ONLY:PAR_IND_Xk_ibz,CPU_and_ROLE_strings_restore
