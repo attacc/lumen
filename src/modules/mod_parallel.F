@@ -211,6 +211,7 @@ module parallel_m
  type(PP_indexes),SAVE :: PAR_IND_CON_BANDS_X(n_parallel_X_types)
  type(PP_indexes),SAVE :: PAR_IND_DIPk_ibz
  type(PP_indexes),SAVE :: PAR_IND_OVLP_ibz
+ type(PP_indexes),SAVE :: PAR_IND_k_plus_q
  !
  ! ... QP
  type(PP_indexes),SAVE :: PAR_IND_QP

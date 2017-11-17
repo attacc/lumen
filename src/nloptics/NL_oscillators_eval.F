@@ -40,7 +40,7 @@ subroutine NL_oscillators_eval(q,k,en)
  use IO_m,                ONLY:io_control,OP_RD_CL,VERIFY,REP,OP_WR_CL,OP_APP_WR_CL 
  use com,                 ONLY:msg
  use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu, &
-                               PAR_Xk_nibz,PAR_Xk_ibz_index,PAR_COM_Q_INDEX,PAR_IND_Q
+                               PAR_Xk_nibz,PAR_Xk_ibz_index,PAR_COM_Q_INDEX,PAR_IND_Q,PAR_COM_Xk_ibz_A2A
  use IO_m,                ONLY:IO_and_Messaging_switch
  use memory_m,            ONLY:mem_est
  !
@@ -90,7 +90,7 @@ subroutine NL_oscillators_eval(q,k,en)
  call live_timing('[OSC] Oscillators :',PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1))
  !
  call IO_and_Messaging_switch("SAVE")
- call IO_and_Messaging_switch("+io_out",CONDITION=.TRUE.)
+ call IO_and_Messaging_switch("+io_out",CONDITION=PAR_COM_Xk_ibz_A2A%CPU_id==0)
  !
  allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),PAR_Xk_nibz,q%nbz,ng_oscll))
  call mem_est("OSCLL",(/size(OSCLL)/),(/2*SP/))

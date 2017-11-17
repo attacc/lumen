@@ -300,7 +300,8 @@ subroutine NL_driver(E,X,k,q,Xw)
    end subroutine setup_DIPOLES_parallelization
    !
    subroutine setup_OSCL_parallelization
-     use parallel_m,       ONLY:PAR_IND_Xk_ibz,CPU_and_ROLE_strings_restore
+     use parallel_m,       ONLY:PAR_IND_Xk_ibz,CPU_and_ROLE_strings_restore, &
+ &                              PAR_IND_k_plus_q
      use nl_optics,        ONLY:eval_OVERLAPS
      implicit none
      !
@@ -313,7 +314,7 @@ subroutine NL_driver(E,X,k,q,Xw)
      !
      call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
      call PARALLEL_global_indexes(E,k,q,"Oscillators",X=X(1))
-     call PARALLEL_WF_distribute(K_index=PAR_IND_Xk_ibz,CLEAN_UP=.TRUE.)
+     call PARALLEL_WF_distribute(K_index=PAR_IND_k_plus_q,CLEAN_UP=.TRUE.)
      call PARALLEL_WF_index( )
      !
    end subroutine setup_OSCL_parallelization

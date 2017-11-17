@@ -38,7 +38,7 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
  ! Work Space
  ! 
  integer :: N_fields,CPU_s(4),i_c,NC,N_basis,i1
- integer :: ncpu_k
+ integer :: ncpu_q
  !
  if (ncpu==1) return
  !
@@ -143,12 +143,11 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
            call default_Non_Linear()
         case("Oscillators") 
            CPU_structure(i_PAR_structure)%ROLE(1)="k"
-           ncpu_k=ncpu/2
-           CPU_structure(i_PAR_structure)%CPU(1)=ncpu_k
+           ncpu_q      =2 
+           CPU_structure(i_PAR_structure)%CPU(1)=ncpu/ncpu_q
            CPU_structure(i_PAR_structure)%ROLE(2)="q"
-           CPU_structure(i_PAR_structure)%CPU(2)=ncpu-ncpu_k
+           CPU_structure(i_PAR_structure)%CPU(2)=ncpu_q
            CPU_structure(i_PAR_structure)%N_chains=2
-           write(*,*) 'passo qui xx',CPU_structure(i_PAR_structure)%CPU(2),CPU_structure(i_PAR_structure)%CPU(1)
 #if defined _SCALAPACK
          case("ScaLapacK") 
            CPU_structure(i_PAR_structure)%ROLE(1)="p"

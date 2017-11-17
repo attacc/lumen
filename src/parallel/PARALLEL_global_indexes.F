@@ -39,7 +39,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 &                        l_par_X_T,l_par_X_G_q0,l_par_RT,l_par_SE,l_par_X_G_all_q,l_par_X_G_finite_q,&
 &                        HEAD_QP_cpu,HEAD_k_cpu,l_par_SC,l_par_NL,l_par_OSCL
  use parallel_m,    ONLY:PAR_IND_runs_ID,PAR_COM_runs_INDEX,PAR_COM_runs_A2A,PAR_nRuns,PAR_runs_index, &
-&                        PAR_IND_runs,PAR_COM_runs,PAR_IND_OVLP_ibz ! Non_Linear optics
+&                        PAR_IND_runs,PAR_COM_runs,PAR_IND_OVLP_ibz,PAR_IND_k_plus_q ! Non_Linear optics
  use parallel_m,    ONLY:& ! COMMUNICATORS
 &                        COMM_reset,PAR_COM_WORLD,&  
 &                        PAR_COM_VAL_INDEX,PAR_COM_CON_INDEX,PAR_COM_Q_A2A,&
@@ -399,7 +399,6 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    allocate(PAR_DIPk_ibz_index(Xk%nibz))
    call Build_up_index(PAR_IND_DIPk_ibz,Xk%nibz,PAR_DIPk_ibz_index,PAR_DIPk_nibz)
    !
-   call PAR_INDEX_copy(PAR_IND_DIPk_ibz,PAR_IND_OVLP_ibz)
    if(eval_OVERLAPS) then
      call PARALLEL_add_Q_to_K_list("overlaps",PAR_IND_Xk_bz,PAR_IND_Xk_bz_ID,PAR_IND_OVLP_ibz,PAR_IND_Xk_ibz_ID,&
 &                                PAR_IND_Q,PAR_COM_Xk_ibz_INDEX,Q_range,Xk,q)
@@ -775,8 +774,8 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    !
    ! Add k+q to the k-point list
    !
-   call PARALLEL_add_Q_to_K_list("k_ibz_q_bz",PAR_IND_Xk_bz,PAR_IND_Xk_bz_ID,PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID,&
-&                                PAR_IND_Q,PAR_COM_Xk_bz_INDEX,Q_range,Xk,q)
+   call PARALLEL_add_Q_to_K_list("k_ibz_q_bz",PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID,PAR_IND_k_plus_q, &
+&                                PAR_IND_Xk_ibz_ID,PAR_IND_Q,PAR_COM_Xk_ibz_INDEX,Q_range,Xk,q)
    !
    ! Copy to WF
    !
