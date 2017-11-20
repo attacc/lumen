@@ -92,6 +92,7 @@ integer function io_OSCLL(q,ID)
  ik_mem=PAR_Xk_ibz_index(ik)
  !
  allocate(disk_data(NL_nbands,q%nbz,2))
+ call mem_est("disk_data",(/size(disk_data)/),(/SP/))
  !
  if (read_is_on(ID)) then
    if(.not.allocated(OSCLL)) then
@@ -126,8 +127,8 @@ integer function io_OSCLL(q,ID)
  enddo
  !
  deallocate(disk_data)
+ call mem_est("disk_data")
  !
-
 1 call io_disconnect(ID=ID)
  !
 #if defined _TIMING

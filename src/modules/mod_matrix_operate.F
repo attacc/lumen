@@ -140,12 +140,14 @@ module matrix_operate
      mr_shp=shape(mr)
      mc_shp=shape(mc) 
      !
+!$omp parallel do default(shared), private(i1,i2)
      do i1=1,min(mr_shp(1),mc_shp(1))
        do i2=1,min(mr_shp(2),mc_shp(2))
          if(.not.present(shift)) mc(i1,i2)=mr(i1,i2,1)+cI*mr(i1,i2,2)
          if(     present(shift)) mc(i1,i2)=mr(i1+shift(1),i2+shift(2),1)+cI*mr(i1+shift(1),i2+shift(2),2)
        enddo
      enddo 
+!$omp end parallel do
      !
    end subroutine
    !
@@ -158,12 +160,14 @@ module matrix_operate
      integer     :: i1,i2,mr_shp(3),mc_shp(2) ! Work Space
      mr_shp=shape(mr)
      mc_shp=shape(mc)
+!$omp parallel do default(shared), private(i1,i2)
      do i1=1,min(mr_shp(1),mc_shp(1))
        do i2=1,min(mr_shp(2),mc_shp(2))
          mr(i1,i2,1)=real(mc(i1,i2),SP)
          mr(i1,i2,2)=aimag(mc(i1,i2))
        enddo
      enddo
+!$omp end parallel do
      !
    end subroutine
    !
