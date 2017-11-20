@@ -196,7 +196,7 @@ subroutine NL_driver(E,X,k,q,Xw)
    do ik=1,QP_nk
      if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
      ik_mem=PAR_Xk_ibz_index(ik)
-     call NL_long_range_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik_mem),k,q,E,ik)
+     call NL_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik_mem),k,q,E,ik)
    enddo
  endif
  !

@@ -1,6 +1,5 @@
 !
-!        Copyright (C) 2000-2015 the LUMEN team
-!              http://www.yambo-code.org
+!        Copyright (C) 2015-2017 the LUMEN team
 !
 ! Authors (see AUTHORS file for details): CA
 ! 
@@ -21,7 +20,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k) 
+subroutine NL_SEX(V_bands,Hk,k,q,E,i_k) 
  !
  ! This subroutine calculate the long-range part of the Screened exchange
  !
@@ -107,4 +106,4 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  enddo
 !$omp end parallel do
  !
-end subroutine NL_long_range_SEX
+end subroutine NL_SEX
