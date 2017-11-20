@@ -31,7 +31,7 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  use nl_optics,      ONLY:NL_bands,OSCLL,W,ng_oscll,NL_nbands,Sigma_SEX_EQ
  use QP_m,           ONLY:QP_nk
  use R_lattice,      ONLY:bz_samp,qindx_S
- use wrapper,        ONLY:M_by_M,Vstar_dot_V,M_by_V
+ use wrapper_omp,    ONLY:V_dot_V_omp
  use parallel_m,     ONLY:PAR_Xk_ibz_index
  ! 
  implicit none
@@ -46,10 +46,11 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  !
  integer :: i_m,i_mp  ! self-energy external indexes
  integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
- integer :: ig1,ig2,i1,ik_mem
+ integer :: ig1,ig2,i1,ik_mem,iv
+ !
  complex(SP) :: OSCLL_val(NL_bands(1):NL_bands(2),E%nbf,ng_oscll,q%nbz)
  complex(SP) :: V_kmq(NL_bands(1):NL_bands(2),E%nbf,q%nbz)
- complex(SP) :: qGG_sum,val_sum(q%nbz)
+ complex(SP) :: val_sum(q%nbz,ng_oscll,ng_oscll)
  !
  !
  ! Build Oscillators in term of valence bands
@@ -63,12 +64,11 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  enddo
 !$omp end parallel do
  !
-!$omp parallel do default(shared), private(iqbz,ig1)
- do iqbz=1,q%nbz
-   do ig1=1,ng_oscll
-     call M_by_M('N','N',NL_nbands,E%nbf,NL_nbands,cONE,OSCLL(:,:,ik_mem,iqbz,ig1),&
-&                 NL_nbands,V_kmq(NL_bands(1):,:,iqbz),NL_nbands,cZERO,OSCLL_val(:,:,ig1,iqbz),NL_nbands)
-   enddo
+!$omp parallel do default(shared), private(iv)
+ do iv=1,E%nbf
+   forall(iqbz=1:q%nbz,i_n=NL_bands(1):NL_bands(2),ig1=1:ng_oscll)
+     OSCLL_val(i_n,iv,ig1,iqbz)=sum(OSCLL(i_n,NL_bands(1):NL_bands(2),ik_mem,iqbz,ig1)*V_kmq(NL_bands(1):NL_bands(2),iv,iqbz))
+   end forall
  enddo
 !$omp end parallel do
  !
@@ -82,20 +82,15 @@ subroutine NL_long_range_SEX(V_bands,Hk,k,q,E,i_k)
  !
  ! Evaluate Sigma_SEX(i_m,i_n,i_k)
  !
-!$omp parallel do default(shared), private(i_n,i_m,ig1,ig2,qGG_sum,val_sum)
+!$omp parallel do default(shared), private(i_n,i_m,ig1,ig2,val_sum)
  do i_n=NL_bands(1),NL_bands(2)
    do i_m=i_n,NL_bands(2)
      !
-     qGG_sum=cZERO
+     forall(ig1=1:ng_oscll,ig2=1:ng_oscll,iqbz=1:q%nbz)
+       val_sum(iqbz,ig1,ig2)=sum(OSCLL_val(i_n,:,ig1,iqbz)*conjg(OSCLL_val(i_m,:,ig2,iqbz))) ! sum of valence bands
+     end forall
      !
-     do ig1=1,ng_oscll
-       do ig2=1,ng_oscll
-         val_sum=sum(OSCLL_val(i_n,:,ig1,1:q%nbz)*conjg(OSCLL_val(i_m,:,ig2,1:q%nbz)),dim=1) ! sum of valence bands
-         qGG_sum=qGG_sum+sum(W(:,ig1,ig2)*val_sum)  ! sum on q-points
-       enddo
-     enddo
-     !
-     Hk(i_n,i_m,1)=Hk(i_n,i_m,1)+spin_occ*qGG_sum 
+     Hk(i_n,i_m,1)=Hk(i_n,i_m,1)+spin_occ*V_dot_V_omp(ng_oscll**2*q%nbz,W(1,1,1),val_sum(1,1,1))
      !
    enddo
  enddo
