@@ -25,7 +25,7 @@ subroutine NL_oscillators_eval(q,k,en)
  !
  ! Evaluate oscillators for the Local-SEX
  !
- use nl_optics,           ONLY:NL_bands,W,ng_oscll
+ use nl_optics,           ONLY:NL_bands,W,OSCLL_k,ng_oscll
  use LIVE_t,              ONLY:live_timing
  use pars,                ONLY:SP,cZERO
  use R_lattice,           ONLY:bz_samp,qindx_S
@@ -56,7 +56,6 @@ subroutine NL_oscillators_eval(q,k,en)
  integer :: i_k_sp,i_kmq_sp,iqibz,ig,i_np,i_mp,io,ic,i_sp_pol
  integer :: ID,io_err,iGo_max
  integer, external :: io_OSCLL
- complex(SP), allocatable :: OSCLL_k(:,:,:,:)
  !
  call PP_redux_wait() 
  !

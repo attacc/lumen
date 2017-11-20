@@ -34,7 +34,7 @@ integer function io_OSCLL(q,ID)
 &                        RD_CL_IF_END,RD_CL,io_action,&
 &                        IO_NOT_ALLOWED,io_DIP,io_fragment
  use IO_m,          ONLY:io_elemental,io_status
- use nl_optics,     ONLY:NL_bands,OSCLL,ng_oscll,NL_nbands
+ use nl_optics,     ONLY:NL_bands,OSCLL,OSCLL_k,ng_oscll,NL_nbands
  use memory_m,      ONLY:mem_est
  use parallel_m,    ONLY:PAR_Xk_ibz_index,PAR_Xk_nibz,myid
 #if defined _TIMING
@@ -112,7 +112,7 @@ integer function io_OSCLL(q,ID)
  do ib=NL_bands(1),NL_bands(2)
    do ig=1,ng_oscll
      !
-     if (write_is_on(ID)) call mat_c2r(OSCLL(ib,:,ik_mem,:,ig),disk_data)
+     if (write_is_on(ID)) call mat_c2r(OSCLL_k(ib,:,:,ig),disk_data)
      !
      write (VAR_name,'(3(a,i4.4))') 'OSCLL_',ik,'_ib_',ib,'_ig_',ig
      call io_bulk(ID,VAR=trim(VAR_name),VAR_SZ=shape(disk_data))
