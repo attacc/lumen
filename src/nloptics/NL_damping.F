@@ -54,9 +54,13 @@ subroutine NL_damping(E,V_bands,ik)
  !
  ! the |V_b(t)><V_b(t)| term
  !
- forall(ib=1:E%nbf,i1=NL_bands(1):NL_bands(2),i2=NL_bands(1):NL_bands(2),is=1:n_sp_pol)
-   I_relax(i1,i2,ib,ik_mem,is)=-cI*2._SP/Phase_LifeTime*(conjg(V_bands(i2,ib,ik,is))*V_bands(i1,ib,ik,is))
- end forall
+!$omp parallel do default(shared), private(ib)
+ do ib=1,E%nbf
+   forall(i1=NL_bands(1):NL_bands(2),i2=NL_bands(1):NL_bands(2),is=1:n_sp_pol)
+     I_relax(i1,i2,ib,ik_mem,is)=-cI*2._SP/Phase_LifeTime*(conjg(V_bands(i2,ib,ik,is))*V_bands(i1,ib,ik,is))
+   end forall
+ enddo
+!$omp end parallel do
  !
  ! the |V_b(t=0)><V_b(t=0)| term 
  !

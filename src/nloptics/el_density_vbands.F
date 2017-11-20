@@ -72,12 +72,10 @@ subroutine el_density_vbands(en,Xk,rho,VAL_BANDS)
    if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
    ik_mem=PAR_Xk_ibz_index(ik)
    !
-!$omp parallel do default(shared), private(ir,is,iv)
+!$omp parallel do default(shared), private(ir,is)
    do ir=1,fft_size
      do is=1,n_sp_pol
-       do iv=1,en%nbf
-         rho_no_sym(ir)=rho_no_sym(ir)+real(spin_occ,SP)*Xk%weights(ik)*abs(VAL_BANDS(ir,iv,ik_mem,is))**2._SP
-       enddo
+       rho_no_sym(ir)=rho_no_sym(ir)+real(spin_occ,SP)*Xk%weights(ik)*sum(abs(VAL_BANDS(ir,:,ik_mem,is))**2._SP)
      enddo
    enddo
 !$omp end parallel do

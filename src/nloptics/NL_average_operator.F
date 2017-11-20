@@ -29,7 +29,7 @@ subroutine NL_average_operator(Xen,Xk,V_bands,OMATRIX,TRANS,VALUE)
  use electrons,   ONLY:levels,n_sp_pol,spin_occ
  use nl_optics,   ONLY:NL_bands
  use QP_m,        ONLY:QP_nk
- use wrapper_omp, ONLY:M_by_V_omp,Vstar_dot_V_omp
+ use wrapper,     ONLY:M_by_V,Vstar_dot_V
  use R_lattice,   ONLY:bz_samp,nXkbz
  use parallel_m,  ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX
  !
@@ -73,12 +73,14 @@ subroutine NL_average_operator(Xen,Xk,V_bands,OMATRIX,TRANS,VALUE)
      !
    enddo
    !   
+!$omp parallel do default(shared), private(iv,is,V_tmp), reduction(+:VALUE)
    do iv=1,Xen%nbf
      do is=1,n_sp_pol
-       call M_by_V_omp(op,NL_bands(2),NL_bands(2),cONE,Hk(:,:,is),NL_bands(2),V_bands(:,iv,ik,is),1,cZERO,V_tmp,1)
-       VALUE=VALUE+spin_occ*Vstar_dot_V_omp(NL_bands(2),V_bands(:,iv,ik,is),V_tmp) 
+       call M_by_V(op,NL_bands(2),NL_bands(2),cONE,Hk(:,:,is),NL_bands(2),V_bands(:,iv,ik,is),1,cZERO,V_tmp,1)
+       VALUE=VALUE+spin_occ*Vstar_dot_V(NL_bands(2),V_bands(:,iv,ik,is),V_tmp) 
      enddo
    enddo
+!$omp end parallel do
    !
  enddo 
  !

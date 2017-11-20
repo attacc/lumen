@@ -128,12 +128,14 @@ subroutine Build_W_operator(V_bands,en,Xk,A_input,ik,i_sp,Hk)
        ! ===========================================
        ! where \tilde V(k+delta,n,:) = \sum_m \tilde S^-1(k,k+delta)_{m,n} * Vp(m,:)
        ! 
+!$omp parallel do default(shared), private(im,i2,iv1), reduction(+:delta_tV_bnd)
        do im=1,en%nbf 
          forall(i2=NL_bands(1):NL_bands(2),iv1=1:en%nbf)
            delta_tV_bnd(iv1,i2)=delta_tV_bnd(iv1,i2)+Sm1_plus (im,iv1,id_red+(istep-1)*3,ikbz,i_sp)*tmp_Vp(i2,im) &
 &                                                   -Sm1_minus(im,iv1,id_red+(istep-1)*3,ikbz,i_sp)*tmp_Vm(i2,im)
          end forall
        enddo
+!$omp end parallel do
        !  
        ! Build the W operator as
        !

@@ -30,7 +30,7 @@ subroutine NL_SEX(V_bands,Hk,k,q,E,i_k)
  use nl_optics,      ONLY:NL_bands,OSCLL,W,ng_oscll,NL_nbands,Sigma_SEX_EQ
  use QP_m,           ONLY:QP_nk
  use R_lattice,      ONLY:bz_samp,qindx_S
- use wrapper_omp,    ONLY:V_dot_V_omp
+ use wrapper,        ONLY:V_dot_V
  use parallel_m,     ONLY:PAR_Xk_ibz_index
  ! 
  implicit none
@@ -72,7 +72,7 @@ subroutine NL_SEX(V_bands,Hk,k,q,E,i_k)
 !$omp end parallel do
  !
 !$omp parallel do default(shared), private(i1)
- do i1=1,NL_bands(2)
+ do i1=NL_bands(1),NL_bands(2)
    Hk(:,i1,:)=Hk(:,i1,:)-Sigma_SEX_EQ(:,i1,:,ik_mem)
  enddo
 !$omp end parallel do
@@ -89,7 +89,7 @@ subroutine NL_SEX(V_bands,Hk,k,q,E,i_k)
        val_sum(iqbz,ig1,ig2)=sum(OSCLL_val(i_n,:,ig1,iqbz)*conjg(OSCLL_val(i_m,:,ig2,iqbz))) ! sum of valence bands
      end forall
      !
-     Hk(i_n,i_m,1)=Hk(i_n,i_m,1)+spin_occ*V_dot_V_omp(ng_oscll**2*q%nbz,W(1,1,1),val_sum(1,1,1))
+     Hk(i_n,i_m,1)=Hk(i_n,i_m,1)+spin_occ*V_dot_V(ng_oscll**2*q%nbz,W(1,1,1),val_sum(1,1,1))
      !
    enddo
  enddo
