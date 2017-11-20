@@ -147,6 +147,7 @@ subroutine NL_oscillators_eval(q,k,en)
  !
  deallocate(OSCLL)
  call mem_est("OSCLL")
+ !
  call elemental_collision_free(isc)
  call WF_free(WF)  
  !
