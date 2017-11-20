@@ -25,7 +25,7 @@ subroutine NL_oscillators_eval(q,k,en)
  !
  ! Evaluate oscillators for the Local-SEX
  !
- use nl_optics,           ONLY:NL_bands,OSCLL,W,ng_oscll
+ use nl_optics,           ONLY:NL_bands,W,ng_oscll
  use LIVE_t,              ONLY:live_timing
  use pars,                ONLY:SP,cZERO
  use R_lattice,           ONLY:bz_samp,qindx_S
@@ -39,7 +39,7 @@ subroutine NL_oscillators_eval(q,k,en)
  use FFT_m,               ONLY:fft_size
  use IO_m,                ONLY:io_control,OP_RD_CL,VERIFY,REP,OP_WR_CL,OP_APP_WR_CL 
  use com,                 ONLY:msg
- use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu, &
+ use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu,myid, &
                                PAR_Xk_nibz,PAR_Xk_ibz_index,PAR_COM_Q_INDEX,PAR_IND_Q,PAR_COM_Xk_ibz_A2A
  use IO_m,                ONLY:IO_and_Messaging_switch
  use memory_m,            ONLY:mem_est
@@ -56,6 +56,7 @@ subroutine NL_oscillators_eval(q,k,en)
  integer :: i_k_sp,i_kmq_sp,iqibz,ig,i_np,i_mp,io,ic,i_sp_pol
  integer :: ID,io_err,iGo_max
  integer, external :: io_OSCLL
+ complex(SP), allocatable :: OSCLL_k(:,:,:,:)
  !
  call PP_redux_wait() 
  !
@@ -92,15 +93,17 @@ subroutine NL_oscillators_eval(q,k,en)
  call IO_and_Messaging_switch("SAVE")
  call IO_and_Messaging_switch("+io_out",CONDITION=PAR_COM_Xk_ibz_A2A%CPU_id==0)
  !
- allocate(OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),PAR_Xk_nibz,q%nbz,ng_oscll))
- call mem_est("OSCLL",(/size(OSCLL)/),(/2*SP/))
+ allocate(OSCLL_k(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),q%nbz,ng_oscll))
+ call mem_est("OSCLL_k",(/size(OSCLL_k)/),(/2*SP/))
  !
- OSCLL=cZERO
- !      
  do i_k=1,QP_nk
    !
    if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
    ! 
+   ik_mem=PAR_Xk_ibz_index(i_k)
+   !
+   OSCLL_k=cZERO
+   !
    do iqbz=1,q%nbz
      !
      if (.not.PAR_IND_Q%element_1D(iqbz)) cycle
@@ -119,20 +122,18 @@ subroutine NL_oscillators_eval(q,k,en)
      i_k_sp  = 1
      i_kmq_sp= 1
      !
-     ik_mem=PAR_Xk_ibz_index(i_k)
-     !
      do i_n=NL_bands(1),NL_bands(2)
        do i_m=NL_bands(1),NL_bands(2)
          isc%is  =(/i_n,i_k,i_k_s,i_k_sp/)
          isc%os  =(/i_m,i_kmq,i_kmq_s,i_kmq_sp/)
          call scatter_Bamp(isc)            
-         OSCLL(i_n,i_m,ik_mem,iqbz,:)=isc%rhotw(:)
+         OSCLL_k(i_n,i_m,iqbz,:)=isc%rhotw(:)
        enddo
      enddo
      !
    enddo
    !
-   call PP_redux_wait(OSCLL(:,:,ik_mem,:,:),COMM=PAR_COM_Q_INDEX%COMM)
+   call PP_redux_wait(OSCLL_k(:,:,:,:),COMM=PAR_COM_Q_INDEX%COMM)
    !
    call io_control(ACTION=OP_APP_WR_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
    io_err=io_OSCLL(q,ID)
@@ -145,8 +146,8 @@ subroutine NL_oscillators_eval(q,k,en)
  !
  call live_timing()
  !
- deallocate(OSCLL)
- call mem_est("OSCLL")
+ deallocate(OSCLL_k)
+ call mem_est("OSCLL_k")
  !
  call elemental_collision_free(isc)
  call WF_free(WF)  
