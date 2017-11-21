@@ -77,7 +77,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 #if defined _SCALAPACK
  use SLK_m,         ONLY:SLK_COM_INDEX,SLK_COM_A2A
 #endif
- use nl_optics,     ONLY:NL_bands,n_runs,eval_OVERLAPS
+ use nl_optics,     ONLY:NL_bands,NL_nbands,n_runs,eval_OVERLAPS
  use electrons,     ONLY:levels
  use stderr,        ONLY:intc
  use R_lattice,     ONLY:bz_samp,nqibz,nqbz
@@ -742,11 +742,11 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  if (ENVIRONMENT=="Oscillators") then
    !=================================
    !
-   CALL PARALLEL_structure(2,(/"k ","q "/))
+   CALL PARALLEL_structure(2,(/"k ","b "/))
    !
-   call PARALLEL_assign_chains_and_COMMs(2,ROLE=(/"k","q"/),&
+   call PARALLEL_assign_chains_and_COMMs(2,ROLE=(/"k","b"/),&
 &                                        COMM_index_1=PAR_COM_Xk_ibz_INDEX,&
-&                                        COMM_index_2=PAR_COM_Q_INDEX, &
+&                                        COMM_index_2=PAR_COM_G_b_INDEX,   &
 &                                        COMM_A2A_1=PAR_COM_Xk_ibz_A2A)
    !
    ! K-points
@@ -761,21 +761,16 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    call PARALLEL_live_message("H(ibz)",ENVIRONMENT=ENVIRONMENT,&
 &           LOADED=PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1),TOTAL=Xk%nibz,&
 &           NCPU=PAR_COM_Xk_ibz_INDEX%n_CPU)
-!  !
-   ! Q-points
    !
-   call PARALLEL_index(PAR_IND_Q,(/q%nbz/),COMM=PAR_COM_Q_INDEX)
-   PAR_IND_Q_ID=PAR_COM_Q_INDEX%CPU_id
-   PAR_nQ=PAR_IND_Q%n_of_elements(PAR_IND_Q_ID+1)
+   ! Bands
    !
-   call PARALLEL_live_message("Q(bz)",ENVIRONMENT=ENVIRONMENT,&
-&          LOADED=PAR_IND_Q%n_of_elements(PAR_IND_Q_ID+1),TOTAL=Q_range(2),&
-&          NCPU=PAR_COM_Q_INDEX%n_CPU)
+   call PARALLEL_index(PAR_IND_G_b,(/NL_nbands**2/),COMM=PAR_COM_G_b_INDEX)
+   PAR_IND_G_b_ID=PAR_COM_G_b_INDEX%CPU_id
+   PAR_nG_bands=PAR_IND_G_b%n_of_elements(PAR_IND_G_b_ID+1)
    !
-   ! Add k+q to the k-point list
-   !
-   call PARALLEL_add_Q_to_K_list("k_ibz_q_bz",PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID,PAR_IND_k_plus_q, &
-&                                PAR_IND_Xk_ibz_ID,PAR_IND_Q,PAR_COM_Xk_ibz_INDEX,Q_range,Xk,q)
+   call PARALLEL_live_message("G bands",ENVIRONMENT=ENVIRONMENT,&
+&                             LOADED=PAR_IND_G_b%n_of_elements(PAR_IND_G_b_ID+1),&
+&                             TOTAL=NL_nbands**2,NCPU=PAR_COM_G_b_INDEX%n_CPU)
    !
    ! Copy to WF
    !

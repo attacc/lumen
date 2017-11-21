@@ -25,7 +25,7 @@ subroutine NL_oscillators_eval(q,k,en)
  !
  ! Evaluate oscillators for the Local-SEX
  !
- use nl_optics,           ONLY:NL_bands,W,OSCLL_k,ng_oscll
+ use nl_optics,           ONLY:NL_bands,W,OSCLL_k,ng_oscll,NL_nbands
  use LIVE_t,              ONLY:live_timing
  use pars,                ONLY:SP,cZERO
  use R_lattice,           ONLY:bz_samp,qindx_S
@@ -39,8 +39,8 @@ subroutine NL_oscillators_eval(q,k,en)
  use FFT_m,               ONLY:fft_size
  use IO_m,                ONLY:io_control,OP_RD_CL,VERIFY,REP,OP_WR_CL,OP_APP_WR_CL 
  use com,                 ONLY:msg
- use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu,myid, &
-                               PAR_Xk_nibz,PAR_Xk_ibz_index,PAR_COM_Q_INDEX,PAR_IND_Q,PAR_COM_Xk_ibz_A2A
+ use parallel_m,          ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu,myid,PAR_IND_G_b, &
+&                              PAR_Xk_nibz,PAR_Xk_ibz_index,PAR_COM_Xk_ibz_A2A,PAR_COM_G_b_INDEX
  use IO_m,                ONLY:IO_and_Messaging_switch
  use memory_m,            ONLY:mem_est
  !
@@ -53,7 +53,7 @@ subroutine NL_oscillators_eval(q,k,en)
  !
  type(elemental_collision)            :: isc 
  integer :: i_k,i_m,i_n,i_q,iqbz,i_kmq_G0,iqs,i_kmq,i_kmq_s,i_k_s,ik_mem
- integer :: i_k_sp,i_kmq_sp,iqibz,ig,i_np,i_mp,io,ic,i_sp_pol
+ integer :: i_k_sp,i_kmq_sp,iqibz,ig,i_np,i_mp,io,ic,i_sp_pol,ib_idx
  integer :: ID,io_err,iGo_max
  integer, external :: io_OSCLL
  !
@@ -103,36 +103,41 @@ subroutine NL_oscillators_eval(q,k,en)
    !
    OSCLL_k=cZERO
    !
-   do iqbz=1,q%nbz
-     !
-     if (.not.PAR_IND_Q%element_1D(iqbz)) cycle
-     !
-     i_kmq_G0  =qindx_S(i_k,iqbz,2)
-     iqibz     =q%sstar(iqbz,1)
-     iqs       =q%sstar(iqbz,2)
-     isc%qs  =(/i_kmq_G0,iqibz,iqs/)
-     !
-     i_k_s=1
-     i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
-     i_kmq_s = k%sstar(qindx_S(i_k,iqbz,1),2)
-     !
-     !  Spin-Polarization not supported!!
-     ! 
-     i_k_sp  = 1
-     i_kmq_sp= 1
-     !
-     do i_n=NL_bands(1),NL_bands(2)
-       do i_m=NL_bands(1),NL_bands(2)
+   do i_n=NL_bands(1),NL_bands(2)
+     do i_m=NL_bands(1),NL_bands(2)
+       !
+       ib_idx=i_m-NL_bands(1)+1+(i_n-NL_bands(1))*NL_nbands
+       !
+       if (.not.PAR_IND_G_b%element_1D(ib_idx)) cycle
+       !
+       do iqbz=1,q%nbz
+         !
+         i_kmq_G0  =qindx_S(i_k,iqbz,2)
+         iqibz     =q%sstar(iqbz,1)
+         iqs       =q%sstar(iqbz,2)
+         isc%qs  =(/i_kmq_G0,iqibz,iqs/)
+         !
+         i_k_s=1
+         i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
+         i_kmq_s = k%sstar(qindx_S(i_k,iqbz,1),2)
+         !
+         !  Spin-Polarization not supported!!
+         ! 
+         i_k_sp  = 1
+         i_kmq_sp= 1
+         !
+         !
          isc%is  =(/i_n,i_k,i_k_s,i_k_sp/)
          isc%os  =(/i_m,i_kmq,i_kmq_s,i_kmq_sp/)
          call scatter_Bamp(isc)            
-         OSCLL_k(i_n,i_m,iqbz,:)=isc%rhotw(:)
+         OSCLL_k(i_n,i_m,iqbz,:)=isc%rhotw(:ng_oscll)
+         !
        enddo
-     enddo
-     !
+       !
+    enddo
    enddo
    !
-   call PP_redux_wait(OSCLL_k(:,:,:,:),COMM=PAR_COM_Q_INDEX%COMM)
+   call PP_redux_wait(OSCLL_k(:,:,:,:),COMM=PAR_COM_G_b_INDEX%COMM)
    !
    call io_control(ACTION=OP_APP_WR_CL,COM=REP,SEC=(/1+i_k+(i_sp_pol-1)*k%nibz/),ID=ID)
    io_err=io_OSCLL(q,ID)
