@@ -211,7 +211,7 @@ module parallel_m
  type(PP_indexes),SAVE :: PAR_IND_CON_BANDS_X(n_parallel_X_types)
  type(PP_indexes),SAVE :: PAR_IND_DIPk_ibz
  type(PP_indexes),SAVE :: PAR_IND_OVLP_ibz
- type(PP_indexes),SAVE :: PAR_IND_k_plus_q
+ type(PP_indexes),SAVE :: PAR_IND_B2
  !
  ! ... QP
  type(PP_indexes),SAVE :: PAR_IND_QP
@@ -285,6 +285,8 @@ module parallel_m
  integer            :: PAR_IND_DIPk_ID
  ! .... Frequencies
  integer            :: PAR_IND_runs_ID
+ !..... Oscillators
+ integer            :: PAR_IND_B2_ID
  !
  ! Specific MPI COMMUNICATORS...
  !==============================

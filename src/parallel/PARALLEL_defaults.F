@@ -142,7 +142,8 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
         case("Non_Linear") 
            call default_Non_Linear()
         case("Oscillators") 
-           ncpu_b      =2
+           ncpu_b       =4
+           ncpu_b       =GreatestCommonDivisor(ncpu,ncpu_b)
            CPU_structure(i_PAR_structure)%ROLE(1)="k"
            CPU_structure(i_PAR_structure)%CPU(1)=ncpu/ncpu_b
            CPU_structure(i_PAR_structure)%ROLE(2)="b"

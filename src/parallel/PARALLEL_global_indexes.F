@@ -39,7 +39,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 &                        l_par_X_T,l_par_X_G_q0,l_par_RT,l_par_SE,l_par_X_G_all_q,l_par_X_G_finite_q,&
 &                        HEAD_QP_cpu,HEAD_k_cpu,l_par_SC,l_par_NL,l_par_OSCL
  use parallel_m,    ONLY:PAR_IND_runs_ID,PAR_COM_runs_INDEX,PAR_COM_runs_A2A,PAR_nRuns,PAR_runs_index, &
-&                        PAR_IND_runs,PAR_COM_runs,PAR_IND_OVLP_ibz,PAR_IND_k_plus_q ! Non_Linear optics
+&                        PAR_IND_runs,PAR_COM_runs,PAR_IND_OVLP_ibz,PAR_IND_B2 ! Non_Linear optics
  use parallel_m,    ONLY:& ! COMMUNICATORS
 &                        COMM_reset,PAR_COM_WORLD,&  
 &                        PAR_COM_VAL_INDEX,PAR_COM_CON_INDEX,PAR_COM_Q_A2A,&
@@ -62,7 +62,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 &                        PAR_IND_Xk_ibz_ID,PAR_IND_Q_ID,&
 &                        PAR_IND_QP_ID,PAR_IND_G_b_ID,PAR_IND_PLASMA_ID,&
 &                        PAR_IND_WF_k_ID,PAR_IND_WF_b_ID,PAR_IND_B_mat_ID,&
-&                        PAR_IND_Bp_mat_ID,PAR_IND_G_k_ID,&
+&                        PAR_IND_Bp_mat_ID,PAR_IND_G_k_ID,PAR_IND_B2_ID,&
 &                        PAR_IND_Kk_ibz_ID,PAR_IND_DIPk_ID
  use interfaces,    ONLY:PARALLEL_index,PARALLEL_assign_chains_and_COMMs,PARALLEL_live_message
  use X_m,           ONLY:X_t,l_X_terminator
@@ -768,10 +768,13 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    PAR_IND_G_b_ID=PAR_COM_G_b_INDEX%CPU_id
    PAR_nG_bands=PAR_IND_G_b%n_of_elements(PAR_IND_G_b_ID+1)
    !
-   call PARALLEL_live_message("G bands",ENVIRONMENT=ENVIRONMENT,&
+   call PARALLEL_live_message("OSCL bands",ENVIRONMENT=ENVIRONMENT,&
 &                             LOADED=PAR_IND_G_b%n_of_elements(PAR_IND_G_b_ID+1),&
 &                             TOTAL=NL_nbands**2,NCPU=PAR_COM_G_b_INDEX%n_CPU)
    !
+   ! Build WF bands indexes
+   !
+   call Build_B2_index(PAR_IND_G_b,PAR_IND_G_b_ID,PAR_IND_B2,PAR_IND_B2_ID,PAR_COM_G_b_INDEX,NL_bands)
    ! Copy to WF
    !
    call COMM_copy(PAR_COM_Xk_ibz_INDEX,PAR_COM_WF_k_INDEX)
@@ -950,6 +953,48 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
          V_ind(i_p)=n_V_ind
        endif
        !
+     enddo
+     !
+   end subroutine
+   !
+   subroutine Build_B2_index(IND_B_in,IND_B_in_ID,IND_B_out,IND_B_out_ID,COMM,b_range)
+     !
+     use parallel_m,    ONLY:PP_indexes,MPI_comm
+     !
+     implicit none
+     !
+     type(MPI_comm)         :: COMM
+     integer, intent(in)    :: b_range(2),IND_B_in_ID
+     integer, intent(out)   :: IND_B_out_ID
+     type(PP_indexes)       :: IND_B_in,IND_B_out
+     integer                :: n_bands,i1,i2,ib_idx
+     !
+     n_bands=b_range(2)-b_range(1)+1
+     !
+     IND_B_out_ID=IND_B_in_ID
+     !
+     allocate(IND_B_out%n_of_elements(COMM%n_CPU),IND_B_out%element_1D(b_range(2)))
+     IND_B_out%n_of_elements(IND_B_out_ID+1)=0
+     IND_B_out%element_1D(:)=.FALSE.
+     !
+     do i1=b_range(1),b_range(2)
+       do i2=b_range(1),b_range(2)
+         !
+         ib_idx=i2-b_range(1)+1+(i1-b_range(1))*n_bands
+         !
+         if (.not.IND_B_in%element_1D(ib_idx)) cycle
+         !
+         if(IND_B_out%element_1D(i1).eqv..false.) then
+           IND_B_out%element_1D(i1)=.TRUE.
+           IND_B_out%n_of_elements(IND_B_out_ID+1)=IND_B_out%n_of_elements(IND_B_out_ID+1)+1
+         endif
+         !
+         if(IND_B_out%element_1D(i2).eqv..false.) then
+           IND_B_out%element_1D(i2)=.TRUE.
+           IND_B_out%n_of_elements(IND_B_out_ID+1)=IND_B_out%n_of_elements(IND_B_out_ID+1)+1
+         endif
+         !
+       enddo
      enddo
      !
    end subroutine
