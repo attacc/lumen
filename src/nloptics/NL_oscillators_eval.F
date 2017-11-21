@@ -70,6 +70,8 @@ subroutine NL_oscillators_eval(q,k,en)
  ! 
  if(io_err==0)  return
  !
+ call PP_redux_wait()
+ !
  ! Oscillators not found, recalculated them
  !
  if(master_cpu) then
