@@ -1,0 +1,7 @@
+New in 1.1 version:
+
+  * Improved OpenMP parallelization
+  * Bands parallelization of Oscillators
+  * Memory distribution on k-points 
+  * Fixed bug in grid generator in ypp (from Yambo)
+  * Fixed bug in shifted grid for GW (from Yambo)

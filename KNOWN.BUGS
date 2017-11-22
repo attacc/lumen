@@ -1,5 +1,0 @@
-Known bugs
-==========
-
-1) Not sure parallelization is working when current is calculated 
-   due to the PAR_IND_DIPk_ibz, see Dipole_driver.F 
