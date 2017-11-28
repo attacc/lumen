@@ -30,7 +30,7 @@ subroutine NL_SEX(V_bands,Hk,k,q,E,i_k)
  use nl_optics,      ONLY:NL_bands,OSCLL,W,ng_oscll,NL_nbands,Sigma_SEX_EQ
  use QP_m,           ONLY:QP_nk
  use R_lattice,      ONLY:bz_samp,qindx_S
- use wrapper,        ONLY:V_dot_V
+ use wrapper_omp,    ONLY:V_dot_V_omp
  use parallel_m,     ONLY:PAR_Xk_ibz_index
  ! 
  implicit none
@@ -81,19 +81,21 @@ subroutine NL_SEX(V_bands,Hk,k,q,E,i_k)
  !
  ! Evaluate Sigma_SEX(i_m,i_n,i_k)
  !
-!$omp parallel do default(shared), private(i_n,i_m,ig1,ig2,val_sum)
  do i_n=NL_bands(1),NL_bands(2)
    do i_m=i_n,NL_bands(2)
      !
-     forall(ig1=1:ng_oscll,ig2=1:ng_oscll,iqbz=1:q%nbz)
-       val_sum(iqbz,ig1,ig2)=sum(OSCLL_val(i_n,:,ig1,iqbz)*conjg(OSCLL_val(i_m,:,ig2,iqbz))) ! sum of valence bands
-     end forall
+!$omp parallel do default(shared), private(i_n,i_m,ig1,ig2,iqbz)
+     do iqbz=1,q%nbz
+       forall(ig1=1:ng_oscll,ig2=1:ng_oscll)
+         val_sum(iqbz,ig1,ig2)=sum(OSCLL_val(i_n,:,ig1,iqbz)*conjg(OSCLL_val(i_m,:,ig2,iqbz))) ! sum of valence bands
+       end forall
+     enddo
+!$omp end parallel do
      !
-     Hk(i_n,i_m,1)=Hk(i_n,i_m,1)+spin_occ*V_dot_V(ng_oscll**2*q%nbz,W(1,1,1),val_sum(1,1,1))
+     Hk(i_n,i_m,1)=Hk(i_n,i_m,1)+spin_occ*V_dot_V_omp(ng_oscll**2*q%nbz,W(1,1,1),val_sum(1,1,1))
      !
    enddo
  enddo
-!$omp end parallel do
  !
  ! Symmetrization
  !

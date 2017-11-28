@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston,
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine electrons_spin_and_magn_interpolate(Xen,Xk,CIRCUIT_k,BANDS_range,spin_output,magn_output)
+subroutine electrons_spin_and_magn_interpolate(Xk,CIRCUIT_k,BANDS_range,spin_output,magn_output)
  !
  use pars,           ONLY:SP,schlen
  use units,          ONLY:HA2EV
@@ -36,7 +36,6 @@ subroutine electrons_spin_and_magn_interpolate(Xen,Xk,CIRCUIT_k,BANDS_range,spin
  !
  implicit none
  !
- type(levels),  intent(in)  :: Xen
  type(bz_samp), intent(in)  :: Xk
  integer      , intent(in)  :: BANDS_range(2)
  type(bz_samp), intent(in)  :: CIRCUIT_k
