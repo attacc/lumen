@@ -314,7 +314,6 @@ subroutine NL_driver(E,X,k,q,Xw)
      call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
      call PARALLEL_global_indexes(E,k,q,"Oscillators",X=X(1))
      call PARALLEL_WF_distribute(B_index=PAR_IND_B2,CLEAN_UP=.TRUE.)
-     call PARALLEL_WF_index( )
      !
    end subroutine setup_OSCL_parallelization
    !
