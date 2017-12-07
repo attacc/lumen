@@ -57,6 +57,10 @@ module X_m
  !
  logical                  :: X_is_evaluated_for_all_Qs
  !
+ ! Check if dipoles are covariant
+ !
+ logical                  :: l_dip_covariant
+ !
  ! Dipole M.E.
  !
  character(schlen)        :: Dipole_approach

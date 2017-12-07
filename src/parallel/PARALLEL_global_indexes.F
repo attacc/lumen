@@ -65,7 +65,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 &                        PAR_IND_Bp_mat_ID,PAR_IND_G_k_ID,PAR_IND_B2_ID,&
 &                        PAR_IND_Kk_ibz_ID,PAR_IND_DIPk_ID
  use interfaces,    ONLY:PARALLEL_index,PARALLEL_assign_chains_and_COMMs,PARALLEL_live_message
- use X_m,           ONLY:X_t,l_X_terminator
+ use X_m,           ONLY:X_t,l_X_terminator,use_covariant_approach
  use drivers,       ONLY:l_eval_collisions,l_elph_corr,l_gw0,l_HF_and_locXC,l_life,l_sc_run,&
 &                        l_real_time,l_elphoton_corr,l_nl_optics
  use matrix_operate,ONLY:UP_matrix_index
@@ -268,6 +268,8 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  if (ENVIRONMENT=="Response_G_space_Zero_Momentum"  ) then
     if(l_nl_optics) then
        n_v_bands= (/1,E%nbm/)
+    else if(use_covariant_approach) then
+       n_v_bands= (/1,X%ib_lim(1)/)
     else
        n_v_bands= (/X%ib(1),E%nbm/)
     endif

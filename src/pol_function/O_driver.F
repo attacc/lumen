@@ -36,8 +36,8 @@ subroutine O_driver(Xen,Xk,q,wv,X)
  use electrons,     ONLY:levels,BZ_DbGd_tot_nkpts
  use R_lattice,     ONLY:bz_samp,q_norm,bare_qpg
  use com,           ONLY:msg,of_open_close
- use X_m,           ONLY:X_t,Epsilon_ii,EEL,Alpha,X_mat,X_alloc,X_fxc,&
-&                        use_X_DbGd,eval_alpha,eps_2_alpha,O_eels
+ use X_m,           ONLY:X_t,Epsilon_ii,EEL,Alpha,X_mat,X_alloc,X_fxc,use_covariant_approach, &
+&                        use_X_DbGd,eval_alpha,eps_2_alpha,O_eels,Dipole_approach
  use parallel_m,    ONLY:PP_redux_wait,PAR_IND_Q,PAR_COM_Q_A2A,PAR_IND_CON_BANDS_X,&
 &                        PAR_IND_Xk_ibz,PAR_IND_VAL_BANDS_X,PAR_COM_DIPOLES
  use wave_func,     ONLY:WF,WF_buffer,WF_buffered_IO
@@ -52,6 +52,7 @@ subroutine O_driver(Xen,Xk,q,wv,X)
  use X_m,           ONLY:Luminescence,Lum_mat
  use com,           ONLY:error
 #endif
+ use nl_optics,     ONLY:eval_OVERLAPS
  use interfaces,    ONLY:PARALLEL_global_indexes,PARALLEL_WF_index,PARALLEL_WF_distribute,WF_load
  !
  implicit none
@@ -78,6 +79,18 @@ subroutine O_driver(Xen,Xk,q,wv,X)
  call set_real_printed_length(f_length=10,g_length=10)
  !
  do iq=X%iq(1),X%iq(2)
+   !
+   ! Check if I use covariant dipoles
+   ! ================================
+   !
+   if(iq==1) then
+     use_covariant_approach      = trim(Dipole_approach)=='Covariant'
+     if(use_covariant_approach) then
+       X%ib_lim(1)=X%ib(2)
+       X%ib_lim(2)=X%ib(1)
+       eval_OVERLAPS=.TRUE.
+     endif
+   endif
    !
    ! PARALLEL indexes
    !==================
