@@ -33,7 +33,7 @@ subroutine QP_ppa_cohsex(X,Xk,E,k,q,qp,Xw,GW_iter)
  use electrons,     ONLY:levels,spin_occ,spin,n_met_bands,n_sp_pol
  use LIVE_t,        ONLY:live_timing
  use com,           ONLY:msg,error
- use drivers,       ONLY:l_ppa,l_cohsex,l_sc_srpa,l_sc_sex,l_sc_coh,l_sc_run
+ use drivers,       ONLY:l_ppa,l_cohsex,l_sc_srpa,l_sc_cohsex,l_sc_run
  use parallel_m,    ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_IND_G_b,PAR_IND_QP,&
 &                        PAR_IND_Q,PAR_IND_Q_ID,PAR_IND_QP_ID,&
 &                        PAR_Q_index,n_WF_bands_to_load,HEAD_QP_cpu
@@ -94,7 +94,7 @@ subroutine QP_ppa_cohsex(X,Xk,E,k,q,qp,Xw,GW_iter)
  !
  ! COHSEX: bands setup
  !
- if ((l_sc_srpa.or.l_cohsex.or.l_sc_coh.or.l_sc_sex  ).and.(.not.COHSEX_use_empties)) then
+ if ((l_sc_srpa.or.l_cohsex.or.l_sc_cohsex).and.(.not.COHSEX_use_empties)) then
    QP_n_G_bands(2)=max(maxval(QP_table(:,:2)),n_met_bands)
  endif
  !
@@ -153,7 +153,7 @@ subroutine QP_ppa_cohsex(X,Xk,E,k,q,qp,Xw,GW_iter)
  ! wf and collisions dimension
  !-----------------------------
  isc%ngrho=X%ng
- if (((l_sc_srpa.or.l_cohsex.or.l_sc_coh).and..not.COHSEX_use_empties).or.l_GW_terminator) isc%ngrho=maxval(G_m_G)
+ if (((l_sc_srpa.or.l_cohsex.or.l_sc_cohsex).and..not.COHSEX_use_empties).or.l_GW_terminator) isc%ngrho=maxval(G_m_G)
  !
  call WF_load(WF,isc%ngrho,maxval(qindx_S(:,:,2)),(/1,n_WF_bands_to_load/),(/1,k%nibz/),title=trim(ch))
  !
@@ -180,7 +180,7 @@ subroutine QP_ppa_cohsex(X,Xk,E,k,q,qp,Xw,GW_iter)
  ! ALLOCATION
  !------------
  !
- if (l_sc_coh.or.l_sc_sex.or.l_cohsex.or.l_sc_srpa) then
+ if (l_sc_cohsex.or.l_cohsex.or.l_sc_srpa) then
    if (io_RESPONSE) call X_alloc('X',(/X%ng,X%ng,1/))
    allocate(dc(2))
  else
@@ -299,7 +299,7 @@ subroutine QP_ppa_cohsex(X,Xk,E,k,q,qp,Xw,GW_iter)
      !
      ! COH (using completeness relation)
      !
-     if (((l_sc_srpa.or.l_sc_coh.or.l_cohsex).and..not.COHSEX_use_empties).or.l_GW_terminator) then
+     if (((l_sc_srpa.or.l_sc_cohsex.or.l_cohsex).and..not.COHSEX_use_empties).or.l_GW_terminator) then
        !
        iscs_save(1,: )=isc%os
        iscs_save(2,:3)=isc%qs
@@ -462,7 +462,7 @@ subroutine QP_ppa_cohsex(X,Xk,E,k,q,qp,Xw,GW_iter)
          !
          QP_Sc(i_qp,:QP_dSc_steps)=QP_Sc(i_qp,:QP_dSc_steps)+dc(:QP_dSc_steps)
          !
-       else if (l_sc_sex.or.l_cohsex.or.(l_sc_coh.and.COHSEX_use_empties)) then
+       else if (l_sc_cohsex.or.l_cohsex.or.(l_sc_cohsex.and.COHSEX_use_empties)) then
          !
          call M_by_V('N', X%ng, X_mat(:,:,X_range(1)), conjg(iscp%rhotw), local_rhotw)
          !
@@ -479,12 +479,12 @@ subroutine QP_ppa_cohsex(X,Xk,E,k,q,qp,Xw,GW_iter)
          !
          ! SEX
          !
-         if (l_sc_sex.or.l_cohsex) dc(1)=-4._SP/spin_occ*pi*pre_factor*e%f(isc%os(1),isc%os(2),isc%os(4))
+         if (l_sc_cohsex.or.l_cohsex) dc(1)=-4._SP/spin_occ*pi*pre_factor*e%f(isc%os(1),isc%os(2),isc%os(4))
          !
          ! COH (when no empties are used the COH part is indeed calculated above)
          !
          if (COHSEX_use_empties) then
-           if (l_sc_coh.or.l_cohsex) dc(2)=2._SP*pi*pre_factor
+           if (l_sc_cohsex.or.l_cohsex) dc(2)=2._SP*pi*pre_factor
          endif
          !
          QP_Sc(i_qp,:)=QP_Sc(i_qp,:)+dc(1)+dc(2)

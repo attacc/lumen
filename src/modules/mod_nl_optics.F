@@ -167,13 +167,14 @@ module nl_optics
  complex(SP), allocatable :: Hk(:,:,:)
  real(SP),    allocatable :: V_xc_ne(:,:)
  real(SP),    allocatable :: V_hartree_ne(:,:)
- complex(SP), allocatable :: Sigma_SEX_EQ(:,:,:,:)
  !
  ! Collisions
  !
  complex(SP), allocatable :: OSCLL(:,:,:,:,:) ! Oscillators
  complex(SP), allocatable :: OSCLL_k(:,:,:,:) ! Oscillators in k, just for the evaluation
  complex(SP), allocatable :: W(:,:,:)
+ complex(SP), allocatable :: Sigma_SEX_EQ(:,:,:,:)
+ complex(SP), allocatable :: NE_Vnl_xc(:,:,:,:)
  !
  ! Density
  !

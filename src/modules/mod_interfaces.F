@@ -71,12 +71,11 @@ module interfaces
      real(SP), optional, intent(in) :: WF_fac(dos_bands(1):dos_bands(2),Xk%nibz,2)
    end subroutine el_density_of_states
    !
-   integer function io_COLLISIONS(ID,COLL_grp,COLL_element,i_coll)
-     use collision,  ONLY:COLLISIONS_element,COLLISIONS_group
+   integer function io_COLLISIONS(i_qp,ID,COLL)
+     use collision,  ONLY:COLLISIONS_element
      integer, intent(inout)             ::ID
-     type(COLLISIONS_group)             ::COLL_grp
-     type(COLLISIONS_element), optional ::COLL_element
-     integer, intent(in)     , optional ::i_coll
+     integer, intent(in)                ::i_qp
+     type(COLLISIONS_element), optional :: COLL
    end function
    !
    integer function eval_G_minus_G(iG,iGo,COMM)
