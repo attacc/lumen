@@ -35,7 +35,7 @@ subroutine COLLISIONS_sex(X,Xk,E,k,q,Xw)
  use parallel_m,    ONLY:PP_redux_wait,PAR_IND_QP,PAR_IND_Q,&
 &                        PAR_n_Bp_mat_elements,PAR_COM_QP_A2A,&
 &                        PAR_IND_Bp_mat,PAR_nQP,PAR_nQ,PAR_COM_G_b_A2A,PAR_COM_Q_index
- use collision,     ONLY:elemental_collision,elemental_collision_free,COLLISIONS_parallel_SC_structure,&
+ use collision,     ONLY:elemental_collision,elemental_collision_free,&
 &                        SEX_collisions,nSEX_collisions,COLL_bands,&
 &                        COLLISIONS_IO_status,elemental_collision_alloc
  use IO_m,          ONLY:io_control,OP_RD_CL,REP,VERIFY,NONE,Io_and_Messaging_switch,io_COLLs
@@ -252,13 +252,7 @@ subroutine COLLISIONS_sex(X,Xk,E,k,q,Xw)
      !
    enddo ! loop on iqbz
    !
-   if (COLLISIONS_parallel_SC_structure) then
-     call PP_redux_wait(SEX_collisions(1)%v3_c,COMM=PAR_COM_QP_A2A%COMM)
-     call PP_redux_wait(SEX_collisions(1)%v3_c,COMM=PAR_COM_Q_index%COMM)
-   else
-     call PP_redux_wait(SEX_collisions(1)%v3_c,COMM=PAR_COM_G_b_A2A%COMM)
-   endif
-   !
+   call PP_redux_wait(SEX_collisions(1)%v3_c,COMM=PAR_COM_G_b_A2A%COMM)
    call COLLISIONS_linearize_and_IO("SEX",i_qp,SEX_collisions,nSEX_collisions)
    !
  enddo ! loop on i_qp

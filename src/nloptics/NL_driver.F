@@ -41,7 +41,7 @@ subroutine NL_driver(E,X,k,q,Xw)
 &                         Integrator,l_use_DIPOLES,NL_P_t,NL_ng,EF_parms,Sigma_SEX_EQ,ng_oscll,   &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,runs_done,n_runs_todo,LSEX,LHF, &
 &                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_alloc_real_space_quantities, &
-&                         NL_alloc_k_distributed,E_bare
+&                         NL_alloc_k_distributed,E_bare,l_nl_collisions
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
  use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX, &
@@ -123,15 +123,21 @@ subroutine NL_driver(E,X,k,q,Xw)
  ! =============================
  if(Correlation==LSEX.or.Correlation==LHF) then
    !
-   ! Parallelization on k and q
-   !
-   call setup_OSCL_parallelization()
-   !
-   ! Evaluate oscillators and write them on disk
-   call NL_oscillators_eval(q,k,E)
-   !
-   X(2)%ng=ng_oscll
-   call NL_lsex_potential(q,X(2),Xw(2)) 
+   if(l_nl_collisions) then
+     !  
+   else
+     !
+     ! Parallelization on k and q
+     !
+     call setup_OSCL_parallelization()
+     !
+     ! Evaluate oscillators and write them on disk
+     call NL_oscillators_eval(q,k,E)
+     !
+     X(2)%ng=ng_oscll
+     call NL_lsex_potential(q,X(2),Xw(2)) 
+     !
+   endif
    !
  else
    !      
@@ -196,7 +202,11 @@ subroutine NL_driver(E,X,k,q,Xw)
    do ik=1,QP_nk
      if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
      ik_mem=PAR_Xk_ibz_index(ik)
-     call NL_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik_mem),k,q,E,ik)
+     if(l_nl_collisions) then
+       call NL_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik_mem),k,q,E,ik)
+     else
+!       call COLLISIONS_compose_nl(G_input
+     endif
    enddo
  endif
  !

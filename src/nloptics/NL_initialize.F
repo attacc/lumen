@@ -40,7 +40,8 @@ subroutine NL_initialize(E,k,q)
  !
  use nl_optics,      ONLY:NL_damping,NL_correlation,Correlation,NL_er,NL_estep,n_frequencies,IPA,TDDFT,HARTREE,LRC,JGM, &
 &                         LRCW,eval_DFT,eval_HARTREE,NL_bands,NL_nbands,l_use_DIPOLES,LSEX,LHF,n_intensities, &
-&                         NL_steps,NL_tot_time,Phase_LifeTime,NL_step,Verbosity_name,VER_HIGH,VER_LOW,NL_verbosity 
+&                         NL_steps,NL_tot_time,Phase_LifeTime,NL_step,Verbosity_name,VER_HIGH,VER_LOW,NL_verbosity, &
+&                         l_nl_collisions
  !
  use electric,       ONLY:l_force_SndOrd
  use parser_m,       ONLY:parser
@@ -59,6 +60,7 @@ subroutine NL_initialize(E,k,q)
  !
  call parser('UseDipoles',           l_use_DIPOLES)
  call parser('FrSndOrd',             l_force_SndOrd)
+ call parser('UseCollisions',        l_nl_collisions)
  !
  if(l_use_DIPOLES) call warning(' Fixed dipoles: only linear response properties are correct!')
  !

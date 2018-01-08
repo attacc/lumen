@@ -305,6 +305,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  call it(defs,'NLGOscll',    '[NL] Number of G in the oscillators', ng_oscll,unit=G_unit)
  call it(defs,'NLGvecs', '[NL] Number of G vectors in NL dynamics for Hartree/TDDFT',NL_ng,unit=G_unit)
  !
+ call it('f',defs,'UseCollisions','[NL] Use Collisions for SEX or HF (just for testing purpose)',verb_level=V_nl_optics)
  call it('f',defs,'UseDipoles','[NL] Use Covariant Dipoles (just for testing purpose)',verb_level=V_nl_optics)
  call it('f',defs,'FrSndOrd','[NL] Force second order in Covariant Dipoles',verb_level=V_nl_optics)
  !
