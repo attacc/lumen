@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_driver(E,X,k,q,Xw)
+subroutine NL_driver(E,X,k,Xk,q,Xw)
  !
  use pars,           ONLY:SP,cZERO,cONE
  use stderr,         ONLY:set_real_printed_length
@@ -52,7 +52,7 @@ subroutine NL_driver(E,X,k,q,Xw)
  ! Notice that E is never changed!
  !
  type(levels)      :: E
- type(bz_samp)     :: k,q
+ type(bz_samp)     :: k,q,Xk
  type(X_t)         :: X(2)
  type(w_samp)      :: Xw(2)
  logical, external :: stop_now
@@ -124,7 +124,11 @@ subroutine NL_driver(E,X,k,q,Xw)
  if(Correlation==LSEX.or.Correlation==LHF) then
    !
    if(l_nl_collisions) then
-     !  
+     !
+     writE(*,*) 'passo qui '
+        call COLLISIONS_eval(E,X,k,Xk,q,Xw(:2))
+     stop
+     !
    else
      !
      ! Parallelization on k and q
@@ -197,16 +201,12 @@ subroutine NL_driver(E,X,k,q,Xw)
  ! If LSEX or LHF calculate the equilibrium contribution 
  ! to the screened exchange
  !
- if(Correlation==LSEX.or.Correlation==LHF) then
+ if(Correlation==LSEX.or.Correlation==LHF.and..not.l_nl_collisions) then
    Sigma_SEX_EQ=cZERO
    do ik=1,QP_nk
      if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
      ik_mem=PAR_Xk_ibz_index(ik)
-     if(l_nl_collisions) then
-!       call COLLISIONS_compose_nl(G_input
-     else
-       call NL_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik_mem),k,q,E,ik)
-     endif
+     call NL_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik_mem),k,q,E,ik)
    enddo
  endif
  !

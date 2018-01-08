@@ -37,11 +37,12 @@ subroutine QP_state_table_setup(en)
  !
  use pars,          ONLY:SP,IP
  use units,         ONLY:HA2EV
- use drivers,       ONLY:l_sc_run,l_real_time,l_eval_collisions
+ use drivers,       ONLY:l_nl_optics
  use memory_m,      ONLY:mem_est
  use QP_m,          ONLY:QP_nk,QP_nb,QP_state,QP_n_states,QP_table,SC_bands_mixed,SC_band_mixing 
  use electrons,     ONLY:levels,n_sp_pol
  use parser_m,      ONLY:parser
+ use nl_optics,     ONLY:NL_bands
  !
  implicit none
  type(levels)::en
@@ -182,6 +183,7 @@ subroutine QP_state_table_setup(en)
          !
          if (i2+i3>QP_nb.or.i2+i3<1) cycle
          !
+         if(i2<NL_bands(1).and.l_nl_optics) cycle
          !
          QP_n_states=QP_n_states+1
          QP_table(QP_n_states,1)=i2

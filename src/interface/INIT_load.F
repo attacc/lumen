@@ -320,8 +320,6 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  call it(defs,'ExtF_pol',             '[NL ExtF] Pol(linear|circular)',Efield(1)%ef_pol,verb_level=V_nl_optics)
  call it(defs,'ExtF_Dir_circ',        '[NL ExtF] Versor_circ',Efield(1)%versor_circ,verb_level=V_nl_optics)
  !
- call it('f',defs,'FrSndOrd','[NL] Force second order in Covariant Dipoles',verb_level=V_nl_optics)
- !
  ! DIPOLES
  !
  call it(defs,'DipApproach',    '[Xd] [G-space v/R-space x/Covariant/Shifted grids]',Dipole_approach,verb_level=V_resp)

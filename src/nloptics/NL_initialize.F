@@ -64,6 +64,11 @@ subroutine NL_initialize(E,k,q)
  !
  if(l_use_DIPOLES) call warning(' Fixed dipoles: only linear response properties are correct!')
  !
+ !Quasi-particle setup
+ !====================
+ !
+ if(l_nl_collisions) call QP_state_table_setup(E)
+ !
  ! Check double-precision
  ! ========================
  !

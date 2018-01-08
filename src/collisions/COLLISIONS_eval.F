@@ -93,7 +93,7 @@ subroutine COLLISIONS_eval(E,X,k,xk,q,Xw)
  ! Switch 
  !========
  !
- call XC_switch()
+! call XC_switch()
  !
  ! No DB => EVAL
  !===============

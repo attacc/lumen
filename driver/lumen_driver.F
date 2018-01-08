@@ -211,7 +211,7 @@ integer function lumen_driver(np,pid,lnstr,iinf,iind,iod,icd,ijs,instr,inf,ind,o
    ! Non-linear optics
    !==================
    !
-   call NL_driver(en,X(:2),k,q,Xw(:2))
+   call NL_driver(en,X(:2),k,Xk,q,Xw(:2))
    !
    !
  endif
