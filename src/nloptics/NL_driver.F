@@ -203,9 +203,9 @@ subroutine NL_driver(E,X,k,q,Xw)
      if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
      ik_mem=PAR_Xk_ibz_index(ik)
      if(l_nl_collisions) then
-       call NL_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik_mem),k,q,E,ik)
-     else
 !       call COLLISIONS_compose_nl(G_input
+     else
+       call NL_SEX(V_bands,Sigma_SEX_EQ(:,:,:,ik_mem),k,q,E,ik)
      endif
    enddo
  endif
