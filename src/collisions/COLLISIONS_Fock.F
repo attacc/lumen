@@ -78,6 +78,7 @@ subroutine COLLISIONS_Fock(E,k,q)
    !
  endif
  !
+ stop
  call WF_load(WF,N_g_vecs,maxval(qindx_S(:,:,2)),COLL_bands,(/1,k%nibz/),title='-Fock Collisions')
  !
  isc%qs    =1

@@ -38,7 +38,7 @@ subroutine COLLISIONS_eval(E,X,k,xk,q,Xw)
  !
  ! In the \Sigma_s case also yambo_sc can evaluate
  !
- use drivers,       ONLY:l_HF_and_locXC,l_cohsex,l_elel_scatt,l_use_collisions,&
+ use drivers,       ONLY:l_HF_and_locXC,l_cohsex,l_use_collisions,&
 &                        l_elphoton_scatt
  use com,           ONLY:error
  use pars,          ONLY:IP,schlen
@@ -86,14 +86,14 @@ subroutine COLLISIONS_eval(E,X,k,xk,q,Xw)
  !
  ! Check for the Time Reversal Symmetry
  !
- if (trim(SC_potential)=="HARTREE-FOCK".or.trim(SC_potential)=="COHSEX".or.l_elel_scatt) then
+ if (trim(SC_potential)=="FOCK".or.trim(SC_potential)=="COHSEX") then
    if (i_time_rev==1) call error(" COLLISIONS not compatible with Time Reversal Symmetry! ")
  endif
  !
  ! Switch 
  !========
  !
-! call XC_switch()
+ call XC_switch()
  !
  ! No DB => EVAL
  !===============
@@ -113,17 +113,18 @@ subroutine COLLISIONS_eval(E,X,k,xk,q,Xw)
  !
  ! PARALLEL Setup
  !================
- if (trim(SC_potential)=="HARTREE-FOCK".or.trim(SC_potential)=="COHSEX".or.l_elphoton_scatt) then
-#if defined _SC && defined _RT
-   call PARALLEL_global_indexes(E,k,q,"Real_Time")
-   call PARALLEL_WF_distribute(K_index=PAR_IND_G_k,Bm_index=PAR_IND_Bp_mat,CLEAN_UP=.TRUE.)
-   COLLISIONS_parallel_SC_structure=.FALSE.
-#endif
-   call PARALLEL_WF_distribute(QP_index=PAR_IND_QP)
+ if (trim(SC_potential)=="FOCK".or.trim(SC_potential)=="COHSEX".or.l_elphoton_scatt) then
+!#if defined _SC && defined _RT
+!   call PARALLEL_global_indexes(E,k,q,"Real_Time")
+!   call PARALLEL_WF_distribute(K_index=PAR_IND_G_k,Bm_index=PAR_IND_Bp_mat,CLEAN_UP=.TRUE.)
+!   COLLISIONS_parallel_SC_structure=.FALSE.
+!#endif
+!   call PARALLEL_WF_distribute(QP_index=PAR_IND_QP)
+   call PARALLEL_WF_distribute(CLEAN_UP=.TRUE.)
    call PARALLEL_WF_index( )
  endif
  !
- if (trim(SC_potential)=="HARTREE-FOCK".or.trim(SC_potential)=="COHSEX") then
+ if (trim(SC_potential)=="FOCK".or.trim(SC_potential)=="COHSEX") then
    !
    call section('+','Hartree-Fock')
    !================================
@@ -175,7 +176,6 @@ subroutine COLLISIONS_eval(E,X,k,xk,q,Xw)
  else
    if (l_HF_and_locXC)  call COLLISIONS_alloc_and_free("Fock","v3","clean",1)
    if (l_cohsex)        call COLLISIONS_alloc_and_free("SEX","v3","clean",1)
-   if (l_elel_scatt)    call COLLISIONS_alloc_and_free("GW_NEQ","v3","clean",1)
  endif
  !
  contains

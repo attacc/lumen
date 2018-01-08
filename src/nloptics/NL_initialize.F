@@ -33,6 +33,7 @@ subroutine NL_initialize(E,k,q)
  use zeros,          ONLY:zero_dfl
  use R_lattice,      ONLY:bz_samp,bare_qpg
  use fields,         ONLY:Efield,Efield_strength,n_ext_fields,EtoT
+ use SC,             ONLY:SC_potential
  !
  ! PDE integrators
  ! ===============
@@ -154,27 +155,35 @@ subroutine NL_initialize(E,k,q)
  select case (trim(NL_Correlation))
     case('IPA')
         Correlation=IPA
+        SC_potential='IP'
     case('HARTREE')
         Correlation=HARTREE
         eval_HARTREE =.true.
+        SC_potential='HARTREE'
     case('TDDFT')  
         Correlation=TDDFT
         eval_HARTREE =.true.
         eval_DFT     =.true.
+        SC_potential='default'
     case('LRC')
         Correlation=LRC
+        SC_potential='HARTREE'
         eval_HARTREE =.true.
     case('LRW')
         Correlation=LRCW
+        SC_potential='HARTREE'        
         eval_HARTREE =.true.
     case('JGM')
         Correlation=JGM
+        SC_potential='HARTREE'        
         eval_HARTREE =.true.
     case('LSEX')
         Correlation=LSEX
+        SC_potential   ='COHSEX'        
         eval_HARTREE =.true.
     case('LHF')
         Correlation=LHF
+        SC_potential   ='FOCK'        
         eval_HARTREE =.true.
     case default
         call error("Unknow correlation in the response function")
