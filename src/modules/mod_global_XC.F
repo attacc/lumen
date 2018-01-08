@@ -219,7 +219,7 @@ module global_XC
            global_XC_string='SC Exact Exchange'
          case(SC_EXXC)
            global_XC_string='SC Exact Exchange +'//trim(xc_string(xc_functional))
-         case(SC_FOCK)
+         case(SC_Fock)
            global_XC_string='SC Fock'
          case(SC_COH)
            global_XC_string='SC COH'
