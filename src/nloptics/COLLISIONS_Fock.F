@@ -24,13 +24,9 @@ subroutine COLLISIONS_Fock(E,k,q,i_k,Fock_Collisions)
  ! Fock Collisions
  !
  use pars,          ONLY:SP,schlen,pi,cZERO
- use memory_m,      ONLY:mem_est
- use IO_m,          ONLY:io_COLLs
- use com,           ONLY:msg
- use LIVE_t,        ONLY:live_timing
  use electrons,     ONLY:levels,spin_occ,spin
  use collision,     ONLY:elemental_collision,elemental_collision_free,elemental_collision_alloc
- use QP_m,          ONLY:QP_ng_Sx,QP_table,QP_n_states
+ use QP_m,          ONLY:QP_ng_Sx
  use R_lattice,     ONLY:qindx_S,bz_samp
  use nl_optics,     ONLY:NL_bands
 #if defined _TIMING
@@ -57,10 +53,6 @@ subroutine COLLISIONS_Fock(E,k,q,i_k,Fock_Collisions)
  type(elemental_collision)           :: isc,iscp
  complex(SP)             :: pre_factor
  !
-#if defined _TIMING
- call timing('Fock Collisions',OPR='start')
-#endif
- !
  ! Reset
  !
  call elemental_collision_free(isc)
@@ -70,8 +62,6 @@ subroutine COLLISIONS_Fock(E,k,q,i_k,Fock_Collisions)
  !
  n_bands   =NL_bands
  N_g_vecs  =QP_ng_Sx
- !
- call msg('r', '[EXS] Plane waves :',QP_ng_Sx)
  !
  ! WFs
  !
@@ -92,12 +82,12 @@ subroutine COLLISIONS_Fock(E,k,q,i_k,Fock_Collisions)
  !
  do i_n = NL_bands(1),NL_bands(2)
    do i_m = i_n, NL_bands(2)
+     !
      i_sp    = 1
      !
      Fock_collisions=cZERO
      !
      do iqbz=1,q%nbz
-       !
        !
        iqibz    =q%sstar(iqbz,1)
        iqs      =q%sstar(iqbz,2)
@@ -127,7 +117,7 @@ subroutine COLLISIONS_Fock(E,k,q,i_k,Fock_Collisions)
        i_kmq_G0 =qindx_S(i_k,iqbz,2)
        !
        i_kmq   = k%sstar(i_kmq_bz,1)
-       i_kmq_s = k%sstar(i_kmq_bz,2)
+       i_kmq_:qs = k%sstar(i_kmq_bz,2)
        !
        isc%is  =(/i_n,i_k,  i_k_s,  i_sp/)
        isc%os  =(/0  ,i_kmq,i_kmq_s,i_sp/)
@@ -166,7 +156,7 @@ subroutine COLLISIONS_Fock(E,k,q,i_k,Fock_Collisions)
            enddo
 !$omp end parallel do
            !
-           Fock_collisions(i_np,i_mp,i_kmq)=Fock_collisions(i_np,i_mp,i_kmq)-4._SP/spin_occ*pi*pre_factor
+           Fock_collisions(i_n,i_m,i_np,i_mp,i_kmq)=Fock_collisions(i_n,i_m,i_np,i_mp,i_kmq)-4._SP/spin_occ*pi*pre_factor
            !
          enddo ! loop on the band i_np
          !

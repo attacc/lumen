@@ -295,7 +295,6 @@ module nl_optics
      allocate(Ho_plus_Sigma(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),PAR_Xk_nibz,n_sp_pol))
      call mem_est("Ho_plus_Sigma",(/size(Ho_plus_Sigma)/),(/2*SP/))
      !
-     !
      ! Reference energies
      !
      allocate(E_bare(1:NL_bands(2),PAR_Xk_nibz,n_sp_pol))
