@@ -24,6 +24,7 @@
 subroutine NL_driver(E,X,k,Xk,q,Xw)
  !
  use pars,           ONLY:SP,cZERO,cONE
+ use drivers,        ONLY:l_use_collisions
  use stderr,         ONLY:set_real_printed_length
  use com,            ONLY:error
  use LIVE_t,         ONLY:live_timing 
@@ -125,7 +126,23 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
    !
    if(l_nl_collisions) then
      !
-     call COLLISIONS_eval(E,X,k,Xk,q,Xw(:2))
+     ! check if they exist      
+     !
+     call COLLISIONS_load(.true.)
+     !
+     if(l_use_collisions.eqv..false.) then 
+       !
+       ! Evaluate Collisions if necessary
+       !
+       call COLLISIONS_eval(E,X,k,Xk,q,Xw(:2))
+     write(*,*) 'passo qui ',l_use_collisions
+     stop
+       !
+     endif
+     !
+     ! and load ....
+     !
+     call COLLISIONS_load(.false.)
      !
    else
      !

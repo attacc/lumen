@@ -196,7 +196,7 @@ subroutine COLLISIONS_Fock(E,k,q)
    enddo ! loop on iqbz
    !
 !   call PP_redux_wait(Fock_collisions(1)%v3_c,COMM=PAR_COM_G_b_A2A%COMM)
-!   call COLLISIONS_linearize_and_IO("Fock",i_qp,Fock_collisions,nFock_collisions)
+   call COLLISIONS_linearize_and_IO("Fock",i_qp,Fock_collisions,nFock_collisions)
    !
    call live_timing(steps=1)
    !

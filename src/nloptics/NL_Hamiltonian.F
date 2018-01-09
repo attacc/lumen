@@ -27,7 +27,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  !
  !   H_k=Ho_k+U_k+ V_k^H-V_k^H[rho_ref]+V_xc[rho]
  !                                        
- use pars,           ONLY:SP,cZERO,pi
+ use pars,           ONLY:SP,cZERO,pi,cONE
  use units,          ONLY:SPEED_OF_LIGHT
  use electrons,      ONLY:levels,n_sp_pol,n_spinor
  use R_lattice,      ONLY:bz_samp
@@ -39,7 +39,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  use xc_functionals, ONLY:V_xc,XC_potential_driver
  use nl_optics,      ONLY:Correlation,V_xc_0,full_rho,IPA,E_full,LRC,JGM,LRCW,l_use_DIPOLES,NL_LRC_alpha,   &
 &                         NL_initial_P,E_tot,E_ext,E_ks,E_xc_0,I_relax,Alpha_ED,l_nl_collisions,dG, & 
-&                         V_hartree_ne,V_xc_ne,rho_n,Hk,eval_DFT,eval_HARTREE,rho_reference,NL_bands,&
+&                         V_hartree_ne,V_xc_ne,rho_n,Hk,eval_DFT,eval_HARTREE,rho_reference,NL_bands,NE_Vnl_xc,&
 &                         Ho_plus_Sigma,NL_P,Phase_LifeTime,NL_nbands,VAL_BANDS,LSEX,LHF,l_nl_collisions
  use global_XC,      ONLY:WF_KIND,WF_xc_functional 
  use parallel_m,     ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu,myid,PAR_Xk_ibz_index
@@ -201,6 +201,12 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
      enddo
      !
    endif                                                         
+   !
+   if(l_nl_collisions) then
+     call V_by_V_plus_V_omp(NL_nbands,cONE,NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ik,1),&
+&                                                 Hk(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),1))
+
+   endif
    !
    ! Damping: NL_damping fills the I_relax matrix 
    ! ================================================

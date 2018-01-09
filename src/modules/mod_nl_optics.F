@@ -174,12 +174,12 @@ module nl_optics
  complex(SP), allocatable :: OSCLL_k(:,:,:,:) ! Oscillators in k, just for the evaluation
  complex(SP), allocatable :: W(:,:,:)
  complex(SP), allocatable :: Sigma_SEX_EQ(:,:,:,:)
- complex(SP), allocatable :: NE_Vnl_xc(:,:,:,:)
  !
  ! Collisions
  !
  logical :: l_nl_collisions
  complex(SP), allocatable :: dG(:,:,:) 
+ complex(SP), allocatable :: NE_Vnl_xc(:,:,:,:)
  !
  ! Density
  !
@@ -270,6 +270,9 @@ module nl_optics
      if(l_nl_collisions) then
        allocate(dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
        call mem_est("dG",(/size(dG)/),(/2*SP/))
+       allocate(NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
+       call mem_est("NE_Vnl_xc",(/size(NE_Vnl_xc)/),(/2*SP/))
+       NE_Vnl_xc=(0._SP,0._SP)
      endif
      !
    end subroutine NL_alloc
@@ -412,6 +415,8 @@ module nl_optics
      if(l_nl_collisions) then
        deallocate(dG)
        call mem_est("dG")
+       deallocate(NE_Vnl_xc)
+       call mem_est("NE_Vnl_xc")
      endif
      !
    end subroutine NL_free

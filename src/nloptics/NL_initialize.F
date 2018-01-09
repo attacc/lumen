@@ -24,7 +24,7 @@
 subroutine NL_initialize(E,k,q)
  ! 
  use pars,           ONLY:SP,DP
- use drivers,        ONLY:l_sc_hartree
+ use drivers,        ONLY:l_sc_hf,l_sc_cohsex
  use vec_operate,    ONLY:normalize_v
  use units,          ONLY:AU2VMm1,AUT2FS,HA2EV
  use electrons,      ONLY:levels,n_sp_pol
@@ -185,10 +185,12 @@ subroutine NL_initialize(E,k,q)
         Correlation=LSEX
         SC_potential   ='COHSEX'        
         eval_HARTREE =.true.
+        l_sc_cohsex=.true.
     case('LHF')
         Correlation=LHF
         SC_potential   ='FOCK'        
         eval_HARTREE =.true.
+        l_sc_hf=.true.
     case default
         call error("Unknow correlation in the response function")
  end select
