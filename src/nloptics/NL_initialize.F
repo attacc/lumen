@@ -34,6 +34,7 @@ subroutine NL_initialize(E,k,q)
  use R_lattice,      ONLY:bz_samp,bare_qpg
  use fields,         ONLY:Efield,Efield_strength,n_ext_fields,EtoT
  use SC,             ONLY:SC_potential
+ use collision,      ONLY:COLL_bands
  !
  ! PDE integrators
  ! ===============
@@ -68,7 +69,10 @@ subroutine NL_initialize(E,k,q)
  !Quasi-particle setup
  !====================
  !
- if(l_nl_collisions) call QP_state_table_setup(E)
+ if(l_nl_collisions) then
+   COLL_bands=NL_bands
+   call QP_state_table_setup(E)
+ endif
  !
  ! Check double-precision
  ! ========================

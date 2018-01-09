@@ -179,6 +179,7 @@ module nl_optics
  ! Collisions
  !
  logical :: l_nl_collisions
+ complex(SP), allocatable :: dG(:,:,:) 
  !
  ! Density
  !
@@ -265,6 +266,11 @@ module nl_optics
      !
      allocate(E_tot_t(NL_steps,3),E_ext_t(NL_steps,3),E_ks_t(NL_steps,3))
      call mem_est("E_tot_t E_ext_t",(/size(E_tot_t),size(E_ext_t),size(E_ks_t)/))
+     !
+     if(l_nl_collisions) then
+       allocate(dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
+       call mem_est("dG",(/size(dG)/),(/2*SP/))
+     endif
      !
    end subroutine NL_alloc
      !
@@ -401,6 +407,11 @@ module nl_optics
        call mem_est("Sigma_SEX_EQ")
        deallocate(W)
        call mem_est("W")
+     endif
+     !
+     if(l_nl_collisions) then
+       deallocate(dG)
+       call mem_est("dG")
      endif
      !
    end subroutine NL_free
