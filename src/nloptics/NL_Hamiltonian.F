@@ -38,9 +38,9 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  use wave_func,      ONLY:WF
  use xc_functionals, ONLY:V_xc,XC_potential_driver
  use nl_optics,      ONLY:Correlation,V_xc_0,full_rho,IPA,E_full,LRC,JGM,LRCW,l_use_DIPOLES,NL_LRC_alpha,   &
-&                         NL_initial_P,E_tot,E_ext,E_ks,E_xc_0,I_relax,Alpha_ED,l_nl_collisions,dG, & 
+&                         NL_initial_P,E_tot,E_ext,E_ks,E_xc_0,I_relax,Alpha_ED,use_COLLISIONS,dG,eval_dG, & 
 &                         V_hartree_ne,V_xc_ne,rho_n,Hk,eval_DFT,eval_HARTREE,rho_reference,NL_bands,NE_Vnl_xc,&
-&                         Ho_plus_Sigma,NL_P,Phase_LifeTime,NL_nbands,VAL_BANDS,LSEX,LHF,l_nl_collisions
+&                         Ho_plus_Sigma,NL_P,Phase_LifeTime,NL_nbands,VAL_BANDS,SEX,HF
  use global_XC,      ONLY:WF_KIND,WF_xc_functional 
  use parallel_m,     ONLY:PP_redux_wait,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX,master_cpu,myid,PAR_Xk_ibz_index
  use IO_m,           ONLY:IO_and_Messaging_switch
@@ -139,13 +139,13 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
     A_vecpot%vecpot_vel=-E_vec_pot*SPEED_OF_LIGHT
     !
  endif
- !
+ ! 
+ if(eval_dG)   call NL_build_dG_lesser(E,V_bands,dG)
  ! 
  ! Evaluate collisions if requires
  !=======================
- if(Correlation==LSEX.or.Correlation==LHF.and..not.l_nl_collisions) then
-   call NL_build_dG_lesser(E,V_bands,dG)
-   call COLLISIONS_compose_nl(dG)
+ if(Correlation==SEX.or.Correlation==HF.and.use_COLLISIONS) then
+!   call COLLISIONS_compose_nl(dG)
  endif
  !
  !
@@ -178,7 +178,9 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
      !
    endif
    !
-   if(Correlation==LSEX.or.Correlation==LHF.and..not.l_nl_collisions) call NL_SEX(V_bands,Hk,k,q,E,ik)
+   if((Correlation==SEX.or.Correlation==HF).and..not.use_COLLISIONS) then
+     call NL_SEX(V_bands,Hk,k,q,E,ik)
+   endif
    !
    ! Add Ho = T+V_ion+V_h+V_xc
    !==================
@@ -202,9 +204,9 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
      !
    endif                                                         
    !
-   if(l_nl_collisions) then
-     call V_by_V_plus_V_omp(NL_nbands,cONE,NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ik,1),&
-&                                                 Hk(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),1))
+   if(use_COLLISIONS) then
+!     call V_by_V_plus_V_omp(NL_nbands,cONE,NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ik,1),&
+!&                                                 Hk(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),1))
 
    endif
    !

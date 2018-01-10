@@ -41,9 +41,9 @@ subroutine NL_initialize(E,k,q)
  use nl_optics,      ONLY:EULER,EULEREXP,RK2,RK4,RK2EXP,RK4EXP,HEUN,INVINT,Integrator,CRANK_NICOLSON,Integrator_name
  !
  use nl_optics,      ONLY:NL_damping,NL_correlation,Correlation,NL_er,NL_estep,n_frequencies,IPA,TDDFT,HARTREE,LRC,JGM, &
-&                         LRCW,eval_DFT,eval_HARTREE,NL_bands,NL_nbands,l_use_DIPOLES,LSEX,LHF,n_intensities, &
+&                         LRCW,eval_DFT,eval_HARTREE,NL_bands,NL_nbands,l_use_DIPOLES,SEX,HF,n_intensities, &
 &                         NL_steps,NL_tot_time,Phase_LifeTime,NL_step,Verbosity_name,VER_HIGH,VER_LOW,NL_verbosity, &
-&                         l_nl_collisions
+&                         use_COLLISIONS,eval_dG
  !
  use electric,       ONLY:l_force_SndOrd
  use parser_m,       ONLY:parser
@@ -62,17 +62,8 @@ subroutine NL_initialize(E,k,q)
  !
  call parser('UseDipoles',           l_use_DIPOLES)
  call parser('FrSndOrd',             l_force_SndOrd)
- call parser('UseCollisions',        l_nl_collisions)
  !
  if(l_use_DIPOLES) call warning(' Fixed dipoles: only linear response properties are correct!')
- !
- !Quasi-particle setup
- !====================
- !
- if(l_nl_collisions) then
-   COLL_bands=NL_bands
-   call QP_state_table_setup(E)
- endif
  !
  ! Check double-precision
  ! ========================
@@ -155,6 +146,8 @@ subroutine NL_initialize(E,k,q)
  !
  eval_HARTREE   =.false.
  eval_DFT       =.false.
+ eval_dG        =.false.
+ use_COLLISIONS =.false.
  !
  select case (trim(NL_Correlation))
     case('IPA')
@@ -181,19 +174,33 @@ subroutine NL_initialize(E,k,q)
         Correlation=JGM
         SC_potential='HARTREE'        
         eval_HARTREE =.true.
-    case('LSEX')
-        Correlation=LSEX
+    case('SEX')
+        Correlation=SEX
         SC_potential   ='COHSEX'        
+        eval_dG      =.true.
         eval_HARTREE =.true.
         l_sc_cohsex=.true.
-    case('LHF')
-        Correlation=LHF
-        SC_potential   ='FOCK'        
+    case('HF')
+        Correlation=HF
+        SC_potential   ='FOCK'
+        eval_dG      =.true.
         eval_HARTREE =.true.
         l_sc_hf=.true.
     case default
         call error("Unknow correlation in the response function")
  end select
+ !
+ call parser('UseCollisions',use_COLLISIONS)
+ !
+ if(Correlation/=HF.and.Correlation/=SEX) use_COLLISIONS=.false.
+ !
+ !Quasi-particle setup
+ !====================
+ !
+ if(use_COLLISIONS) then
+   COLL_bands=NL_bands
+   call QP_state_table_setup(E)
+ endif
  !
  ! Deallocate bare_qpg if not required
  !=============================
@@ -269,6 +276,7 @@ subroutine NL_initialize(E,k,q)
  call msg( 'sr','Intensity steps            :',n_intensities)
  call msg( 'r', 'Frequency   step           :',NL_estep*HA2EV)
  call msg( 'r', 'Use Dipoles                :',l_use_DIPOLES)
+ call msg( 'r', 'Use COLLISIONS             :',use_COLLISIONS)
  call msg( 'r', 'Force Snd Order Dipoles    :',l_force_SndOrd)
  !
 end subroutine NL_initialize

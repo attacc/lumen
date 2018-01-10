@@ -114,12 +114,13 @@ module nl_optics
  integer, parameter :: LRC    = 4
  integer, parameter :: JGM    = 5
  integer, parameter :: LRCW   = 6
- integer, parameter :: LSEX   = 7
- integer, parameter :: LHF    = 8
+ integer, parameter :: SEX   = 7
+ integer, parameter :: HF    = 8
  !
  logical :: eval_HARTREE
  logical :: eval_DFT
  logical :: eval_OVERLAPS
+ logical :: eval_dG
  !
  ! Non-linear spectra parameters
  !
@@ -177,7 +178,7 @@ module nl_optics
  !
  ! Collisions
  !
- logical :: l_nl_collisions
+ logical :: use_COLLISIONS
  complex(SP), allocatable :: dG(:,:,:) 
  complex(SP), allocatable :: NE_Vnl_xc(:,:,:,:)
  !
@@ -249,7 +250,7 @@ module nl_optics
      allocate(V_bands(1:NL_bands(2),en%nbf,QP_nk,n_sp_pol))
      call mem_est("V_bands",(/size(V_bands)/),(/2*SP/))
      !
-     if(Correlation==LSEX.or.Correlation==LHF) then
+     if(Correlation==SEX.or.Correlation==HF) then
        allocate(W(q%nbz,ng_oscll,ng_oscll))
        call mem_est("W",(/size(W)/),(/2*SP/))
      endif          
@@ -267,7 +268,7 @@ module nl_optics
      allocate(E_tot_t(NL_steps,3),E_ext_t(NL_steps,3),E_ks_t(NL_steps,3))
      call mem_est("E_tot_t E_ext_t",(/size(E_tot_t),size(E_ext_t),size(E_ks_t)/))
      !
-     if(l_nl_collisions) then
+     if(use_COLLISIONS) then
        allocate(dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
        call mem_est("dG",(/size(dG)/),(/2*SP/))
        allocate(NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
@@ -296,7 +297,7 @@ module nl_optics
      allocate(VAL_BANDS(fft_size,en%nbf,PAR_Xk_nibz,n_sp_pol))
      call mem_est("Val_bands",(/size(VAL_BANDS)/),(/2*SP/))
      !
-     if(Correlation==LSEX.or.Correlation==LHF) then
+     if(Correlation==SEX.or.Correlation==HF) then
        !  
        allocate(Sigma_SEX_EQ(NL_bands(2),NL_bands(2),n_sp_pol,PAR_Xk_nibz))
        call mem_est("Sigma_SEX_EQ",(/size(Sigma_SEX_EQ)/),(/2*SP/))
@@ -403,7 +404,7 @@ module nl_optics
      deallocate(E_tot_t,E_ext_t,E_ks_t)
      call mem_est("E_tot_t E_ext_t E_ks_t")
      !
-     if(Correlation==LSEX.or.Correlation==LHF) then
+     if(Correlation==SEX.or.Correlation==HF) then
        deallocate(OSCLL)
        call mem_est("OSCLL")
        deallocate(Sigma_SEX_EQ)
@@ -412,7 +413,7 @@ module nl_optics
        call mem_est("W")
      endif
      !
-     if(l_nl_collisions) then
+     if(use_COLLISIONS) then
        deallocate(dG)
        call mem_est("dG")
        deallocate(NE_Vnl_xc)

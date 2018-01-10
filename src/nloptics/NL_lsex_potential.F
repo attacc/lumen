@@ -25,7 +25,7 @@ subroutine NL_lsex_potential(q,X,Xw)
  !
  ! Construct the screeend potential W(G=G'=0,q)
  !
- use nl_optics,           ONLY:NL_bands,W,Correlation,LSEX
+ use nl_optics,           ONLY:NL_bands,W,Correlation,SEX
  use LIVE_t,              ONLY:live_timing
  use pars,                ONLY:SP,cZERO,pi
  use frequency,           ONLY:w_samp,W_reset
@@ -65,7 +65,7 @@ subroutine NL_lsex_potential(q,X,Xw)
  ! 
  call live_timing('[NL] W potential :',q%nbz)
  !
- if(Correlation==LSEX) then
+ if(Correlation==SEX) then
    call io_control(ACTION=OP_RD_CL,COM=REP,SEC=(/1,2/),MODE=VERIFY,ID=ID)
    io_err=io_X(X,Xw,ID)
    if (io_err<0) call error('Incomplete and/or broken tatic diel. fun. database')
@@ -88,7 +88,7 @@ subroutine NL_lsex_potential(q,X,Xw)
      W(iqbz,ig1,ig1)=-4._SP/spin_occ*pi*isc%gamp(ig1,ig1)
    enddo
    !
-   if(Correlation==LSEX) then
+   if(Correlation==SEX) then
      !      
      isc%iqref=-1
      call scatter_Gamp(isc,'c')

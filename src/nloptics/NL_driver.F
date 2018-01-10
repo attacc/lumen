@@ -40,9 +40,9 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
  use frequency,      ONLY:w_samp
  use nl_optics,      ONLY:n_runs,Correlation,IPA,NL_alloc,NL_free,V_bands,NL_bands,NL_step,&
 &                         Integrator,l_use_DIPOLES,NL_P_t,NL_ng,EF_parms,Sigma_SEX_EQ,ng_oscll,   &
-&                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,runs_done,n_runs_todo,LSEX,LHF, &
+&                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,runs_done,n_runs_todo,SEX,HF, &
 &                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_alloc_real_space_quantities, &
-&                         NL_alloc_k_distributed,E_bare,l_nl_collisions
+&                         NL_alloc_k_distributed,E_bare,use_COLLISIONS
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
  use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX, &
@@ -120,11 +120,11 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
  ! ==================
  call NL_alloc(E,q) 
  !
- ! Evaluate Oscillators for LSEX/LHF
+ ! Evaluate Oscillators for SEX/HF
  ! =============================
- if(Correlation==LSEX.or.Correlation==LHF) then
+ if(Correlation==SEX.or.Correlation==HF) then
    !
-   if(l_nl_collisions) then
+   if(use_COLLISIONS) then
      !
      ! check if they exist      
      !
@@ -203,7 +203,7 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
  !
  ! Load oscillators
  ! ===================
- if(Correlation==LSEX.or.Correlation==LHF) call NL_oscillators_load(q,k)
+ if(Correlation==SEX.or.Correlation==HF) call NL_oscillators_load(q,k)
  !    
  ! Initialization
  ! ==================
@@ -211,10 +211,10 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
  !
  ! Equilibrium Exchange
  !=========================
- ! If LSEX or LHF calculate the equilibrium contribution 
+ ! If SEX or HF calculate the equilibrium contribution 
  ! to the screened exchange
  !
- if(Correlation==LSEX.or.Correlation==LHF.and..not.l_nl_collisions) then
+ if((Correlation==SEX.or.Correlation==HF).and..not.use_COLLISIONS) then
    Sigma_SEX_EQ=cZERO
    do ik=1,QP_nk
      if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
