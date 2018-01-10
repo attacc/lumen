@@ -145,7 +145,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  ! Evaluate collisions if requires
  !=======================
  if(Correlation==SEX.or.Correlation==HF.and.use_COLLISIONS) then
-!   call COLLISIONS_compose_nl(dG)
+   call COLLISIONS_compose_nl(dG)
  endif
  !
  !
@@ -205,8 +205,8 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
    endif                                                         
    !
    if(use_COLLISIONS) then
-!     call V_by_V_plus_V_omp(NL_nbands,cONE,NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ik,1),&
-!&                                                 Hk(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),1))
+     call V_by_V_plus_V_omp(NL_nbands,cONE,NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ik,1),&
+&                                                 Hk(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),1))
 
    endif
    !

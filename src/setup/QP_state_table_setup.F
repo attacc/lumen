@@ -37,7 +37,7 @@ subroutine QP_state_table_setup(en)
  !
  use pars,          ONLY:SP,IP
  use units,         ONLY:HA2EV
- use drivers,       ONLY:l_nl_optics
+ use drivers,       ONLY:l_nl_optics,l_eval_collisions
  use memory_m,      ONLY:mem_est
  use QP_m,          ONLY:QP_nk,QP_nb,QP_state,QP_n_states,QP_table,SC_bands_mixed,SC_band_mixing 
  use electrons,     ONLY:levels,n_sp_pol
@@ -159,6 +159,7 @@ subroutine QP_state_table_setup(en)
  endif
  !
  bands_mixed=1
+ if(l_eval_collisions.or.l_nl_optics) bands_mixed=QP_nb
  !
  ! QP_table allocation
  !

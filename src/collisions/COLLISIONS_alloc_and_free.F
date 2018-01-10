@@ -39,7 +39,7 @@ subroutine COLLISIONS_alloc_and_free(what,elements,actions,I)
  !
  integer :: D(3,2),COLL_range(2),J,mem_size(5),size_
  logical :: l_Fock,l_SEX,l_GW_NEQ,l_v3,l_v1,l_table,l_all,l_alloc,&
-&           l_clean,l_collision,l_distribute,l_Momentum,l_complex,l_real
+&           l_clean,l_collision,l_distribute,l_Momentum
  !
  if (I==0) COLL_range=(/1,PAR_nQP/)
  if (I==0) size_=PAR_nQP
@@ -50,9 +50,6 @@ subroutine COLLISIONS_alloc_and_free(what,elements,actions,I)
  !
  l_Fock    =index(what,"Fock")>0
  l_SEX     =index(what,"SEX")>0
- !
- l_complex=l_Fock.or.l_SEX
- l_real   =l_GW_NEQ.or.l_Momentum
  !
  ! Elements
  !
@@ -116,37 +113,21 @@ subroutine COLLISIONS_alloc_and_free(what,elements,actions,I)
      mem_size=0
      do J=COLL_range(1),COLL_range(2)
        if (l_alloc.and.(l_v3.or.l_all)) then
-         if(l_real) then
-           allocate(COLL(J)%v3_r(D(1,1):D(1,2),D(2,1):D(2,2),D(3,1):D(3,2)))
-           COLL(J)%v3_r=rZERO
-           mem_size(1)=mem_size(1)+size(COLL(J)%v3_r)
-         endif
-         if(l_complex) then
-           allocate(COLL(J)%v3_c(D(1,1):D(1,2),D(2,1):D(2,2),D(3,1):D(3,2)))
-           COLL(J)%v3_c=cZERO
-           mem_size(2)=mem_size(2)+size(COLL(J)%v3_c)
-         endif
+         allocate(COLL(J)%v3_c(D(1,1):D(1,2),D(2,1):D(2,2),D(3,1):D(3,2)))
+         COLL(J)%v3_c=cZERO
+         mem_size(2)=mem_size(2)+size(COLL(J)%v3_c)
          COLL(J)%D=D
        endif
        if (l_clean.and.(l_v3.or.l_all)) then
-         if (l_real  .and.associated(COLL(J)%v3_r)) deallocate(COLL(J)%v3_r)
-         if (l_complex.and.associated(COLL(J)%v3_c)) deallocate(COLL(J)%v3_c)
+         if (associated(COLL(J)%v3_c)) deallocate(COLL(J)%v3_c)
        endif
        if (l_alloc.and.(l_v1.or.l_all)) then
-         if(l_real) then
-           allocate(COLL(J)%v_r(COLL(J)%N))
-           COLL(J)%v_r=rZERO
-           mem_size(3)=mem_size(3)+size(COLL(J)%v_r)
-         endif
-         if(l_complex) then
-           allocate(COLL(J)%v_c(COLL(J)%N))
-           COLL(J)%v_c=cZERO
-           mem_size(4)=mem_size(4)+size(COLL(J)%v_c)
-         endif
+         allocate(COLL(J)%v_c(COLL(J)%N))
+         COLL(J)%v_c=cZERO
+         mem_size(4)=mem_size(4)+size(COLL(J)%v_c)
        endif
        if (l_clean.and.(l_v1.or.l_all)) then
          if (associated(COLL(J)%v_c)) deallocate(COLL(J)%v_c)
-         if (associated(COLL(J)%v_r)) deallocate(COLL(J)%v_r )
        endif
        if (l_alloc.and.(l_table.or.l_all)) then
          allocate(COLL(J)%table(D(1,1):D(1,2),D(2,1):D(2,2),D(3,1):D(3,2)))
@@ -161,24 +142,20 @@ subroutine COLLISIONS_alloc_and_free(what,elements,actions,I)
      !
      if (l_alloc) then
        if(l_v3.or.l_all) then
-         if (l_real  )  call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_v3r",  (/mem_size(1)/))
-         if (l_complex) call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_v3c",  (/mem_size(2)/))
+         call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_v3c",  (/mem_size(2)/))
        endif
        if (l_v1.or.l_all) then
-         if (l_real  )  call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_vr",   (/mem_size(3)/))
-         if (l_complex) call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_vc",   (/mem_size(4)/))
+         call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_vc",   (/mem_size(4)/))
        endif
        if (l_table.or.l_all)  call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_table",(/mem_size(5)/),(/LP/))
      endif
      !
      if (l_clean) then
        if (l_v3.or.l_all) then
-         if (l_real   ) call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_v3r")
-         if (l_complex) call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_v3c")
+         call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_v3c")
        endif
        if (l_v1.or.l_all) then
-         if (l_real   ) call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_vr")
-         if (l_complex) call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_vc")
+         call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_vc")
        endif
        if (l_table.or.l_all)   call mem_est("COLLISIONS_"//trim(COLL(1)%name)//"_table")
      endif

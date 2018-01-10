@@ -104,18 +104,12 @@ module collision
    integer(LP), pointer  :: table(:,:,:)  => null()
    complex(SP), pointer  :: v_c(:)        => null()
    complex(SP), pointer  :: v3_c(:,:,:)   => null()
-   real(SP)   , pointer  :: v_r(:)        => null()
-   real(SP)   , pointer  :: v3_r(:,:,:)   => null()
  end type
  !
- integer :: nGW_NEQ_collisions=0
- type(COLLISIONS_element), allocatable :: GW_NEQ_collisions(:)
  integer :: nFock_collisions=0
  type(COLLISIONS_element), allocatable :: Fock_collisions(:)
  integer :: nSEX_collisions=0
  type(COLLISIONS_element), allocatable :: SEX_collisions(:)
- integer :: nP_collisions=0
- type(COLLISIONS_element), allocatable :: P_collisions(:)
  !
  contains
    !

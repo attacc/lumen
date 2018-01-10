@@ -42,8 +42,6 @@ subroutine COLLISIONS_linearize_and_IO(what,i_qp,COLL,N)
  real(SP)  :: COLLISIONS_max
  !
  l_exchange = (index(what,"Fock")>0).or.(index(what,"SEX")>0)
- l_GW_NEQ   =  index(what,"GW_NEQ")>0
- l_QED_P    =  index(what,"Momentum")>0
  !
  i_ref=1
  if (.not.io_COLLs) i_ref=PAR_QP_index(i_qp)
@@ -66,8 +64,6 @@ subroutine COLLISIONS_linearize_and_IO(what,i_qp,COLL,N)
          ! In the COHSEX/HF case a cutoff can be applied
          !
          if (l_exchange) store_it=abs(COLL(1)%v3_c(i1,i2,i3))>=COLLISIONS_max*COLLISIONS_cutoff.or.COLLISIONS_cutoff<0.0
-         !
-         if (l_GW_NEQ .or. l_QED_P ) store_it=.TRUE.
          !
          if (store_it) then
            ic=ic+1
