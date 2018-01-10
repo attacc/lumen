@@ -29,16 +29,19 @@ integer function io_COLLISIONS(i_qp,ID,COLL)
 &                        n_COLLISIONS,COLLISIONS_state,COLL_bands
  use IO_m,          ONLY:io_sec,io_connect,io_header,io_status,io_elemental, &
 &                        io_bulk,write_is_on,io_disconnect,&
-&                        ver_is_gt_or_eq,IO_OUTDATED_DB,read_is_on,io_fragment,IO_mode,&
+&                        IO_OUTDATED_DB,read_is_on,io_fragment,IO_mode,&
 &                        VERIFY,io_extension,io_raw_extension
- use global_XC,     ONLY:SC_Fock,global_XC_string,EXT_NONE,SE_NONE,SC_COHSEX
+ use global_XC,     ONLY:SC_Fock,global_XC_string,EXT_NONE,SE_NONE,SC_COHSEX,SE_GW_NEQ,SE_GW_QED
  use com,           ONLY:error
  use SC,            ONLY:SC_X_size,SC_X_bands
- use QP_m,          ONLY:QP_ng_Sx,QP_n_states,SC_band_mixing
+ use QP_m,          ONLY:QP_ng_Sx,QP_n_states,SC_band_mixing,QP_QED_ng
  use parallel_m,    ONLY:PAR_IND_QP
  use X_m,           ONLY:n_X_descs,X_description
  use stderr,        ONLY:intc
  use drivers,       ONLY:l_elel_scatt,l_elphoton_scatt
+#if defined _TIMING
+ use timing_m,      ONLY:timing
+#endif
  !
  implicit none
  !
@@ -72,15 +75,14 @@ integer function io_COLLISIONS(i_qp,ID,COLL)
    !
    io_COLLISIONS=io_header(ID,QPTS=.true.,R_LATT=.true.,WF=.true.,IMPOSE_SN=.true.)
    !
-   if (.not.ver_is_gt_or_eq(ID,revision=2800)) then
-     io_COLLISIONS=IO_OUTDATED_DB
-     goto 1
-   endif
-   !
    call io_elemental(ID,VAR="PARAMETERS",VAR_SZ=10,MENU=0)
    !
-   call io_elemental(ID,I0=n_COLLISIONS,&
-&       VAR=' Total number of COLLISIONS      :',CHECK=.true.,OP=(/"=="/))
+!   if (ver_is_gt_or_eq(ID,revision=5152)) then
+!     call io_elemental(ID,I0=n_COLLISIONS,&
+!&         VAR=' Total number of COLLISIONS      :',CHECK=.true.,OP=(/"=="/))
+!   else
+   n_COLLISIONS=QP_n_states
+!   endif
    !
    call io_elemental(ID,I1=COLL_bands,&
 &       VAR=' Bands                           :',CHECK=.true.,OP=(/"==","=="/))
@@ -109,33 +111,8 @@ integer function io_COLLISIONS(i_qp,ID,COLL)
      !
    else if (V_kind_disk==SC_COHSEX) then
      !
-     ! Global Response Descriptions
+     ! Global Response Descriptions (to be done)
      !==============================
-     call io_elemental(ID,VAR="N_X_descriptions",VAR_SZ=1,MENU=0)
-     if (n_X_descs> 0) call io_elemental(ID,I0=n_X_descs,CHECK=.true.,OP=(/"=="/))
-     if (n_X_descs==0) then
-       call io_elemental(ID,DB_I0=n_X_descs,I0=n_X_descs)
-       n_X_descs=-n_X_descs
-     endif
-     call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
-     !
-     ! In this case I have loaded the em1s DB and I know the parameters.
-     ! I can, therefore, write/read and/or VERIFIY the values
-     !
-     do i_desc=1,iabs(n_X_descs)
-       !
-       call io_elemental(ID,VAR='X_descriptions_'//trim(intc(i_desc)),CH0="",VAR_SZ=1,MENU=0)
-       call io_elemental(ID,DB_CH0=X_string,CH0=X_description(i_desc),VAR='',CHECK=n_X_descs>0,OP=(/"=="/))
-       call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
-       !
-       ! For the real-time databases I need to extract from the X_descriptions few parameters which describe
-       ! the response function properties
-       !
-       if (read_is_on(ID).and.i_desc<=2) then
-         if (i_desc==1) read (X_string(26:40),*) SC_X_size
-         if (i_desc==2) read (X_string(26:40),'(i2,1x,i3)') SC_X_bands
-       endif
-     enddo
      !
      call io_elemental(ID,VAR="INTERACTION_PARAMETERS",VAR_SZ=2,MENU=0)
      call io_elemental(ID,I0=RIM_ng,VAR=        ' RIM RL components      :',WARN=.true.)
@@ -150,13 +127,11 @@ integer function io_COLLISIONS(i_qp,ID,COLL)
    !
    ! States
    !
-   if (ver_is_gt_or_eq(ID,revision=5152)) then
-     if (read_is_on(ID).and..not.allocated(COLLISIONS_state)) then
-       allocate(COLLISIONS_state(n_COLLISIONS,4))
-     endif
-     call io_bulk(ID,VAR='COLLISIONS_STATE',VAR_SZ=(/n_COLLISIONS,4/))
-     call io_bulk(ID,I2=COLLISIONS_state)
-   endif
+   if (read_is_on(ID).and..not.allocated(COLLISIONS_state)) then
+      allocate(COLLISIONS_state(n_COLLISIONS,4))
+    endif
+   call io_bulk(ID,VAR='COLLISIONS_STATE',VAR_SZ=(/n_COLLISIONS,4/))
+   call io_bulk(ID,I2=COLLISIONS_state)
    !
    io_COLLISIONS=io_status(ID)
    if (io_COLLISIONS/=0) goto 1
@@ -208,23 +183,33 @@ integer function io_COLLISIONS(i_qp,ID,COLL)
 &                                COLL%D(2,1):COLL%D(2,2),&
 &                                COLL%D(3,1):COLL%D(3,2)))
    !
-   ! Complex collisions
-   allocate(COLLISIONS_v_disk(COLL%N,2))
-   call io_bulk(ID,VAR='COLLISIONS_v',VAR_SZ=(/COLL%N,2/))
-   if(write_is_on(ID)) then
-     COLLISIONS_v_disk(:,1) =real(COLL%v_c(1:COLL%N))
-     COLLISIONS_v_disk(:,2)=aimag(COLL%v_c(1:COLL%N))
-     call io_bulk(ID,R2=COLLISIONS_v_disk)
+   if(V_kind==SE_GW_NEQ.or.V_kind==SE_GW_QED) then
+     ! Real collisions
+     call io_bulk(ID,VAR='COLLISIONS_v',VAR_SZ=(/COLL%N/))
+     call io_bulk(ID,R1=COLL%v_r)
    else
-     call io_bulk(ID,R2=COLLISIONS_v_disk)
-     COLL%v_c(1:COLL%N)=CMPLX(COLLISIONS_v_disk(:,1),COLLISIONS_v_disk(:,2))
+     ! Complex collisions
+     allocate(COLLISIONS_v_disk(COLL%N,2))
+     call io_bulk(ID,VAR='COLLISIONS_v',VAR_SZ=(/COLL%N,2/))
+     if(write_is_on(ID)) then
+       COLLISIONS_v_disk(:,1) =real(COLL%v_c(1:COLL%N))
+       COLLISIONS_v_disk(:,2)=aimag(COLL%v_c(1:COLL%N))
+       call io_bulk(ID,R2=COLLISIONS_v_disk)
+     else
+       call io_bulk(ID,R2=COLLISIONS_v_disk)
+       COLL%v_c(1:COLL%N)=CMPLX(COLLISIONS_v_disk(:,1),COLLISIONS_v_disk(:,2))
+     endif
+     deallocate(COLLISIONS_v_disk)
    endif
-   deallocate(COLLISIONS_v_disk)
    !
  endif
  !
 1 continue
  !
  call io_disconnect(ID=ID)
+ !
+#if defined _TIMING
+ call timing('io_COLLISIONS',OPR='stop')
+#endif
  !
 end function io_COLLISIONS

@@ -126,14 +126,16 @@ subroutine COLLISIONS_load(CHECK_EXISTENCE_ONLY)
    V_kind=V_kinds(iv)
    !
    if (V_kind==SC_Fock)     call COLLISIONS_alloc_and_free("Fock","collision","alloc",0)
-   if (V_kind==SC_COHSEX) call COLLISIONS_alloc_and_free("SEX","collision","alloc",0)
+   if (V_kind==SC_COHSEX)   call COLLISIONS_alloc_and_free("SEX","collision","alloc",0)
    !
    do i_qp=1,QP_n_states
      !
-     if (.not.PAR_IND_QP%element_1D(i_qp)) cycle
+!     if (.not.PAR_IND_QP%element_1D(i_qp)) cycle
      !
-     i_qp_mem=PAR_QP_index(i_qp)
-     i_db    =DB_table(i_qp)
+!     i_qp_mem=PAR_QP_index(i_qp)
+ !    i_db    =DB_table(i_qp)
+     i_qp_mem=i_qp
+     i_db    =i_qp
      !
      call io_control(ACTION=OP_RD,SEC=(/1,2/),ID=ID)
      !
@@ -149,7 +151,7 @@ subroutine COLLISIONS_load(CHECK_EXISTENCE_ONLY)
      call io_control(ACTION=RD_CL,SEC=(/3/),ID=ID)
      !
      if (V_kind==SC_Fock)     io_err(iv)=io_COLLISIONS(i_db,ID,Fock_collisions(i_qp_mem))
-     if (V_kind==SC_COHSEX) io_err(iv)=io_COLLISIONS(i_db,ID,SEX_collisions(i_qp_mem))
+     if (V_kind==SC_COHSEX)   io_err(iv)=io_COLLISIONS(i_db,ID,SEX_collisions(i_qp_mem))
      !
      ! Now the transfer %v_r => %v3_r
      !

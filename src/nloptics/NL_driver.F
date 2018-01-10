@@ -135,8 +135,6 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
        ! Evaluate Collisions if necessary
        !
        call COLLISIONS_eval(E,X,k,Xk,q,Xw(:2))
-     write(*,*) 'passo qui ',l_use_collisions
-     stop
        !
      endif
      !
