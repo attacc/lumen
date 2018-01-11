@@ -71,7 +71,6 @@ subroutine COLLISIONS_alloc_and_free(what,elements,actions,I)
    D(2,:)=COLL_bands
    D(3,:)=(/1,nkibz/)
    if (l_collision.and.l_alloc) then
-     write(*,*) ' allocated ',allocated(Fock_collisions)
      allocate(Fock_collisions(size_))
      nFock_collisions=size_
      Fock_collisions(:)%kind=SC_Fock

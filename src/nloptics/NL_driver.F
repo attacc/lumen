@@ -140,8 +140,6 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
        !
      endif
      !
-     call COLLISIONS_load(.true.)
-     !
      call COLLISIONS_load(.false.)
      !
    else
