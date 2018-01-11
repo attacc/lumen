@@ -38,7 +38,7 @@ subroutine COLLISIONS_linearize_and_IO(what,i_qp,COLL,N)
  ! Work Space
  !
  integer   :: ic,i1,i2,i3,i_cycle,io_err,i_ref,ID
- logical   :: store_it,l_exchange,l_GW_NEQ,l_QED_P
+ logical   :: store_it,l_exchange
  real(SP)  :: COLLISIONS_max
  !
  l_exchange = (index(what,"Fock")>0).or.(index(what,"SEX")>0)
@@ -71,7 +71,6 @@ subroutine COLLISIONS_linearize_and_IO(what,i_qp,COLL,N)
              !
              COLL(i_ref)%table(i1,i2,i3)=1
              if (l_exchange          ) COLL(i_ref)%v_c(ic) = COLL(1)%v3_c(i1,i2,i3)
-             if (l_GW_NEQ.or.l_QED_P ) COLL(i_ref)%v_r(ic) = COLL(1)%v3_r(i1,i2,i3)
              !
            endif
          endif

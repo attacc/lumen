@@ -28,6 +28,7 @@ subroutine COLLISIONS_alloc_and_free(what,elements,actions,I)
  use R_lattice,      ONLY:nqbz,nkibz
  use parallel_m,     ONLY:PAR_nPlasma,PAR_nQ,PAR_nQP
  use global_XC,      ONLY:SC_Fock,SC_COHSEX
+ use QP_m,           ONLY:QP_n_states
  use collision,      ONLY:COLLISIONS_element,Fock_collisions,SEX_collisions,&
 &                         nFock_collisions,nSEX_collisions,COLL_bands
  implicit none
@@ -41,8 +42,8 @@ subroutine COLLISIONS_alloc_and_free(what,elements,actions,I)
  logical :: l_Fock,l_SEX,l_GW_NEQ,l_v3,l_v1,l_table,l_all,l_alloc,&
 &           l_clean,l_collision,l_distribute,l_Momentum
  !
- if (I==0) COLL_range=(/1,PAR_nQP/)
- if (I==0) size_=PAR_nQP
+ if (I==0) COLL_range=(/1,QP_n_states/) !PAR_nQP/)
+ if (I==0) size_=QP_n_states !PAR_nQP
  if (I> 0) COLL_range=(/I,I/)
  if (I> 0) size_=1
  !
@@ -70,6 +71,7 @@ subroutine COLLISIONS_alloc_and_free(what,elements,actions,I)
    D(2,:)=COLL_bands
    D(3,:)=(/1,nkibz/)
    if (l_collision.and.l_alloc) then
+     write(*,*) ' allocated ',allocated(Fock_collisions)
      allocate(Fock_collisions(size_))
      nFock_collisions=size_
      Fock_collisions(:)%kind=SC_Fock

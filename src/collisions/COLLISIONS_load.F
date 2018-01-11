@@ -32,7 +32,7 @@ subroutine COLLISIONS_load(CHECK_EXISTENCE_ONLY)
  use QP_m,            ONLY:QP_n_states,QP_QED_ng,QP_table
  use R_lattice,       ONLY:nqbz
  use global_XC,       ONLY:SC_Fock,SC_COHSEX,SE_GW_NEQ
- use collision,       ONLY:P_collisions,COLL_bands
+ use collision,       ONLY:COLL_bands
  use collision,       ONLY:V_kind,SEX_collisions,Fock_collisions,n_COLLISIONS,COLLISIONS_state
  use IO_m,            ONLY:OP_RD,RD_CL,OP_RD_CL,io_control,VERIFY,REP
  use parallel_m,      ONLY:PAR_nQP,PAR_QP_index,PAR_IND_QP,PAR_IND_Plasma,PAR_IND_Q,&

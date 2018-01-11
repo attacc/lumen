@@ -136,9 +136,11 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
        !
        call COLLISIONS_eval(E,X,k,Xk,q,Xw(:2))
        !
+       call COLLISIONS_free()
+       !
      endif
      !
-     ! and load ....
+     call COLLISIONS_load(.true.)
      !
      call COLLISIONS_load(.false.)
      !

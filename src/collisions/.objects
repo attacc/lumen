@@ -1,2 +1,2 @@
 objs = COLLISIONS_alloc_and_free.o COLLISIONS_load.o COLLISIONS_eval.o   COLLISIONS_linearize_and_IO.o \
-       COLLISIONS_sex.o COLLISIONS_Fock.o COLLISIONS_compose_nl.o XC_switch.o
+       COLLISIONS_sex.o COLLISIONS_Fock.o COLLISIONS_compose_nl.o XC_switch.o COLLISIONS_free.o
