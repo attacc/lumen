@@ -30,7 +30,7 @@ subroutine COLLISIONS_compose_nl(G_input)
  use QP_m,             ONLY:QP_table,QP_nk,QP_n_states
  use collision,        ONLY:Fock_collisions,SEX_collisions,nFock_collisions,nSEX_collisions
  use electrons,        ONLY:spin
- use parallel_m,       ONLY:PAR_QP_index,PAR_IND_QP,PP_redux_wait,HEAD_QP_cpu,PAR_COM_G_b_INDEX
+ use parallel_m,       ONLY:PAR_QP_index,PAR_IND_QP,PP_redux_wait,PAR_COM_Xk_ibz_INDEX
  use nl_optics,        ONLY:NE_Vnl_xc,NL_bands
  !
  implicit none
@@ -49,9 +49,9 @@ subroutine COLLISIONS_compose_nl(G_input)
  !
  do i_qp=1,QP_n_states
    !
-!   if (.not.(PAR_IND_QP%element_1D(i_qp).and.HEAD_QP_cpu)) cycle
+   if (.not.(PAR_IND_QP%element_1D(i_qp))) cycle
    !
-   i_qp_mem=i_qp !PAR_QP_index(i_qp)
+   i_qp_mem=PAR_QP_index(i_qp)
    !
    i_k=QP_table(i_qp,3)
    i_n=QP_table(i_qp,1)
@@ -93,7 +93,7 @@ subroutine COLLISIONS_compose_nl(G_input)
  !================
  do i_qp=1,QP_n_states
    !
- !  if (.not.(PAR_IND_QP%element_1D(i_qp).and.HEAD_QP_cpu)) cycle
+   if (.not.(PAR_IND_QP%element_1D(i_qp))) cycle
    !
    i_k=QP_table(i_qp,3)
    i_n=QP_table(i_qp,1)
@@ -104,6 +104,6 @@ subroutine COLLISIONS_compose_nl(G_input)
    !
  enddo
  !
- !call PP_redux_wait(NE_Vnl_xc,COMM=PAR_COM_G_b_INDEX%COMM)
+ call PP_redux_wait(NE_Vnl_xc,COMM=PAR_COM_Xk_ibz_INDEX%COMM)
  !
 end subroutine COLLISIONS_compose_nl

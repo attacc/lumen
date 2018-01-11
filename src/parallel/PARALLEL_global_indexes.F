@@ -314,6 +314,11 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  !-----------
  if (ENVIRONMENT=="Self_Energy"                     ) QP_range=QP_n_states
  !
+ if (ENVIRONMENT=="Collisions"                      ) then
+   Q_range=(/1,nqbz/)
+   QP_range=QP_n_states
+ endif
+ !
  !------------
  ! Oscillators
  !------------
@@ -702,33 +707,22 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    call PARALLEL_live_message("H(ibz)",ENVIRONMENT=ENVIRONMENT,&
 &           LOADED=PAR_IND_Xk_ibz%n_of_elements(PAR_IND_Xk_ibz_ID+1),TOTAL=Xk%nibz,&
 &           NCPU=PAR_COM_Xk_ibz_INDEX%n_CPU)
-!   !
-!   ! Copy to WF
-!   !
-!   call PAR_INDEX_copy(PAR_IND_OVLP_ibz,PAR_IND_WF_k)
-!   call COMM_copy(PAR_COM_Xk_ibz_INDEX,PAR_COM_WF_k_INDEX)
-!   PAR_IND_WF_k_ID=PAR_COM_WF_k_INDEX%CPU_id
    !
    ! Build QP indexes
    !
    n_bands=NL_bands
    !
-   allocate(PAR_QP_index(QP_n_states),PAR_IND_QP%n_of_elements(ncpu),PAR_IND_QP%element_1D(QP_n_states)) 
-   PAR_IND_QP%element_1D=.FALSE.
-   PAR_IND_QP%n_of_elements=0
-   PAR_nQP=0
+   ! QP states use the same group of k-points
+   !
+   call PARALLEL_index(PAR_IND_QP,(/QP_n_states/),COMM=PAR_COM_Xk_ibz_INDEX)
+   PAR_IND_QP_ID=PAR_COM_Xk_ibz_INDEX%CPU_id
+   PAR_nQP=PAR_IND_QP%n_of_elements(PAR_IND_QP_ID+1)
+   allocate(PAR_QP_index(QP_n_states))
    PAR_QP_index=0
-   do i_qp=1,QP_n_states
-     ib1 = QP_table(i_qp,1)
-     ib2 = QP_table(i_qp,2)
-     i_k = QP_table(i_qp,3)
-     if (.not.PAR_IND_Xk_ibz%element_1D(i_k)) cycle
-     PAR_nQP=PAR_nQP+1
-     PAR_QP_index(i_qp)=PAR_nQP
-     PAR_IND_QP%element_1D(i_qp)=.TRUE.
-     PAR_IND_QP%n_of_elements=PAR_nQP
-   enddo
-   call PARALLEL_live_message("QPs",ENVIRONMENT=ENVIRONMENT,LOADED=PAR_nQP,TOTAL=QP_n_states)
+   call Build_up_index(PAR_IND_QP,QP_n_states,PAR_QP_index,PAR_nQP)
+   call PARALLEL_live_message("QPs",ENVIRONMENT=ENVIRONMENT,&
+&                             LOADED=PAR_IND_QP%n_of_elements(PAR_IND_QP_ID+1),TOTAL=QP_n_states,&
+&                             NCPU=PAR_COM_QP_INDEX%n_CPU)
    !
    ! Io and messaging
    !
@@ -777,6 +771,63 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    ! Build WF bands indexes
    !
    call Build_B2_index(PAR_IND_G_b,PAR_IND_G_b_ID,PAR_IND_B2,PAR_IND_B2_ID,PAR_COM_G_b_INDEX,NL_bands)
+   ! Copy to WF
+   !
+   call COMM_copy(PAR_COM_Xk_ibz_INDEX,PAR_COM_WF_k_INDEX)
+   PAR_IND_WF_k_ID=PAR_COM_WF_k_INDEX%CPU_id
+   !
+   ! Io and messaging
+   !
+   call IO_and_Messaging_switch("+io_out",CONDITION=PAR_COM_Xk_ibz_INDEX%CPU_id==0)
+   !
+   call IO_and_Messaging_switch("+output",CONDITION=PAR_COM_Xk_ibz_INDEX%CPU_id==0)
+   !
+ endif
+ !
+ !
+  !==============================
+ if (ENVIRONMENT=="Collisions") then
+   !=================================
+   !
+   CALL PARALLEL_structure(2,(/"qp","q "/))
+   !
+   call PARALLEL_assign_chains_and_COMMs(2,ROLE=(/"qp","q "/),&
+&                                        COMM_index_1=PAR_COM_QP_INDEX,&
+&                                        COMM_index_2=PAR_COM_Q_INDEX,   &
+&                                        COMM_A2A_1=PAR_COM_Xk_ibz_A2A)
+   !
+   ! QP-states
+   !
+   call PARALLEL_index(PAR_IND_QP,(/QP_n_states/),COMM=PAR_COM_QP_INDEX)
+   PAR_IND_QP_ID=PAR_COM_QP_INDEX%CPU_id
+   PAR_nQP      =PAR_IND_QP%n_of_elements(PAR_IND_Xk_ibz_ID+1)
+   !
+   allocate(PAR_QP_index(QP_n_states))
+   call Build_up_index(PAR_IND_QP,QP_n_states,PAR_QP_index,PAR_nQP)
+   !
+   call PARALLEL_live_message("QPs",ENVIRONMENT=ENVIRONMENT,&
+&                             LOADED=PAR_IND_QP%n_of_elements(PAR_IND_QP_ID+1),TOTAL=QP_n_states,&
+&                             NCPU=PAR_COM_QP_INDEX%n_CPU)
+
+   !
+   ! Q-points
+   !
+   WHAT="bz"
+   !
+   call PARALLEL_index(PAR_IND_Q,(/Q_range(2)/),COMM=PAR_COM_Q_INDEX,CONSECUTIVE=.TRUE.)
+   PAR_IND_Q_ID=PAR_COM_Q_INDEX%CPU_id
+   PAR_nQ=PAR_IND_Q%n_of_elements(PAR_IND_Q_ID+1)
+   call PARALLEL_live_message("Q("//trim(WHAT)//")",ENVIRONMENT=ENVIRONMENT,&
+&                             LOADED=PAR_IND_Q%n_of_elements(PAR_IND_Q_ID+1),TOTAL=Q_range(2),&
+&                             NCPU=PAR_COM_Q_INDEX%n_CPU)
+   !
+   allocate(PAR_Q_index(Q_range(2)))
+   call Build_up_index(PAR_IND_Q,Q_range(2),PAR_Q_index,PAR_nQ)
+   !
+   call PARALLEL_add_Q_to_K_list('k_qp_q_'//trim(WHAT),PAR_IND_QP,PAR_IND_QP_ID,PAR_IND_Xk_ibz,PAR_IND_Xk_ibz_ID,&
+  &                                PAR_IND_Q,PAR_COM_QP_INDEX,(/0,0/),Xk,q)
+
+   !
    ! Copy to WF
    !
    call COMM_copy(PAR_COM_Xk_ibz_INDEX,PAR_COM_WF_k_INDEX)

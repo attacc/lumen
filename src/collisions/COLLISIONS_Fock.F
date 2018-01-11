@@ -101,7 +101,7 @@ subroutine COLLISIONS_Fock(E,k,q)
  !
  do i_qp=1,QP_n_states
    !
-!   if (.not.PAR_IND_QP%element_1D(i_qp)) cycle
+   if (.not.PAR_IND_QP%element_1D(i_qp)) cycle
    !
    if (io_COLLs) then
      if (COLLISIONS_IO_status(i_qp)/=-1) cycle
@@ -115,8 +115,6 @@ subroutine COLLISIONS_Fock(E,k,q)
    Fock_collisions(1)%v3_c=cZERO
    !
    do iqbz=1,q%nbz
-     !
-!     if (.not.PAR_IND_Q%element_1D(iqbz)) cycle
      !
      iqibz    =q%sstar(iqbz,1)
      iqs      =q%sstar(iqbz,2)
@@ -167,8 +165,6 @@ subroutine COLLISIONS_Fock(E,k,q)
          !
          ! COLLISIONS(n,n',qp_n_states) = \sum_{G,q} ( rho(m,n,G,q,k) x rho*(m',n',G,q,k) /|q+G|^2 )
          !
-!         if ( .not. PAR_IND_Bp_mat%element_1D( B_mat_index(i_np,i_mp,COLL_bands) ) ) cycle
-         !
          isc%os(1)=i_np
          !
          if (any(isc%is/=iscp%is).or.any(isc%os/=iscp%os)) then
@@ -195,7 +191,6 @@ subroutine COLLISIONS_Fock(E,k,q)
      !
    enddo ! loop on iqbz
    !
-!   call PP_redux_wait(Fock_collisions(1)%v3_c,COMM=PAR_COM_G_b_A2A%COMM)
    call COLLISIONS_linearize_and_IO("Fock",i_qp,Fock_collisions,nFock_collisions)
    !
    call live_timing(steps=1)

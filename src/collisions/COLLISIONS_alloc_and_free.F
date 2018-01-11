@@ -42,8 +42,8 @@ subroutine COLLISIONS_alloc_and_free(what,elements,actions,I)
  logical :: l_Fock,l_SEX,l_GW_NEQ,l_v3,l_v1,l_table,l_all,l_alloc,&
 &           l_clean,l_collision,l_distribute,l_Momentum
  !
- if (I==0) COLL_range=(/1,QP_n_states/) !PAR_nQP/)
- if (I==0) size_=QP_n_states !PAR_nQP
+ if (I==0) COLL_range=(/1,PAR_nQP/)
+ if (I==0) size_=PAR_nQP
  if (I> 0) COLL_range=(/I,I/)
  if (I> 0) size_=1
  !

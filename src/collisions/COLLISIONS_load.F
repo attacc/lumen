@@ -35,8 +35,8 @@ subroutine COLLISIONS_load(CHECK_EXISTENCE_ONLY)
  use collision,       ONLY:COLL_bands
  use collision,       ONLY:V_kind,SEX_collisions,Fock_collisions,n_COLLISIONS,COLLISIONS_state
  use IO_m,            ONLY:OP_RD,RD_CL,OP_RD_CL,io_control,VERIFY,REP
- use parallel_m,      ONLY:PAR_nQP,PAR_QP_index,PAR_IND_QP,PAR_IND_Plasma,PAR_IND_Q,&
-&                          PAR_nQ,PAR_Q_index,PAR_Plasma_index
+ use parallel_m,      ONLY:PAR_nQP,PAR_QP_index,PAR_IND_QP,PAR_IND_Q,&
+&                          PAR_nQ,PAR_Q_index,PP_redux_wait,PAR_COM_Xk_ibz_INDEX
  use interfaces,      ONLY:io_COLLISIONS
  use electrons,       ONLY:spin
  use stderr,          ONLY:intc
@@ -130,12 +130,10 @@ subroutine COLLISIONS_load(CHECK_EXISTENCE_ONLY)
    !
    do i_qp=1,QP_n_states
      !
-!     if (.not.PAR_IND_QP%element_1D(i_qp)) cycle
+     if (.not.PAR_IND_QP%element_1D(i_qp)) cycle
      !
-!     i_qp_mem=PAR_QP_index(i_qp)
- !    i_db    =DB_table(i_qp)
-     i_qp_mem=i_qp
-     i_db    =i_qp
+     i_qp_mem=PAR_QP_index(i_qp)
+     i_db    =DB_table(i_qp)
      !
      call io_control(ACTION=OP_RD,SEC=(/1,2/),ID=ID)
      !
@@ -160,6 +158,8 @@ subroutine COLLISIONS_load(CHECK_EXISTENCE_ONLY)
    end do
    !
  enddo
+ !
+ call PP_redux_wait(COMM=PAR_COM_Xk_ibz_INDEX%COMM)
  !
  call live_timing()
  !

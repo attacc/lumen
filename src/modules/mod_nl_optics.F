@@ -271,16 +271,13 @@ module nl_optics
      if(use_COLLISIONS) then
        allocate(dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
        call mem_est("dG",(/size(dG)/),(/2*SP/))
-       allocate(NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
-       call mem_est("NE_Vnl_xc",(/size(NE_Vnl_xc)/),(/2*SP/))
-       NE_Vnl_xc=(0._SP,0._SP)
      endif
      !
    end subroutine NL_alloc
      !
    subroutine NL_alloc_k_distributed(en)
      !  
-     use parallel_m,     ONLY:PAR_Xk_nibz,PAR_Xk_ibz_index
+     use parallel_m,     ONLY:PAR_Xk_nibz,PAR_Xk_ibz_index,PAR_nQP
      use pars,           ONLY:SP
      use memory_m,       ONLY:mem_est
      use electrons,      ONLY:levels,n_spin,n_sp_pol
@@ -299,8 +296,14 @@ module nl_optics
      !
      if(Correlation==SEX.or.Correlation==HF) then
        !  
-       allocate(Sigma_SEX_EQ(NL_bands(2),NL_bands(2),n_sp_pol,PAR_Xk_nibz))
-       call mem_est("Sigma_SEX_EQ",(/size(Sigma_SEX_EQ)/),(/2*SP/))
+       if(use_COLLISIONS) then
+         allocate(NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),PAR_nQP,n_sp_pol))
+         call mem_est("NE_Vnl_xc",(/size(NE_Vnl_xc)/),(/2*SP/))
+         NE_Vnl_xc=(0._SP,0._SP)
+       else
+         allocate(Sigma_SEX_EQ(NL_bands(2),NL_bands(2),n_sp_pol,PAR_Xk_nibz))
+         call mem_est("Sigma_SEX_EQ",(/size(Sigma_SEX_EQ)/),(/2*SP/))
+       endif
        !
      endif          
      !

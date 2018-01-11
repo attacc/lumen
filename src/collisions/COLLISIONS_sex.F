@@ -132,7 +132,7 @@ subroutine COLLISIONS_sex(X,Xk,E,k,q,Xw)
  !
  do i_qp=1,QP_n_states
    !
-!   if (.not.PAR_IND_QP%element_1D(i_qp)) cycle
+   if (.not.PAR_IND_QP%element_1D(i_qp)) cycle
    !
    if (io_COLLs) then
      if (COLLISIONS_IO_status(i_qp)/=-1) cycle
@@ -146,8 +146,6 @@ subroutine COLLISIONS_sex(X,Xk,E,k,q,Xw)
    SEX_collisions(1)%v3_c=cZERO
    !
    do iqbz=1,q%nbz
-     !
-!     if (.not.PAR_IND_Q%element_1D(iqbz)) cycle
      !
      iqibz    =q%sstar(iqbz,1)
      iqs      =q%sstar(iqbz,2)
@@ -223,8 +221,6 @@ subroutine COLLISIONS_sex(X,Xk,E,k,q,Xw)
          !
          ! COLLISIONS(n,n',qp_n_states) = \sum_{G,G',q} ( rho(m,n,G,q,k) x EM1s(G ,G') x rho*(m',n',G',q,k) /|q+G|/|q+G'| )
          !
-!         if ( .not. PAR_IND_Bp_mat%element_1D( B_mat_index(i_np,i_mp,COLL_bands) ) ) cycle
-         !
          isc%os(1)=i_np
          !
          if (any(isc%is/=iscp%is).or.any(isc%os/=iscp%os)) then
@@ -253,7 +249,6 @@ subroutine COLLISIONS_sex(X,Xk,E,k,q,Xw)
    !
    call live_timing(steps=1)
    !
-!   call PP_redux_wait(SEX_collisions(1)%v3_c,COMM=PAR_COM_G_b_A2A%COMM)
    call COLLISIONS_linearize_and_IO("SEX",i_qp,SEX_collisions,nSEX_collisions)
    !
  enddo ! loop on i_qp
