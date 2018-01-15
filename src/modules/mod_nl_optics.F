@@ -171,6 +171,7 @@ module nl_optics
  !
  ! Oscillators
  !
+ logical :: use_OSCILLATORS
  complex(SP), allocatable :: OSCLL(:,:,:,:,:) ! Oscillators
  complex(SP), allocatable :: OSCLL_k(:,:,:,:) ! Oscillators in k, just for the evaluation
  complex(SP), allocatable :: W(:,:,:)
@@ -178,7 +179,6 @@ module nl_optics
  !
  ! Collisions
  !
- logical :: use_COLLISIONS
  complex(SP), allocatable :: dG(:,:,:) 
  complex(SP), allocatable :: NE_Vnl_xc(:,:,:,:)
  !
@@ -268,9 +268,15 @@ module nl_optics
      allocate(E_tot_t(NL_steps,3),E_ext_t(NL_steps,3),E_ks_t(NL_steps,3))
      call mem_est("E_tot_t E_ext_t",(/size(E_tot_t),size(E_ext_t),size(E_ks_t)/))
      !
-     if(use_COLLISIONS) then
+     if((Correlation==SEX.or.Correlation==HF).and..not.use_OSCILLATORS) then
+       !  
        allocate(dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
        call mem_est("dG",(/size(dG)/),(/2*SP/))
+       !
+       allocate(NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk,n_sp_pol))
+       call mem_est("NE_Vnl_xc",(/size(NE_Vnl_xc)/),(/2*SP/))
+       NE_Vnl_xc=(0._SP,0._SP)
+       !
      endif
      !
    end subroutine NL_alloc
@@ -294,17 +300,9 @@ module nl_optics
      allocate(VAL_BANDS(fft_size,en%nbf,PAR_Xk_nibz,n_sp_pol))
      call mem_est("Val_bands",(/size(VAL_BANDS)/),(/2*SP/))
      !
-     if(Correlation==SEX.or.Correlation==HF) then
-       !  
-       if(use_COLLISIONS) then
-         allocate(NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),PAR_nQP,n_sp_pol))
-         call mem_est("NE_Vnl_xc",(/size(NE_Vnl_xc)/),(/2*SP/))
-         NE_Vnl_xc=(0._SP,0._SP)
-       else
-         allocate(Sigma_SEX_EQ(NL_bands(2),NL_bands(2),n_sp_pol,PAR_Xk_nibz))
-         call mem_est("Sigma_SEX_EQ",(/size(Sigma_SEX_EQ)/),(/2*SP/))
-       endif
-       !
+     if((Correlation==SEX.or.Correlation==HF).and.use_OSCILLATORS) then
+       allocate(Sigma_SEX_EQ(NL_bands(2),NL_bands(2),n_sp_pol,PAR_Xk_nibz))
+       call mem_est("Sigma_SEX_EQ",(/size(Sigma_SEX_EQ)/),(/2*SP/))
      endif          
      !
      allocate(I_relax(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),en%nbf,PAR_Xk_nibz,n_sp_pol))
@@ -408,19 +406,19 @@ module nl_optics
      call mem_est("E_tot_t E_ext_t E_ks_t")
      !
      if(Correlation==SEX.or.Correlation==HF) then
-       deallocate(OSCLL)
-       call mem_est("OSCLL")
-       deallocate(Sigma_SEX_EQ)
-       call mem_est("Sigma_SEX_EQ")
-       deallocate(W)
-       call mem_est("W")
-     endif
-     !
-     if(use_COLLISIONS) then
-       deallocate(dG)
-       call mem_est("dG")
-       deallocate(NE_Vnl_xc)
-       call mem_est("NE_Vnl_xc")
+       if(use_OSCILLATORS) then
+         deallocate(OSCLL)
+         call mem_est("OSCLL")
+         deallocate(Sigma_SEX_EQ)
+         call mem_est("Sigma_SEX_EQ")
+         deallocate(W)
+         call mem_est("W")
+       else
+         deallocate(dG)
+         call mem_est("dG")
+         deallocate(NE_Vnl_xc)
+         call mem_est("NE_Vnl_xc")
+       endif
      endif
      !
    end subroutine NL_free

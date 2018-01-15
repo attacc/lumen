@@ -32,7 +32,7 @@ subroutine COLLISIONS_Fock(E,k,q)
  use electrons,     ONLY:levels,spin_occ,spin
  use parallel_m,    ONLY:PP_redux_wait,PAR_IND_QP,PAR_IND_Q,&
 &                        PAR_n_Bp_mat_elements,PAR_COM_QP_A2A,&
-&                        PAR_IND_Bp_mat,PAR_nQP,PAR_nQ,PAR_COM_G_b_A2A,PAR_COM_Q_index
+&                        PAR_IND_Q,PAR_nQP,PAR_nQ,PAR_COM_G_b_A2A,PAR_COM_Q_index
  use collision,     ONLY:elemental_collision,elemental_collision_free,&
 &                        Fock_collisions,nFock_collisions,COLLISIONS_IO_status,&
 &                        elemental_collision_alloc,COLL_bands
@@ -103,10 +103,6 @@ subroutine COLLISIONS_Fock(E,k,q)
    !
    if (.not.PAR_IND_QP%element_1D(i_qp)) cycle
    !
-   if (io_COLLs) then
-     if (COLLISIONS_IO_status(i_qp)/=-1) cycle
-   endif
-   !
    i_n     = QP_table(i_qp,1)
    i_m     = QP_table(i_qp,2)
    i_k     = QP_table(i_qp,3)
@@ -116,6 +112,8 @@ subroutine COLLISIONS_Fock(E,k,q)
    !
    do iqbz=1,q%nbz
      !
+     if (.not.PAR_IND_Q%element_1D(iqbz)) cycle
+     ! 
      iqibz    =q%sstar(iqbz,1)
      iqs      =q%sstar(iqbz,2)
      !
@@ -190,6 +188,8 @@ subroutine COLLISIONS_Fock(E,k,q)
      enddo ! loop on the band i_mp
      !
    enddo ! loop on iqbz
+   !
+   call PP_redux_wait(Fock_collisions(1)%v3_c,COMM=PAR_COM_Q_index%COMM)
    !
    call COLLISIONS_linearize_and_IO("Fock",i_qp,Fock_collisions,nFock_collisions)
    !

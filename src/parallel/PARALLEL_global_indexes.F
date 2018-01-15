@@ -37,7 +37,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
 &                        Q_range,QP_range,n_v_bands,n_c_bands,K_range,n_bands,EH_range
  use parallel_m,    ONLY:& ! LOGICALS
 &                        l_par_X_T,l_par_X_G_q0,l_par_RT,l_par_SE,l_par_X_G_all_q,l_par_X_G_finite_q,&
-&                        HEAD_QP_cpu,HEAD_k_cpu,l_par_SC,l_par_NL,l_par_OSCL
+&                        HEAD_QP_cpu,HEAD_k_cpu,l_par_SC,l_par_NL,l_par_OSCL,l_par_COLL
  use parallel_m,    ONLY:PAR_IND_runs_ID,PAR_COM_runs_INDEX,PAR_COM_runs_A2A,PAR_nRuns,PAR_runs_index, &
 &                        PAR_IND_runs,PAR_COM_runs,PAR_IND_OVLP_ibz,PAR_IND_B2 ! Non_Linear optics
  use parallel_m,    ONLY:& ! COMMUNICATORS
@@ -118,6 +118,7 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
  l_par_RT           =ENVIRONMENT=="Real_Time"
  l_par_NL           =ENVIRONMENT=="Non_Linear"
  l_par_OSCL         =ENVIRONMENT=="Oscillators"
+ l_par_COLL         =ENVIRONMENT=="Collisions"
  !
  X_type=1
  if (present(X)) then
@@ -835,9 +836,9 @@ subroutine PARALLEL_global_indexes(E,Xk,q,ENVIRONMENT,X,RESET)
    !
    ! Io and messaging
    !
-   call IO_and_Messaging_switch("+io_out",CONDITION=PAR_COM_Xk_ibz_INDEX%CPU_id==0)
+   call IO_and_Messaging_switch("+io_out",CONDITION=PAR_COM_Q_INDEX%CPU_id==0)
    !
-   call IO_and_Messaging_switch("+output",CONDITION=PAR_COM_Xk_ibz_INDEX%CPU_id==0)
+   call IO_and_Messaging_switch("+output",CONDITION=PAR_COM_Q_INDEX%CPU_id==0)
    !
  endif
  !

@@ -38,7 +38,7 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
  ! Work Space
  ! 
  integer :: N_fields,CPU_s(4),i_c,NC,N_basis,i1
- integer :: ncpu_q,ncpu_b
+ integer :: ncpu_q,ncpu_b,ncpu_qp
  !
  if (ncpu==1) return
  !
@@ -116,6 +116,11 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
              N_fields=N_fields+1
              CPU_s(N_fields)=PARALLEL_CPU_used(i_c)
            endif
+         case("Collisions") 
+           if (trim(PARALLEL_CPU_role(i_c))=="qp".or.trim(PARALLEL_CPU_role(i_c))=="q") then
+             N_fields=N_fields+1
+             CPU_s(N_fields)=PARALLEL_CPU_used(i_c)
+           endif
 #if defined _SCALAPACK
          case("ScaLapacK") 
            if (trim(PARALLEL_CPU_role(i_c))=="p".or.trim(PARALLEL_CPU_role(i_c))=="d") then
@@ -148,6 +153,14 @@ subroutine PARALLEL_defaults(ENVIRONMENT)
            CPU_structure(i_PAR_structure)%CPU(1)=ncpu/ncpu_b
            CPU_structure(i_PAR_structure)%ROLE(2)="b"
            CPU_structure(i_PAR_structure)%CPU(2)=ncpu_b
+           CPU_structure(i_PAR_structure)%N_chains=2
+        case("Collisions") 
+           ncpu_q       =4
+           ncpu_q       =GreatestCommonDivisor(ncpu,ncpu_q)
+           CPU_structure(i_PAR_structure)%ROLE(1)="qp"
+           CPU_structure(i_PAR_structure)%CPU(1)=ncpu/ncpu_q
+           CPU_structure(i_PAR_structure)%ROLE(2)="q"
+           CPU_structure(i_PAR_structure)%CPU(2)=ncpu_q
            CPU_structure(i_PAR_structure)%N_chains=2
 #if defined _SCALAPACK
          case("ScaLapacK") 

@@ -1,4 +1,4 @@
-    !
+!
 !        Copyright (C) 2000-2016 the YAMBO team
 !              http://www.yambo-code.org
 !
@@ -433,7 +433,7 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
  if (l_nl_optics) then
    call CPU_activate("NL")
    call initactivate(1,'NL_Threads')
-   call CPU_activate("OSCL")
+   call CPU_activate("COLL")
  endif
  !
  if (l_bse) then
@@ -654,7 +654,7 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
  !
  if (l_nl_optics) then
    call initactivate(1,'FFTGvecs NLBands NLstep NLtime NLverbosity NLintegrator NLCorrelation NLLrcAlpha')
-   call initactivate(1,'Gauge NLEnRange NLEnSteps NLDamping NLGOscll NLGvecs UseCollisions UseDipoles FrSndOrd InducedField') 
+   call initactivate(1,'Gauge NLEnRange NLEnSteps NLDamping NLGOscll NLGvecs UseOscill UseDipoles FrSndOrd InducedField') 
    call initactivate(1,'NLInSteps ExtF_Dir ExtF_FrStep ExtF_Int ExtF_Damp ExtF_kind ExtF_StartIdx')
    call init_QP_ctl_switch('G')
  endif

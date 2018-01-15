@@ -302,10 +302,10 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  call it(defs,'NLEnRange',    '[NL] Energy range',NL_er,E_unit)
  call it(defs,'NLEnSteps',    '[NL] Energy steps',n_frequencies)
  call it(defs,'NLInSteps',    '[NL] Intensity steps for Richardson extrap. (1-3)',n_intensities,Verb_level=V_nl_optics)
- call it(defs,'NLGOscll',    '[NL] Number of G in the oscillators', ng_oscll,unit=G_unit)
+ call it(defs,'NLGOscll',    '[NL] Number of G in the oscillators', ng_oscll,unit=G_unit,verb_level=V_nl_optics)
  call it(defs,'NLGvecs', '[NL] Number of G vectors in NL dynamics for Hartree/TDDFT',NL_ng,unit=G_unit)
  !
- call it('f',defs,'UseCollisions','[NL] Use Collisions for SEX or HF (just for testing purpose)',verb_level=V_nl_optics)
+ call it('f',defs,'UseOscill','[NL] Use Oscillators in G-space for the collisions (work in progress)',verb_level=V_nl_optics)
  call it('f',defs,'UseDipoles','[NL] Use Covariant Dipoles (just for testing purpose)',verb_level=V_nl_optics)
  call it('f',defs,'FrSndOrd','[NL] Force second order in Covariant Dipoles',verb_level=V_nl_optics)
  !
@@ -362,6 +362,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
        if (i_s==7) possible_fields='(p,d) '    ! SLK
        if (i_s==8) possible_fields='(w,k) '    ! NL
        if (i_s==9) possible_fields='(k,b) '    ! Oscillators
+       if (i_s==10) possible_fields='(qp,q) '  ! Collisions
        !
        if (len_trim(CPU_structure(i_s)%Short_Description)==0) cycle
        name=trim(CPU_structure(i_s)%Short_Description)//"_CPU"

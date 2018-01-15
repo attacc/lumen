@@ -77,7 +77,7 @@ module parallel_m
  !
  ! Logicals
  !
- logical            :: l_par_X_T,l_par_X_G_q0,l_par_X_G_all_q,l_par_NL,&
+ logical            :: l_par_X_T,l_par_X_G_q0,l_par_X_G_all_q,l_par_NL,l_par_COLL,&
 &                      l_par_X_G_finite_q,l_par_SE,l_par_RT,l_par_SC,l_par_OSCL
  !
  ! In a parallel run only the head CPU in the q and b chains can do 
@@ -489,6 +489,8 @@ module parallel_m
      CPU_structure(8)%Short_Description="NL"
      CPU_structure(9)%Long_Description="Oscillators"
      CPU_structure(9)%Short_Description="OSCL"
+     CPU_structure(10)%Long_Description="Collisions"
+     CPU_structure(10)%Short_Description="COLL"
    end subroutine
    !
    subroutine COMM_reset(COMM)

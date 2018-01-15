@@ -42,7 +42,7 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
 &                         Integrator,l_use_DIPOLES,NL_P_t,NL_ng,EF_parms,Sigma_SEX_EQ,ng_oscll,   &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,runs_done,n_runs_todo,SEX,HF, &
 &                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_alloc_real_space_quantities, &
-&                         NL_alloc_k_distributed,E_bare,use_COLLISIONS
+&                         NL_alloc_k_distributed,E_bare,use_OSCILLATORS
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
  use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX, &
@@ -124,7 +124,23 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
  ! =============================
  if(Correlation==SEX.or.Correlation==HF) then
    !
-   if(use_COLLISIONS) then
+   if(use_OSCILLATORS) then
+     !
+     ! Parallelization on k and q
+     !
+     call setup_OSCL_parallelization()
+     !
+     ! Evaluate oscillators and write them on disk
+     call NL_oscillators_eval(q,k,E)
+     !
+     X(2)%ng=ng_oscll
+     call NL_lsex_potential(q,X(2),Xw(2))
+     !
+   else
+     !
+     ! setup Oscillators parallelization
+     !
+     call setup_COLL_parallelization()
      !
      ! check if they exist      
      !
@@ -139,20 +155,6 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
        call COLLISIONS_free()
        !
      endif
-     !
-     call COLLISIONS_load(.false.)
-     !
-   else
-     !
-     ! Parallelization on k and q
-     !
-     call setup_OSCL_parallelization()
-     !
-     ! Evaluate oscillators and write them on disk
-     call NL_oscillators_eval(q,k,E)
-     !
-     X(2)%ng=ng_oscll
-     call NL_lsex_potential(q,X(2),Xw(2)) 
      !
    endif
    !
@@ -201,10 +203,22 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
  !================
  call QP_apply(NL_bands,E,k,"G",msg_fmt='s')
  !
- ! Load oscillators
+ ! Load oscillators or collisions
  ! ===================
- if(Correlation==SEX.or.Correlation==HF) call NL_oscillators_load(q,k)
- !    
+ if(Correlation==SEX.or.Correlation==HF) then
+   !  
+   if(use_OSCILLATORS) then
+     !  
+     call NL_oscillators_load(q,k)
+     !
+   else
+     !  
+     call COLLISIONS_load(.false.)
+     !
+   endif
+   !
+ endif
+ !
  ! Initialization
  ! ==================
  call NL_start_and_restart(E,k,X)
@@ -214,7 +228,7 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
  ! If SEX or HF calculate the equilibrium contribution 
  ! to the screened exchange
  !
- if((Correlation==SEX.or.Correlation==HF).and..not.use_COLLISIONS) then
+ if((Correlation==SEX.or.Correlation==HF).and.use_OSCILLATORS) then
    Sigma_SEX_EQ=cZERO
    do ik=1,QP_nk
      if (.not.PAR_IND_Xk_ibz%element_1D(ik)) cycle
@@ -321,6 +335,24 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
      call PARALLEL_global_indexes(E,k,q,"Non_Linear",RESET=.FALSE.,X=X(1))
      !
    end subroutine setup_DIPOLES_parallelization
+   !
+   subroutine setup_COLL_parallelization
+     use parallel_m,       ONLY:PAR_IND_B2,CPU_and_ROLE_strings_restore
+     use nl_optics,        ONLY:eval_OVERLAPS
+     implicit none
+     !
+     ! Restore original number of bands
+     !
+     X(1)%ib       =(/NL_bands(1),NL_bands(2)/)
+     !
+     ! Restore user-defined parallel structure
+     call CPU_and_ROLE_strings_restore()
+     !
+     call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
+     call PARALLEL_global_indexes(E,k,q,"Collisions",X=X(1))
+     call PARALLEL_WF_distribute(CLEAN_UP=.TRUE.)
+     !
+   end subroutine setup_COLL_parallelization
    !
    subroutine setup_OSCL_parallelization
      use parallel_m,       ONLY:PAR_IND_B2,CPU_and_ROLE_strings_restore
