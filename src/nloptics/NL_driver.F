@@ -350,7 +350,7 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
      !
      call PARALLEL_global_indexes(E,k,q," ",RESET=.TRUE.,X=X(1))
      call PARALLEL_global_indexes(E,k,q,"Collisions",X=X(1))
-     call PARALLEL_WF_distribute(CLEAN_UP=.TRUE.)
+     call PARALLEL_WF_distribute(K_index=PAR_IND_Xk_ibz,CLEAN_UP=.TRUE.)
      !
    end subroutine setup_COLL_parallelization
    !
