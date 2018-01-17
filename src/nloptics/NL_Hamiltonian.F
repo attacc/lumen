@@ -204,7 +204,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
      !
    endif                                                         
    !
-   if(.not.use_OSCILLATORS) then
+   if((Correlation==SEX.or.Correlation==HF).and..not.use_OSCILLATORS) then
      call V_by_V_plus_V_omp(NL_nbands,cONE,NE_Vnl_xc(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ik,1),&
 &                                                 Hk(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),1))
 
