@@ -306,6 +306,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  call it(defs,'NLGvecs', '[NL] Number of G vectors in NL dynamics for Hartree/TDDFT',NL_ng,unit=G_unit)
  !
  call it('f',defs,'UseOscill','[NL] Use Oscillators in G-space for the collisions (work in progress)',verb_level=V_nl_optics)
+ call it('f',defs,'TestOSCLL','[NL] Test Oscillators vs Collisions [only for testing purposes]',verb_level=V_nl_optics)
  call it('f',defs,'UseDipoles','[NL] Use Covariant Dipoles (just for testing purpose)',verb_level=V_nl_optics)
  call it('f',defs,'FrSndOrd','[NL] Force second order in Covariant Dipoles',verb_level=V_nl_optics)
  !
