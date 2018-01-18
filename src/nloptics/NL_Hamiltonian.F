@@ -144,7 +144,7 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
  ! 
  ! Evaluate collisions if requires
  !=======================
- if(Correlation==SEX.or.Correlation==HF.and..not.use_OSCILLATORS) then
+ if((Correlation==SEX.or.Correlation==HF).and..not.use_OSCILLATORS) then
    call COLLISIONS_compose_nl(dG)
  endif
  !
