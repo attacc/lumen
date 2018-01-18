@@ -198,6 +198,8 @@ subroutine NL_initialize(E,k,q)
  if(.not.use_OSCILLATORS) then
    COLL_bands=NL_bands
    call QP_state_table_setup(E)
+ else
+   eval_dG=.false.
  endif
  !
  ! Deallocate bare_qpg if not required
