@@ -43,7 +43,7 @@ subroutine NL_initialize(E,k,q)
  use nl_optics,      ONLY:NL_damping,NL_correlation,Correlation,NL_er,NL_estep,n_frequencies,IPA,TDDFT,HARTREE,LRC,JGM, &
 &                         LRCW,eval_DFT,eval_HARTREE,NL_bands,NL_nbands,l_use_DIPOLES,SEX,HF,n_intensities, &
 &                         NL_steps,NL_tot_time,Phase_LifeTime,NL_step,Verbosity_name,VER_HIGH,VER_LOW,NL_verbosity, &
-&                         use_OSCILLATORS,eval_dG
+&                         use_OSCILLATORS,eval_dG,use_COLLISIONS,l_test_oscll
  !
  use electric,       ONLY:l_force_SndOrd
  use parser_m,       ONLY:parser
@@ -62,6 +62,7 @@ subroutine NL_initialize(E,k,q)
  !
  call parser('UseDipoles',           l_use_DIPOLES)
  call parser('FrSndOrd',             l_force_SndOrd)
+ call parser('TestOSCLL',            l_test_oscll)
  !
  if(l_use_DIPOLES) call warning(' Fixed dipoles: only linear response properties are correct!')
  !
@@ -148,6 +149,7 @@ subroutine NL_initialize(E,k,q)
  eval_DFT       =.false.
  eval_dG        =.false.
  use_OSCILLATORS=.false.
+ use_COLLISIONS =.false.
  !
  select case (trim(NL_Correlation))
     case('IPA')
@@ -177,29 +179,40 @@ subroutine NL_initialize(E,k,q)
     case('SEX')
         Correlation=SEX
         SC_potential   ='COHSEX'        
-        eval_dG      =.true.
         eval_HARTREE =.true.
         l_sc_cohsex=.true.
     case('HF')
         Correlation=HF
         SC_potential   ='FOCK'
-        eval_dG      =.true.
         eval_HARTREE =.true.
         l_sc_hf=.true.
     case default
         call error("Unknow correlation in the response function")
  end select
  !
+ ! By default the code use Collisions
+ ! ==================================
+ ! 
+ if(Correlation==HF.or.Correlation==SEX) then
+    use_COLLISIONS=.true.
+    eval_dG       =.true.
+ endif
+ !
+ ! Force Lumen to use Oscillators to build collisions on the fly
+ ! =============================================================
+ !
  call parser('UseOscill',use_OSCILLATORS)
+ if(use_OSCILLATORS.and..not.l_test_oscll) then
+   use_COLLISIONS=.false.
+   eval_dG       =.false.
+ endif
  !
  !Quasi-particle setup
  !====================
  !
- if(.not.use_OSCILLATORS) then
+ if(use_COLLISIONS) then
    COLL_bands=NL_bands
    call QP_state_table_setup(E)
- else
-   eval_dG=.false.
  endif
  !
  ! Deallocate bare_qpg if not required

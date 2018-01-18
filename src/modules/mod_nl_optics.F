@@ -172,6 +172,7 @@ module nl_optics
  ! Oscillators
  !
  logical :: use_OSCILLATORS
+ logical :: l_test_oscll
  complex(SP), allocatable :: OSCLL(:,:,:,:,:) ! Oscillators
  complex(SP), allocatable :: OSCLL_k(:,:,:,:) ! Oscillators in k, just for the evaluation
  complex(SP), allocatable :: W(:,:,:)
@@ -179,6 +180,7 @@ module nl_optics
  !
  ! Collisions
  !
+ logical :: use_COLLISIONS
  complex(SP), allocatable :: dG(:,:,:) 
  complex(SP), allocatable :: NE_Vnl_xc(:,:,:,:)
  !
@@ -268,7 +270,7 @@ module nl_optics
      allocate(E_tot_t(NL_steps,3),E_ext_t(NL_steps,3),E_ks_t(NL_steps,3))
      call mem_est("E_tot_t E_ext_t",(/size(E_tot_t),size(E_ext_t),size(E_ks_t)/))
      !
-     if((Correlation==SEX.or.Correlation==HF).and..not.use_OSCILLATORS) then
+     if((Correlation==SEX.or.Correlation==HF).and.use_COLLISIONS) then
        !  
        allocate(dG(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk))
        call mem_est("dG",(/size(dG)/),(/2*SP/))
@@ -413,7 +415,8 @@ module nl_optics
          call mem_est("Sigma_SEX_EQ")
          deallocate(W)
          call mem_est("W")
-       else
+       endif
+       if(use_COLLISIONS) then
          deallocate(dG)
          call mem_est("dG")
          deallocate(NE_Vnl_xc)
