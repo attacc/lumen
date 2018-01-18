@@ -42,7 +42,7 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
 &                         Integrator,l_use_DIPOLES,NL_P_t,NL_ng,EF_parms,Sigma_SEX_EQ,ng_oscll,   &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,runs_done,n_runs_todo,SEX,HF, &
 &                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_alloc_real_space_quantities, &
-&                         NL_alloc_k_distributed,E_bare,use_OSCILLATORS
+&                         NL_alloc_k_distributed,E_bare,use_OSCILLATORS,l_test_oscll,use_COLLISIONS
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
  use parallel_m,     ONLY:PAR_IND_runs,PAR_IND_runs_ID,CPU_structure,PAR_IND_Xk_ibz,PAR_COM_Xk_ibz_INDEX, &
@@ -136,7 +136,9 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
      X(2)%ng=ng_oscll
      call NL_lsex_potential(q,X(2),Xw(2))
      !
-   else
+   endif
+   !
+   if(use_OSCILLATORS) then
      !
      ! setup Oscillators parallelization
      !
@@ -211,7 +213,9 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
      !  
      call NL_oscillators_load(q,k)
      !
-   else
+   endif
+   !
+   if(use_COLLISIONS) then
      !  
      call COLLISIONS_load(.false.)
      !
