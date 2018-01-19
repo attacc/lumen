@@ -1,5 +1,6 @@
 !
-!        Copyright (C) 2015-2017 the LUMEN team
+!        Copyright (C) 2000-2015 the LUMEN team
+!              http://www.yambo-code.org
 !
 ! Authors (see AUTHORS file for details): CA
 ! 
@@ -20,76 +21,56 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_SEX_collisions(V_bands,k,q,E,i_k) 
+subroutine NL_SEX_collisions(k,q,i_k,i_n,i_m,COLL) 
  !
  ! This subroutine calculate the long-range part of the Screened exchange
  !
- use electrons,      ONLY:n_sp_pol,levels,spin_occ
- use pars,           ONLY:SP,cI,cZERO,cONE
- use FFT_m,          ONLY:fft_size
- use nl_optics,      ONLY:NL_bands,OSCLL,W,ng_oscll,NL_nbands,Sigma_SEX_EQ
+ use electrons,      ONLY:n_sp_pol
+ use pars,           ONLY:SP,cI,cZERO
+ use nl_optics,      ONLY:NL_bands,OSCLL,W,ng_oscll
  use QP_m,           ONLY:QP_nk
  use R_lattice,      ONLY:bz_samp,qindx_S
- use wrapper,        ONLY:V_dot_V
- use wrapper_omp,    ONLY:V_dot_V_omp
- use parallel_m,     ONLY:PAR_Xk_ibz_index
  ! 
  implicit none
  !
- complex(SP), intent(inout) :: Hk(NL_bands(2),NL_bands(2),n_sp_pol)
  integer,     intent(in)    :: i_k
  type(bz_samp), intent(in)  :: k,q
- type(levels),  intent(in)  :: E
- complex(SP),  intent(in)   :: V_bands(NL_bands(2),E%nbf,QP_nk,n_sp_pol)
+ integer,   intent(in)      :: i_n,i_m
  !
  ! Work Space
  !
- integer :: i_m,i_mp  ! self-energy external indexes
- integer :: i_n,i_np,iqbz,i_kmq ! self-energy internal indexes
- integer :: ig1,ig2,i1,ik_mem,iv
+ integer :: i_mp  ! self-energy external indexes
+ integer :: i_np,iqbz,i_kmq ! self-energy internal indexes
+ integer :: ig1,ig2
  !
- complex(SP) :: OSCLL_val(NL_bands(1):NL_bands(2),E%nbf,ng_oscll,q%nbz)
- complex(SP) :: V_kmq(NL_bands(1):NL_bands(2),E%nbf,q%nbz)
- complex(SP) :: val_sum(q%nbz,ng_oscll,ng_oscll)
+ ! Collisions output
  !
- !
- ! Build Oscillators in term of valence bands
- ! 
- ik_mem=PAR_Xk_ibz_index(i_k)
- !
-!$omp parallel do default(shared), private(iqbz,i_kmq)
- do iqbz=1,q%nbz
-   i_kmq           = k%sstar(qindx_S(i_k,iqbz,1),1)
-   V_kmq(:,:,iqbz) = V_bands(NL_bands(1):,:,i_kmq,1)
- enddo
-!$omp end parallel do
- !
-!$omp parallel do default(shared), private(iv)
- do iv=1,E%nbf
-   forall(iqbz=1:q%nbz,i_n=NL_bands(1):NL_bands(2),ig1=1:ng_oscll)
-     OSCLL_val(i_n,iv,ig1,iqbz)=sum(OSCLL(i_n,NL_bands(1):NL_bands(2),ik_mem,iqbz,ig1)*V_kmq(NL_bands(1):NL_bands(2),iv,iqbz))
-   end forall
- enddo
-!$omp end parallel do
+ complex(SP), intent(out) :: COLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk)
  !
  ! Long-range SEX
  !
+ !
  ! Evaluate Sigma_SEX(i_m,i_n,i_k)
  !
- do i_n=NL_bands(1),NL_bands(2)
-   do i_m=i_n,NL_bands(2)
-     !
-!$omp parallel do default(shared), private(ig1,ig2,iqbz)
-     do iqbz=1,q%nbz
-       forall(ig1=1:ng_oscll,ig2=1:ng_oscll)
-         val_sum(iqbz,ig1,ig2)=sum(OSCLL_val(i_n,:,ig1,iqbz)*conjg(OSCLL_val(i_m,:,ig2,iqbz))) ! sum of valence bands
-       end forall
-     enddo
-!$omp end parallel do
-     !
-     Hk(i_n,i_m,1)=Hk(i_n,i_m,1)+spin_occ*V_dot_V_omp(ng_oscll**2*q%nbz,W(1,1,1),val_sum(1,1,1))
-     !
+ do i_mp=NL_bands(1),NL_bands(2)
+    do i_np=NL_bands(1),NL_bands(2)
+      !
+      COLL(i_np,i_mp,:)=cZERO
+      ! 
+      do iqbz=1,q%nbz
+         i_kmq   = k%sstar(qindx_S(i_k,iqbz,1),1)
+         !
+         ! Build Collision on the fly
+         !
+         do ig1=1,ng_oscll
+           do ig2=1,ng_oscll
+             COLL(i_np,i_mp,i_kmq)=COLL(i_np,i_mp,i_kmq)+OSCLL(i_n,i_np,i_k,iqbz,ig1) &
+&                                                 *conjg(OSCLL(i_m,i_mp,i_k,iqbz,ig2))*W(iqbz,ig2,ig1) 
+            enddo
+         enddo
+         !
+       enddo
    enddo
  enddo
  !
-end subroutine NL_SEX
+end subroutine NL_SEX_collisions
