@@ -24,4 +24,6 @@ subroutine NL_test_collisions()
  !
  ! Test-collisions built on the fly vs collisions stored in memory
  !
+ stop
+ !
 end subroutine NL_test_collisions

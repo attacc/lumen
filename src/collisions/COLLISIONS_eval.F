@@ -62,7 +62,7 @@ subroutine COLLISIONS_eval(E,X,k,xk,q,Xw)
  type(levels)  :: E
  type(w_samp)  :: Xw(2) 
  type(bz_samp) :: k,Xk,q
- type(X_t)     :: X(4)
+ type(X_t)     :: X(2)
  !
  ! WorkSpace
  !

@@ -35,13 +35,13 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
  use R_lattice,      ONLY:bz_samp,qindx_free
  use memory_m,       ONLY:mem_est
  use fields,         ONLY:Efield
- use QP_m,           ONLY:QP_nk
+ use QP_m,           ONLY:QP_nk,QP_ng_Sx
  use QP_CTL_m,       ONLY:QP_apply
  use frequency,      ONLY:w_samp
  use nl_optics,      ONLY:n_runs,Correlation,IPA,NL_alloc,NL_free,V_bands,NL_bands,NL_step,&
 &                         Integrator,l_use_DIPOLES,NL_P_t,NL_ng,EF_parms,Sigma_SEX_EQ,ng_oscll,   &
 &                         E_ext_t,E_tot_t,E_ks_t,E_ks,E_tot,E_ext,runs_done,n_runs_todo,SEX,HF, &
-&                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_alloc_real_space_quantities, &
+&                         NL_nbands,NL_P,NL_i_time,NL_steps,NL_alloc_real_space_quantities,ng_oscll, &
 &                         NL_alloc_k_distributed,E_bare,use_OSCILLATORS,l_test_oscll,use_COLLISIONS
  use IO_m,           ONLY:IO_and_Messaging_switch
  use interfaces,     ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,PARALLEL_WF_index
@@ -152,6 +152,11 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
        !
        ! Evaluate Collisions if necessary
        !
+       if(l_test_oscll) then
+         QP_ng_Sx =ng_oscll
+         X(2)%ng  =ng_oscll
+       endif
+       !
        call COLLISIONS_eval(E,X,k,Xk,q,Xw(:2))
        !
        call COLLISIONS_free()
@@ -168,6 +173,8 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
    !
  endif
  !
+ if(l_test_oscll) call NL_test_collisions()
+ !    
  ! Generate DIPOLES in all the BZ if required
  !===================
  if(l_use_DIPOLES) call Build_DIP_bz(k,E,X)
