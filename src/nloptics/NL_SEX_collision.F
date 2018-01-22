@@ -68,8 +68,8 @@ subroutine NL_SEX_collisions(k,q,i_qp,COLL)
          !
          do ig1=1,ng_oscll
            do ig2=1,ng_oscll
-             COLL(i_np,i_mp,i_kmq)=COLL(i_np,i_mp,i_kmq)+OSCLL(i_n,i_np,i_k,iqbz,ig1) &
-&                                                 *conjg(OSCLL(i_m,i_mp,i_k,iqbz,ig2))*W(iqbz,ig2,ig1) 
+             COLL(i_np,i_mp,i_kmq)=COLL(i_np,i_mp,i_kmq)+OSCLL(i_n,i_np,i_k,iqbz,ig2) &
+&                                                 *conjg(OSCLL(i_m,i_mp,i_k,iqbz,ig1))*W(iqbz,ig2,ig1) 
             enddo
          enddo
          !
