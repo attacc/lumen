@@ -74,8 +74,6 @@ subroutine NL_test_collisions(k,q)
      !
    enddo
    !
-   stop
-   !
  enddo 
  !
 end subroutine NL_test_collisions

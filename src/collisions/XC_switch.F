@@ -67,7 +67,7 @@ subroutine XC_switch()
      l_sc_hartree=.true.
      SC_kind=SC_Hartree
      SC_xc_functional=0
-   case('HARTREE-FOCK')
+   case('FOCK')
      l_sc_hf=.true.
      l_sc_pot_is_local=.false.
      SC_kind=SC_Fock
