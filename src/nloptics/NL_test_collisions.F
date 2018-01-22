@@ -38,6 +38,10 @@ subroutine NL_test_collisions(k,q)
  integer :: ic1,ic2
  complex(SP) :: COLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk)
  complex(SP) :: COLL_OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk)
+ ! 
+ real(SP) :: max_diff,diff
+ !
+ max_diff=0._SP
  !
  do i_qp=1,QP_n_states
    !
@@ -65,9 +69,8 @@ subroutine NL_test_collisions(k,q)
            endif
          endif
          !
-         write(*,*) ' Collision indexex ',ib,ibp,i_kmq
-         write(*,*) COLL(ib,ibp,i_kmq)
-         write(*,*) COLL_OSCLL(ib,ibp,i_kmq)
+         diff=abs(COLL(ib,ibp,i_kmq)-COLL_OSCLL(ib,ibp,i_kmq))
+         if(max_diff<=diff) max_diff=diff
          !
        enddo
      enddo
@@ -75,5 +78,8 @@ subroutine NL_test_collisions(k,q)
    enddo
    !
  enddo 
+ !
+ write(*,*)
+ write(*,*) 'Max error in collisions : ',max_diff
  !
 end subroutine NL_test_collisions
