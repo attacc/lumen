@@ -21,36 +21,40 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine NL_SEX_collisions(k,q,i_k,i_n,i_m,COLL) 
+subroutine NL_SEX_collisions(k,q,i_qp,COLL) 
  !
  ! This subroutine calculate the long-range part of the Screened exchange
  !
  use electrons,      ONLY:n_sp_pol
  use pars,           ONLY:SP,cI,cZERO
  use nl_optics,      ONLY:NL_bands,OSCLL,W,ng_oscll
- use QP_m,           ONLY:QP_nk
+ use QP_m,           ONLY:QP_table,QP_nk,QP_n_states
  use R_lattice,      ONLY:bz_samp,qindx_S
  ! 
  implicit none
  !
- integer,     intent(in)    :: i_k
  type(bz_samp), intent(in)  :: k,q
- integer,   intent(in)      :: i_n,i_m
+ integer,       intent(in)  :: i_qp
  !
  ! Work Space
  !
  integer :: i_mp  ! self-energy external indexes
  integer :: i_np,iqbz,i_kmq ! self-energy internal indexes
  integer :: ig1,ig2
+ integer :: i_n,i_m
+ integer :: i_k
  !
  ! Collisions output
  !
  complex(SP), intent(out) :: COLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk)
  !
- ! Long-range SEX
+ ! Coll indexes
  !
+ i_n=QP_table(i_qp,1)
+ i_m=QP_table(i_qp,2)
+ i_k=QP_table(i_qp,3)
  !
- ! Evaluate Sigma_SEX(i_m,i_n,i_k)
+ ! Build Collisions from the Oscillators
  !
  do i_mp=NL_bands(1),NL_bands(2)
     do i_np=NL_bands(1),NL_bands(2)

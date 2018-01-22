@@ -173,8 +173,6 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
    !
  endif
  !
- if(l_test_oscll) call NL_test_collisions()
- !    
  ! Generate DIPOLES in all the BZ if required
  !===================
  if(l_use_DIPOLES) call Build_DIP_bz(k,E,X)
@@ -228,6 +226,11 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
      !
    endif
    !
+   if(l_test_oscll) then
+     call NL_test_collisions(k,q)
+     stop
+   endif
+   !    
  endif
  !
  ! Initialization
