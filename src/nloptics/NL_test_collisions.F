@@ -29,6 +29,7 @@ subroutine NL_test_collisions(k,q)
  use collision,      ONLY:Fock_collisions,SEX_collisions,nFock_collisions,nSEX_collisions
  use QP_m,           ONLY:QP_table,QP_nk,QP_n_states
  use nl_optics,      ONLY:NL_bands
+ use com,            ONLY:msg
  !
  implicit none
  ! 
@@ -40,6 +41,8 @@ subroutine NL_test_collisions(k,q)
  complex(SP) :: COLL_OSCLL(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),QP_nk)
  ! 
  real(SP) :: max_diff,diff
+ !
+ call msg('s','Collisions Test')
  !
  max_diff=0._SP
  !

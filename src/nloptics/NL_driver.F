@@ -138,7 +138,7 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
      !
    endif
    !
-   if(use_OSCILLATORS) then
+   if(use_COLLISIONS) then
      !
      ! setup Oscillators parallelization
      !
