@@ -132,6 +132,8 @@ subroutine Dipole_driver(Xen,Xk,X,field_dir)
     eval_OVERLAPS=.true.
  endif
  !
+ if(l_nl_optics) Dipole_bands_ordered=.false.
+ !
  ! Set up band limits
  !
  if (Dipole_bands_ordered.or.Dipole_Energy_treshold<0._SP) then

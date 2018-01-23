@@ -94,10 +94,10 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
  ! the optical collisions that are done in G-space and would
  ! force the reloading of the WFs
  !
- Dipole_approach='Covariant' 
  if(l_use_DIPOLES) then
    call DIPOLE_driver(E,k,X(1),X(1)%q0)
  else
+   Dipole_approach='Covariant' 
    if(load_Overlaps()/=0) call DIPOLE_driver(E,k,X(1),X(1)%q0)
  endif
  !
