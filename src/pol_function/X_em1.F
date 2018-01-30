@@ -41,6 +41,10 @@ integer function X_em1(Xen,Xk,q,X,Xw,APPEND_NO_VERIFY)
  use interfaces,    ONLY:PARALLEL_global_indexes,PARALLEL_WF_distribute,&
 &                        PARALLEL_WF_index,WF_load
  use QP_m,          ONLY:QP_n_W_freqs_redux
+#if defined _LU
+ use X_m,           ONLY:Luminescence,Lum_mat
+ use electrons,     ONLY:nel_cond
+#endif
  !
  implicit none
  !
@@ -164,6 +168,12 @@ integer function X_em1(Xen,Xk,q,X,Xw,APPEND_NO_VERIFY)
    endif
    !
  endif
+ !
+ ! Alloc Luminescence IP if required
+ ! =================================
+#if defined _LU
+   if(nel_cond>0._SP) allocate(Lum_mat(Xw%n_freqs))
+#endif
  !
  ! Parallel distribution
  !=======================
