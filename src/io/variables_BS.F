@@ -100,6 +100,12 @@ integer function variables_BS(ID,local_description,X)
  call io_elemental(ID,&
 &     VAR="    |ALDA kernel in R-space  :",L0=BS_K_is_ALDA,CHECK=.true.,OP=(/"=="/),&
 &     DESCRIPTION=local_description(i_local_desc))
+#if defined _LU
+  i_local_desc=i_local_desc+1
+  call io_elemental(ID,&
+&     VAR="    |Number of exc. elec,    :",R0=nel_cond,CHECK=.true.,OP=(/"=="/),&
+&     DESCRIPTION=local_description(i_local_desc))
+#endif
  !
  if (res_exch_disk.or.cpl_exch_disk) then
    i_local_desc=i_local_desc+1
@@ -175,12 +181,6 @@ integer function variables_BS(ID,local_description,X)
 &         VAR="    |Coulomb Cutoff          :",CH0=cut_geometry,CHECK=.true.,OP=(/"=="/),&
 &         DESCRIPTION=local_description(i_local_desc))
      i_local_desc=i_local_desc+1
-#if defined _LU
-     call io_elemental(ID,&
-&         VAR="    |Number of exc. elec,    :",R0=nel_cond,CHECK=.true.,OP=(/"=="/),&
-&         DESCRIPTION=local_description(i_local_desc))
-     i_local_desc=i_local_desc+1
-#endif
      call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
      !
      ! W_TDDFT_KERNEL
