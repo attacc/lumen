@@ -27,6 +27,9 @@ integer function variables_X(ID,local_description,X)
  use units,         ONLY:HA2EV
  use X_m,           ONLY:X_t,use_X_DbGd,X_DbGd_nkpts,n_X_descs
  use IO_m,          ONLY:io_elemental,io_status,read_is_on
+#if defined _LU
+ use electrons,     ONLY:nel_cond
+#endif
  implicit none
  !
  integer            ::ID
@@ -46,7 +49,11 @@ integer function variables_X(ID,local_description,X)
  !
  ! PARS_1
  !
+#if defined _LU
+ call io_elemental(ID,VAR=trim(X_label)//"PARS_1",VAR_SZ=6,MENU=0)
+#else
  call io_elemental(ID,VAR=trim(X_label)//"PARS_1",VAR_SZ=5,MENU=0)
+#endif
  i_local_desc=i_local_desc+1
  call io_elemental(ID,DB_I0=X%ng_db,&
 &     VAR=" X matrix size          :",I0=X%ng,CHECK=.true.,OP=(/"<="/),&
@@ -59,6 +66,12 @@ integer function variables_X(ID,local_description,X)
  call io_elemental(ID,UNIT=HA2EV,&
 &     VAR=" X e/h energy range [ev]:",R1=X%ehe,CHECK=.true.,OP=(/">=","<="/),&
 &     DESCRIPTION=local_description(i_local_desc))
+#if defined _LU
+ i_local_desc=i_local_desc+1
+ call io_elemental(ID,&
+&     VAR=" Number of exc. electr. :",R0=nel_cond,WARN=.true.,OP=(/"=="/),&
+&     DESCRIPTION=local_description(i_local_desc))
+#endif
  call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
  !
  ! PARS_2

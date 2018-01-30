@@ -34,6 +34,9 @@ integer function variables_BS(ID,local_description,X)
 &                        BS_K_is_ALDA,BS_cpl_K_exchange,&
 &                        BS_cpl_K_corr
  use IO_m,          ONLY: io_elemental,io_status
+#if defined _LU
+ use electrons,     ONLY:nel_cond
+#endif
  implicit none
  !
  integer            ::ID
@@ -49,6 +52,9 @@ integer function variables_BS(ID,local_description,X)
  ! PARS1
  !
  var_size=30
+#if defined _LU
+ var_size=var_size+1
+#endif
  !
  i_local_desc=1
  local_description=' '
@@ -169,6 +175,12 @@ integer function variables_BS(ID,local_description,X)
 &         VAR="    |Coulomb Cutoff          :",CH0=cut_geometry,CHECK=.true.,OP=(/"=="/),&
 &         DESCRIPTION=local_description(i_local_desc))
      i_local_desc=i_local_desc+1
+#if defined _LU
+     call io_elemental(ID,&
+&         VAR="    |Number of exc. elec,    :",R0=nel_cond,CHECK=.true.,OP=(/"=="/),&
+&         DESCRIPTION=local_description(i_local_desc))
+     i_local_desc=i_local_desc+1
+#endif
      call io_elemental(ID,VAR="",VAR_SZ=0,MENU=0)
      !
      ! W_TDDFT_KERNEL
