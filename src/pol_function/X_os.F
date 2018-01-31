@@ -93,7 +93,7 @@ subroutine X_os(Xo,iq,Xen,Xk,Xw,X)
  force_bare_X_G=use_X_DbGd.or.associated(Xen%W).or.associated(Xen%GreenF)
  !
 #if defined _LU
- force_bare_X_G=force_bare_X_G.or.nel_cond>0._SP
+! force_bare_X_G=force_bare_X_G.or.nel_cond>0._SP
 #endif
  !
  skip_WF_load= (iq==1.and.X%ng==1)
