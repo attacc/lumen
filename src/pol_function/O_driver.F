@@ -50,7 +50,7 @@ subroutine O_driver(Xen,Xk,q,wv,X)
  use X_output,      ONLY:lum_file_name
  use electrons,     ONLY:nel_cond
  use X_m,           ONLY:Luminescence,Lum_mat
- use com,           ONLY:error
+ use com,           ONLY:error,warning
 #endif
  use nl_optics,     ONLY:eval_OVERLAPS
  use interfaces,    ONLY:PARALLEL_global_indexes,PARALLEL_WF_index,PARALLEL_WF_distribute,WF_load
@@ -129,7 +129,7 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    !
    if (iq>1) then
 #if defined _LU
-     call error("Luminescence only at q=0")
+     if(nel_cond>0._SP) call warning("Luminescence only at q=0")
 #endif
      if (.not.PAR_IND_Q%element_1D(iq)) cycle
    endif
@@ -185,7 +185,7 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    !
    call of_open_close(eps_file_name,'ot')
 #if defined _LU
-   if(nel_cond/=0._SP) then
+   if(nel_cond/=0._SP.and.iq==1) then
      call of_open_close(lum_file_name,'ot')
    else
      lum_file_name=' '
@@ -258,27 +258,21 @@ subroutine O_driver(Xen,Xk,q,wv,X)
    ! X Dyson equation solver
    !
 #if defined _LU
-   !
    if(nel_cond>0._SP) then
-     !  
      Luminescence(:,1)=Lum_mat(:)*4.0_SP*pi/Q_plus_G_sq_modulus
-     !
    endif
-   !
 #endif
    !
    if(l_rpa_IP) then
      Epsilon_ii(:,2)=Epsilon_ii(:,1)
 #if defined _LU
-     Luminescence(:,2)=Luminescence(:,1)
+    if(iq==1) Luminescence(:,2)=Luminescence(:,1)
 #endif
    else
-#if defined _LU
-    call error("RPA not implemented yet in luminescence! ")
-#endif
      call X_s(iq,X,wv,(/1,wv%n_freqs/))
      !
      Epsilon_ii(:,2)=1._SP/(X_mat(i_G_shift,i_G_shift,:)*bare_qpg(iq,i_G_shift)**2/Q_plus_G_sq_modulus+1._SP)
+     !
    endif
    !
    call of_open_close(eps_file_name,'oa')
