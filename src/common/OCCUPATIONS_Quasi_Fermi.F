@@ -35,6 +35,7 @@ subroutine OCCUPATIONS_Quasi_Fermi(E,K,mode)
  !  Full report of system electronic character
  !
  use pars,          ONLY:SP,DP
+ use units,         ONLY:HA2EV
  use electrons,     ONLY:levels,nel_cond,nel,E_duplicate,E_reset
  use R_lattice,     ONLY:bz_samp
  use IO_m,          ONLY:IO_and_Messaging_switch

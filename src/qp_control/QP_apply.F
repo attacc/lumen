@@ -97,6 +97,12 @@ subroutine QP_apply(band_range,en,k,object,msg_fmt,qp_impose,QP_ctl_impose)
  if (object=="K") Eid=2
  if (object=="G") Eid=3
  !
+ ! Remove Quasi-Fermi Occupation 
+ !
+#if defined _LU
+ call OCCUPATIONS_Fermi(en,k,2)
+#endif
+ !
  call QP_reset(qp)
  do i_spin=1,n_sp_pol
    call reset_QP_ctl(QP_ctl_from_DB(i_spin))

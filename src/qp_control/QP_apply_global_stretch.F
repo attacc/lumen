@@ -165,7 +165,7 @@ subroutine QP_apply_global_stretch(band_range,E,k,QP_ctl_from_DB,QP_ctl_add,DB_c
          ! Energy
          !========
          if (what=='E') then
-           ! Shissor correction
+           ! Scissor correction
            delta=M_factors_CTL(iref+1)
            if(l_add_DB_corr) delta=delta+M_factors_DBs(iref+1)
            ! Stretching correction
@@ -231,6 +231,21 @@ subroutine QP_apply_global_stretch(band_range,E,k,QP_ctl_from_DB,QP_ctl_add,DB_c
          !
        enddo
      enddo
+     !
+     ! Shift the additional bands below and above the band_range
+     !
+     do ib=1,band_range(1)
+       do ik=1,E%nk
+         E%E(ib,ik,i_spin)=E%E(ib,ik,i_spin)+(E%E(band_range(1),ik,i_spin)-E%Eo(band_range(1),ik,i_spin))
+       enddo
+     enddo
+     !   
+     do ib=band_range(2)+1,E%nb
+       do ik=1,E%nk
+         E%E(ib,ik,i_spin)=E%E(ib,ik,i_spin)+(E%E(band_range(2),ik,i_spin)-E%Eo(band_range(2),ik,i_spin))
+       enddo
+     enddo
+     !
    end subroutine
    !
    subroutine fit_report(qpfit,what)

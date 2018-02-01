@@ -23,7 +23,7 @@
 subroutine OCCUPATIONS_Merge(E,E_minus,E_plus,K,mode)
  !
  use pars,          ONLY:SP,DP
- use electrons,     ONLY:levels
+ use electrons,     ONLY:levels,default_nel
  use com,           ONLY:msg
  use R_lattice,     ONLY:bz_samp
  !
@@ -37,7 +37,7 @@ subroutine OCCUPATIONS_Merge(E,E_minus,E_plus,K,mode)
  !
  integer :: nval
  !
- nval=E%nbf ! number of valence bands 
+ nval=nint(default_nel/2._SP) !nel/2._SP ! number of valence bands 
  !
  E%nbm=E_plus%nbm   ! from negative charged distribution
  E%nbf=E_minus%nbf  ! from positive charged distribution
