@@ -44,6 +44,11 @@ subroutine K_output_file(iq,mode)
  use X_output,  ONLY:moke_file_name,off_file_name,beta_file_name
  use KERR,      ONLY:B_Hall,A_drude
 #endif
+#if defined _LU
+ use X_output,  ONLY:lu_file_name
+ use lum_m,     ONLY:LU
+ use drivers,   ONLY:l_lum
+#endif
  !
  implicit none
  integer      :: iq
@@ -96,6 +101,10 @@ subroutine K_output_file(iq,mode)
  if (l_INIT) title_mode='ot'
  !
  call of_open_close(eps_file_name,title_mode)
+#if defined _LU
+ call of_open_close(lu_file_name,title_mode)
+#endif
+
  if (eval_reflectivity) call of_open_close(refl_file_name,title_mode)
  if (eval_eels)         call of_open_close(eel_file_name,title_mode)
  if (eval_alpha)        call of_open_close(alpha_file_name,title_mode)
@@ -148,6 +157,16 @@ subroutine K_output_file(iq,mode)
  if (l_Diago) call msg("o eps",'#',headers(:5),INDENT=0,USE_TABS=.TRUE.)
  if (l_IP) call msg("o eps",'#',headers(:3),INDENT=0,USE_TABS=.TRUE.)
  !
+#if defined _LU
+ if (l_lum) then
+   call X_setup_headers('PL')
+   if (l_IP) then
+     call msg("o lu_",'#',headers(:2),INDENT=0,USE_TABS=.TRUE.)
+   else
+     call msg("o lu_",'#',headers(:3),INDENT=0,USE_TABS=.TRUE.)
+   endif
+ endif
+#endif
  !
  if (eval_reflectivity) then 
    call X_setup_headers('REFL')
@@ -226,6 +245,32 @@ subroutine K_output_file(iq,mode)
  !
  call msg("o eps refl eel alpha off beta moke jdos pl_",'#')
  !
+#if defined _LU
+ !
+ if (l_lum) then
+   !
+   ! PHOTOLUMINESCENCE
+   !--------------------
+   !
+   do iw=1,BSS_n_freqs
+     !
+     ! PL: 2 (int) 3 (non int) 
+     !
+     if (l_IP) then
+       n_output_data=2
+       output_data(1:2)=(/real(LU(iw,1))*HA2EV,LU(iw,3)/)
+     else
+       n_output_data=3
+       output_data(1:3)=(/real(LU(iw,1))*HA2EV,LU(iw,2),LU(iw,3)/)
+     endif
+     !
+     call msg("o lu_",'',output_data(:n_output_data),INDENT=-2,USE_TABS=.TRUE.)
+     !
+   enddo
+   !
+ endif
+ !
+#endif
  !
  ! ABSORPTION
  !------------

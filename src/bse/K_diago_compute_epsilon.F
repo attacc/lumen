@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine K_diago_compute_epsilon(iq,W,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,BS_R_right_kerr,BS_R_PL)
+subroutine K_diago_compute_epsilon(iq,W,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,BS_R_right_kerr,BS_R_LU)
  !
  ! eps2(iw)= 1 - Sum  [BS_R_left(i)*BS_R_right(i)] / [w+i*eta - E(i)]  
  !
@@ -37,6 +37,10 @@ subroutine K_diago_compute_epsilon(iq,W,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,
  use interfaces,     ONLY:PARALLEL_index
  use R_lattice,      ONLY:nkbz
  !
+#if defined _LU
+ use lum_m,          ONLY:LU
+ use drivers,        ONLY:l_lum
+#endif
  !
  implicit none
  !
@@ -46,7 +50,7 @@ subroutine K_diago_compute_epsilon(iq,W,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,
  complex(SP), intent(in)  :: BS_R_left(BS_H_dim),BS_R_right(BS_H_dim)
  real(SP),    pointer     :: BS_E_SOC_corr(:,:)
  complex(SP), pointer     :: BS_R_right_kerr(:)
- real(SP),    pointer     :: BS_R_PL(:,:)
+ real(SP),    pointer     :: BS_R_LU(:,:)
  !
  ! Work space
  !
@@ -62,6 +66,10 @@ subroutine K_diago_compute_epsilon(iq,W,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,
  Epsilon_ii(:,2)=cZERO
  Joint_DOS(:,2) =cZERO
  !
+#if defined _LU
+ if (l_lum) LU(:,2) = rZERO
+#endif
+
  !
  !
  ! If perturbative SOC energies are loaded compute the SOC energies
@@ -69,7 +77,11 @@ subroutine K_diago_compute_epsilon(iq,W,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,
  call PP_indexes_reset(px)
  call PARALLEL_index(px,(/BS_H_dim/))
  !
+#if defined _LU
+ call live_timing('BSK  EPS and LU',px%n_of_elements(myid+1))
+#else
  call live_timing('BSK     epsilon',px%n_of_elements(myid+1))
+#endif
  !
  do i1=1,BS_H_dim
    !
@@ -90,6 +102,13 @@ subroutine K_diago_compute_epsilon(iq,W,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,
      Joint_DOS(:,2)=Joint_DOS(:,2)-1._SP/(W%p(:)-EXC_E(i_pert_SOC))
      if (BSS_add_antiresonant) Joint_DOS(:,2)=Joint_DOS(:,2)+1._SP/(W%p(:)+conjg(EXC_E(i_pert_SOC)))
      !
+#if defined _LU
+     if(l_lum) then
+       LU(:,2)=LU(:,2)+BS_R_LU(1,i1)*aimag(-1._SP/(W%p(:)-EXC_E(i_pert_SOC)))/pi
+       if (BSS_add_antiresonant) LU(:,2)=LU(:,2)+BS_R_LU(2,i1)*aimag(-1._SP/(W%p(:)+conjg(EXC_E(i_pert_SOC))))/pi
+     endif
+#endif
+ 
      !
    enddo
    !
@@ -99,6 +118,10 @@ subroutine K_diago_compute_epsilon(iq,W,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,
  !
  call PP_redux_wait(Epsilon_ii(:,2))
  call PP_redux_wait(Joint_DOS(:,2) )
+#if defined _LU
+ call PP_redux_wait(LU(:,2))
+#endif
+
  !
  !
  call PP_indexes_reset(px)

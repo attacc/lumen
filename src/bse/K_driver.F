@@ -45,7 +45,7 @@ subroutine K_driver(Xen,Ken,Xk,q,X_static_pp,Xw)
  use drivers,        ONLY:l_kerr,l_anomalous_Hall
 #endif
 #if defined _LU
- use BS,             ONLY:l_BSE_lum
+ use drivers,        ONLY:l_lum
 #endif
  !
  implicit none
@@ -131,7 +131,7 @@ subroutine K_driver(Xen,Ken,Xk,q,X_static_pp,Xw)
 #endif
  !
 #if defined _LU
- call parser('EvalLum',l_BSE_lum)
+ call parser('EvalLum',l_lum)
 #endif
  ! Energy points
  !===============

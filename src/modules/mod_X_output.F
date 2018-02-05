@@ -32,7 +32,7 @@ module X_output
  implicit none
  !
  character(15)     :: headers(7)
- character(schlen) :: eps_file_name,eel_file_name,alpha_file_name,fxc_file_name,jdos_file_name,pl_file_name
+ character(schlen) :: eps_file_name,eel_file_name,alpha_file_name,fxc_file_name,jdos_file_name,lu_file_name
  character(schlen) :: off_file_name,beta_file_name,moke_file_name,refl_file_name
  character(schlen) :: lum_file_name
  !
@@ -142,7 +142,7 @@ module X_output
      !
      fxc_file_name=  'fxc_q'//trim(intc(iq))
      ! 
-     pl_file_name   ='pl_q'//trim(intc(iq))
+     lu_file_name   ='lu_q'//trim(intc(iq))
      eps_file_name  ='eps_q'//trim(intc(iq))
      refl_file_name ='refl_q'//trim(intc(iq))
      eel_file_name  ='eel_q'//trim(intc(iq))
@@ -166,7 +166,7 @@ module X_output
      endif
      !
      if (len_trim(solver)>0) then
-       pl_file_name   =  trim(pl_file_name)//'_'//solver
+       lu_file_name   =  trim(lu_file_name)//'_'//solver
        eps_file_name  =  trim(eps_file_name)//'_'//solver
        refl_file_name =  trim(refl_file_name)//'_'//solver
        eel_file_name  =  trim(eel_file_name)//'_'//solver
@@ -181,7 +181,7 @@ module X_output
      endif
      !
      if (len_trim(approx)>0) then
-       pl_file_name   =  trim(pl_file_name)//'_'//approx
+       lu_file_name   =  trim(lu_file_name)//'_'//approx
        eps_file_name  =  trim(eps_file_name)//'_'//approx
        refl_file_name =  trim(refl_file_name)//'_'//approx
        eel_file_name  =  trim(eel_file_name)//'_'//approx
@@ -195,7 +195,7 @@ module X_output
      endif
      !
      if (len_trim(equation)>0) then
-       pl_file_name   =  trim(pl_file_name)//'_'//equation
+       lu_file_name   =  trim(lu_file_name)//'_'//equation
        eps_file_name  =  trim(eps_file_name)//'_'//equation
        refl_file_name =  trim(refl_file_name)//'_'//equation
        eel_file_name  =  trim(eel_file_name)//'_'//equation

@@ -87,13 +87,13 @@ module BS
    complex(SP), allocatable      :: dipoles_A(:)
    complex(SP), allocatable      :: dipoles_R_kerr(:)
    complex(SP), allocatable      :: dipoles_A_kerr(:)
-   complex(SP), allocatable      :: dipoles_R_PL(:,:)
-   complex(SP), allocatable      :: dipoles_A_PL(:,:)
+   complex(SP), allocatable      :: dipoles_R_LU(:,:)
+   complex(SP), allocatable      :: dipoles_A_LU(:,:)
    complex(SP), allocatable      :: Z(:)
    real(SP)   , allocatable      :: E(:)
    real(SP)   , allocatable      :: f(:)
    real(SP)   , allocatable      :: f_RES(:)
-   real(SP)   , allocatable      :: f_PL(:,:)
+   real(SP)   , allocatable      :: f_LU(:,:)
    real(SP)   , allocatable      :: W(:)
    real(SP)   , allocatable      :: E_SOC_corr(:,:)
    !
@@ -218,7 +218,7 @@ module BS
    subroutine BS_Blocks_and_Transitions_alloc(E,iT)
      !
      use pars,       ONLY:IP
-     use drivers,    ONLY:l_kerr,l_photolum
+     use drivers,    ONLY:l_kerr,l_lum
      use stderr,     ONLY:intc
      use memory_m,   ONLY:mem_est
      use electrons,  ONLY:levels,E_SOC_nbands,n_sp_pol
@@ -233,10 +233,10 @@ module BS
          call mem_est("BS_T_grp_dipoles_KERR_R_N",(/nT/))
          if (BS_K_coupling) call mem_est("BS_T_grp_dipoles_KERR_A_N",(/nT/))
        endif
-       if(l_photolum) then
-         call mem_est("BS_T_grp_dipoles_PL_R_N",(/4*nT/))
-         if (BS_K_coupling) call mem_est("BS_T_grp_dipoles_PL_A_N",(/4*nT/))
-         call mem_est("BS_T_grp_f_PL",(/2*nT/),(/SP/))
+       if(l_lum) then
+         call mem_est("BS_T_grp_dipoles_LU_R_N",(/4*nT/))
+         if (BS_K_coupling) call mem_est("BS_T_grp_dipoles_LU_A_N",(/4*nT/))
+         call mem_est("BS_T_grp_f_LU",(/2*nT/),(/SP/))
        endif
        call mem_est("BS_T_grp_table_N",(/nT/),(/IP/))
        call mem_est("BS_T_grp_E_N",(/nT/),(/SP/))
@@ -254,15 +254,15 @@ module BS
        allocate(BS_T_grp(iT)%dipoles_R_kerr(nT))
        if (BS_K_coupling) allocate(BS_T_grp(iT)%dipoles_A_kerr(nT))
      endif
-     if(l_photolum) then
-       allocate(BS_T_grp(iT)%dipoles_R_PL(nT,3))
-       if (BS_K_coupling) allocate(BS_T_grp(iT)%dipoles_A_PL(nT,3))
+     if(l_lum) then
+       allocate(BS_T_grp(iT)%dipoles_R_LU(nT,3))
+       if (BS_K_coupling) allocate(BS_T_grp(iT)%dipoles_A_LU(nT,3))
      endif
      allocate(BS_T_grp(iT)%table(nT,4))
      allocate(BS_T_grp(iT)%E(nT))
      allocate(BS_T_grp(iT)%f(nT))
      allocate(BS_T_grp(iT)%f_RES(nT))
-     if(l_photolum) allocate(BS_T_grp(iT)%f_PL(2,nT))
+     if(l_lum) allocate(BS_T_grp(iT)%f_LU(2,nT))
      if (associated(E%Z)) allocate(BS_T_grp(iT)%Z(nT))
      if (associated(E%W)) allocate(BS_T_grp(iT)%W(nT))
      if (E_SOC_nbands/=0) allocate(BS_T_grp(iT)%E_SOC_corr(2/n_sp_pol,nT))
@@ -272,7 +272,7 @@ module BS
    subroutine BS_Blocks_and_Transitions_free()
      use stderr,     ONLY:intc
      use memory_m,   ONLY:mem_est
-     use drivers,    ONLY:l_kerr,l_photolum
+     use drivers,    ONLY:l_kerr,l_lum
      use parallel_m, ONLY:PAR_BS_T_grps_index
      use electrons,  ONLY:E_SOC_nbands
      integer :: i_g
@@ -296,7 +296,7 @@ module BS
        deallocate(BS_T_grp(i_g)%E)
        deallocate(BS_T_grp(i_g)%f)
        deallocate(BS_T_grp(i_g)%f_RES)
-       if (allocated(BS_T_grp(i_g)%f_PL)) deallocate(BS_T_grp(i_g)%f_PL)
+       if (allocated(BS_T_grp(i_g)%f_LU)) deallocate(BS_T_grp(i_g)%f_LU)
        if (allocated(BS_T_grp(i_g)%Z))    deallocate(BS_T_grp(i_g)%Z)
        if (allocated(BS_T_grp(i_g)%W))    deallocate(BS_T_grp(i_g)%W)
        if (E_SOC_nbands/=0)               deallocate(BS_T_grp(i_g)%E_SOC_corr)
@@ -305,9 +305,9 @@ module BS
      !
      call mem_est("BS_T_grp_dipoles_R_N")
      call mem_est("BS_T_grp_dipoles_A_N")
-     if(l_photolum) then
-       call mem_est("BS_T_grp_dipoles_PL_R_N BS_T_grp_f_PL")
-       if (BS_K_coupling) call mem_est("BS_T_grp_dipoles_PL_A_N")
+     if(l_lum) then
+       call mem_est("BS_T_grp_dipoles_LU_R_N BS_T_grp_f_LU")
+       if (BS_K_coupling) call mem_est("BS_T_grp_dipoles_LU_A_N")
      endif
      if(l_kerr) then
        call mem_est("BS_T_grp_dipoles_R_N")

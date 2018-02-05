@@ -50,7 +50,7 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
 &                       BS_bands,BS_nT_at_k,BSE_mode,BS_T_grp,BS_nT_grps,&
 &                       BS_not_const_eh_f,BS_Blocks_and_Transitions_alloc
 #if defined _LU
- use BS,           ONLY:l_BSE_lum
+ use drivers,      ONLY:l_lum
 #endif
  use X_m,          ONLY:global_gauge,Dipole_Energy_treshold
  use parallel_m,   ONLY:PAR_IND_WF_b_and_k,PAR_IND_T_all,PAR_IND_T_ordered,PAR_IND_T_groups,&
@@ -60,6 +60,11 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
  use R_lattice,    ONLY:qindx_X,bz_samp
  !
  implicit none
+ !
+#if defined _LU
+ real(SP):: f_eh_LU(2)
+#endif
+ !
  !
  type(levels) :: Ken
  type(bz_samp):: Xk
@@ -182,6 +187,11 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
              !
              BS_T_grp(i_T_group_now)%E(i_T_in_the_grp) =E_eh
              BS_T_grp(i_T_group_now)%f(i_T_in_the_grp) =f_eh
+             !
+#if defined _LU
+             if (l_lum) BS_T_grp(i_T_group_now)%f_LU(:,i_T_in_the_grp) =f_eh_LU
+#endif
+             !
              BS_T_grp(i_T_group_now)%f_RES(i_T_in_the_grp)=f_eh_RES
              !
              if (associated(Ken%Z)) BS_T_grp(i_T_group_now)%Z(i_T_in_the_grp)=Ken%Z(ic,ik,i_sp)*Ken%Z(iv,ikp,i_sp)
@@ -245,9 +255,6 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
      f_eh_REF =(Ken%f(iv,ikp,i_sp)-Ken%f(ic,ik ,i_sp))/spin_occ
      f_eh     =f_eh_REF
      f_eh_RES =f_eh_REF
-#if defined _LU
-     if(l_BSE_lum) f_eh_RES =(spin_occ-Ken%f(iv,ikp,i_sp))*Ken%f(ic,ik ,i_sp)/spin_occ
-#endif
      !
      ! f_eh  enter the excitonic Hamiltonian
      ! f_eh_RES enter the residual of the dielectric constant
@@ -256,6 +263,15 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
      f_e = (         Ken%f(iv,ikp,i_sp))/spin_occ
      f_h = (spin_occ-Ken%f(ic,ik ,i_sp))/spin_occ
      !
+#if defined _LU
+     !
+     ! Resonant
+     f_eh_LU(1) = Ken%f(ic,ikp,i_sp)*(spin_occ-Ken%f(iv,ik ,i_sp))/spin_occ/spin_occ
+     !
+     ! Anti-Resonant
+     f_eh_LU(2) = Ken%f(iv,ik ,i_sp)*(spin_occ-Ken%f(ic,ikp,i_sp))/spin_occ/spin_occ
+     !
+#endif
      !
      ! A 0.001 % fractional occupation swiches on the particular treatment of finite temp. BSE 
      if ( abs(abs(f_eh_REF)-1._SP)> filled_tresh ) BS_not_const_eh_f=.TRUE.
