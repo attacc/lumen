@@ -38,6 +38,11 @@ subroutine K_diago_driver(iq,W)
  use interfaces,     ONLY:K_diago_compute_epsilon
  use IO_m,           ONLY:io_control,REP,VERIFY,OP_WR_CL,OP_RD_CL
  use parser_m,       ONLY:parser
+ use BS_solvers,     ONLY:BSS_eh_f
+#if defined _LU
+ use drivers,        ONLY:l_lum
+ use lum_m,          ONLY:BSS_LU_free
+#endif
  !
  !
 #if defined _TIMING
@@ -58,7 +63,7 @@ subroutine K_diago_driver(iq,W)
  complex(SP),allocatable :: BS_E(:)
  complex(SP),allocatable :: BS_R_left(:)       
  complex(SP),allocatable :: BS_R_right(:)      
- real(SP),   pointer     :: BS_R_PL(:,:) => null()
+ real(SP),   pointer     :: BS_R_LU(:,:) => null()
  real(SP)   ,pointer     :: BS_E_SOC_corr(:,:) => null()
  complex(SP),pointer     :: BS_R_right_kerr(:) => null()
  complex(SP),pointer     :: BS_overlap(:,:) => null()
@@ -103,7 +108,7 @@ subroutine K_diago_driver(iq,W)
  ! Diagonalization DB (IN)
  !========================
  call io_control(ACTION=OP_RD_CL,COM=REP,MODE=VERIFY,SEC=(/1,2/),ID=ID)
- io_err=io_BSS_diago(iq,ID,BS_H_dim,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,BS_R_right_kerr,BS_R_PL)
+ io_err=io_BSS_diago(iq,ID,BS_H_dim,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,BS_R_right_kerr,BS_R_LU)
  !
  ! Kernel loading
  !================
@@ -148,11 +153,18 @@ subroutine K_diago_driver(iq,W)
      !
      call K_diago_non_hermitian_residuals(BS_E,BS_R_left,BS_R_right,BS_V_left,BS_V_right,BS_overlap)
      !
+#if defined _LU
+     if(l_lum     ) call LU_diago_residual(BS_V_left,BS_V_right,BS_R_LU,K_is_not_hermitian,BS_overlap)
+#endif
+
      !
    else
      !
      call K_diago_hermitian_residuals(BS_E_real,BS_R_left,BS_R_right)
      !
+#if defined _LU
+     if(l_lum     ) call LU_diago_residual(BS_mat,BS_mat,BS_R_LU,K_is_not_hermitian)
+#endif
      !
    endif
    !
@@ -161,7 +173,7 @@ subroutine K_diago_driver(iq,W)
  !
  ! Now I calculate epsilon
  !=========================
- call K_diago_compute_epsilon(iq,W,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,BS_R_right_kerr,BS_R_PL)
+ call K_diago_compute_epsilon(iq,W,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,BS_R_right_kerr,BS_R_LU)
  !
  ! I write the output file 
  !
@@ -172,7 +184,7 @@ subroutine K_diago_driver(iq,W)
  if (io_err/=0) then
    !
    call io_control(ACTION=OP_WR_CL,COM=REP,MODE=VERIFY,SEC=(/1,2,3/),ID=ID)
-   io_err=io_BSS_diago(iq,ID,BS_H_dim,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,BS_R_right_kerr,BS_R_PL)
+   io_err=io_BSS_diago(iq,ID,BS_H_dim,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,BS_R_right_kerr,BS_R_LU)
    !
  endif
  !
@@ -180,6 +192,10 @@ subroutine K_diago_driver(iq,W)
  !=======
  call BS_mat_free( )
  call local_free( )
+ !
+#if defined _LU
+ call BSS_LU_free()
+#endif
  !
  !
 #if defined _TIMING
@@ -203,6 +219,9 @@ subroutine K_diago_driver(iq,W)
        allocate(BS_R_left(BS_H_dim))
        allocate(BS_R_right(BS_H_dim))
        !
+#if defined _LU
+       allocate(BS_R_LU(2,BS_H_dim))
+#endif
        !
      case(2)
        !
@@ -242,6 +261,12 @@ subroutine K_diago_driver(iq,W)
        deallocate(BS_R_right_kerr)
        nullify(BS_R_right_kerr)
      endif
+#endif
+#if defined _LU
+    if(associated(BS_R_LU)) then
+       deallocate(BS_R_LU)
+       nullify(BS_R_LU)
+    endif
 #endif
      !
    end subroutine local_free

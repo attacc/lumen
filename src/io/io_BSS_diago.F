@@ -96,6 +96,10 @@ integer function io_BSS_diago(iq,ID,BS_H_dim,bsE,bsRl,bsRr,BsE_corr,bsR_kerr,bsR
    if (read_is_on(ID)) bsRl(:)=cmplx(V_disk(1,:),V_disk(2,:),SP)
    if (read_is_on(ID)) bsRr(:)=cmplx(V_disk(3,:),V_disk(4,:),SP)
    !
+   if(associated(bsR_pl)) then
+     call io_bulk(ID,'BS_PL_Residuals',VAR_SZ=(/2,BS_H_dim/))
+     call io_bulk(ID,R2=bsR_pl)
+   endif
    !
  endif
  !

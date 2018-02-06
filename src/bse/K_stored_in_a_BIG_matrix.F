@@ -39,6 +39,9 @@ subroutine K_stored_in_a_BIG_matrix(iq)
 &                         BSS_dipoles,BSS_eh_table,BSS_eh_E,BSS_eh_f,BSS_eh_W,BSS_eh_Z,BS_mat_alloc
  use BS_solvers,     ONLY:BSS_eh_f_RES
  use BS,             ONLY:BS_K_dim,BS_nT_grps,BS_blk,n_BS_blks,BS_T_grp,BS_K_coupling
+#if defined _LU
+ use lum_m,          ONLY:BSS_LU_alloc
+#endif
  !
  !
  implicit none
@@ -58,6 +61,9 @@ subroutine K_stored_in_a_BIG_matrix(iq)
  !
  call BS_mat_alloc( )
  !
+#if defined _LU
+   call BSS_LU_alloc( )
+#endif
  !
  ! FILLING BSS_eh_* and BSS_dipoles
  !==================================

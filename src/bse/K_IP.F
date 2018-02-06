@@ -68,7 +68,7 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
  real(SP)          ::conjg_fac,Z_
  complex(SP)       ::drude_GreenF(W_bss%n_freqs),res,E_plus_W0,E_plus_W(2/n_sp_pol),diam_term,diam_term0
 #if defined _LU
- complex(SP)       ::P_weighted(3)
+ complex(SP)       ::rotated_P(3),P_weighted(3)
  real(SP)          ::res_LU(2)
 #endif
 
@@ -108,7 +108,7 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
  endif
  !
  !
-#if defined _PL
+#if defined _LU
  !
  ! LU_0
  !======
@@ -176,12 +176,14 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
        ! *velocity* : DIP_projected(c,v,k) is q_ver*<v|p|c> while I need q_ver*<c|r|v> =  conjg(q_ver*<v|r|c>)
        !              see definition of conjg_fac few lines before for the -1
        !
-#if defined _PL
+#if defined _LU
        if (l_lum) then
          !
-         BS_T_grp(i_T_g)%dipoles_R_PL(i_T,:)=conjg(DIP_projected(ic,iv,ik_bz_mem,i_sp_pol))
+         call GET_the_rotated_P( )         
+         !
+         BS_T_grp(i_T_g)%dipoles_R_LU(i_T,:)=conjg(rotated_P(:))
          if (BS_K_coupling) then
-           BS_T_grp(i_T_g)%dipoles_A_PL(i_T,:)=DIP_projected(ic,iv,ik_bz_mem,i_sp_pol)
+           BS_T_grp(i_T_g)%dipoles_A_LU(i_T,:)=rotated_P(:)
          endif
          !
        endif
@@ -200,13 +202,13 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
        res=BS_T_grp(i_T_g)%dipoles_R(i_T)*conjg(BS_T_grp(i_T_g)%dipoles_R(i_T))*BS_T_grp(i_T_g)%f_RES(i_T)*Z_
        if (allocated(BS_T_grp(i_T_g)%W) .and. trim(global_gauge)=="velocity") res=res*E_plus_W0/conjg(E_plus_W0)
        !
-#if defined _PL
+#if defined _LU
        if (l_lum) then
          do ic=1,3
            P_weighted(ic)=BS_T_grp(i_T_g)%dipoles_R_LU(i_T,ic)*LU_weights(ic)
          enddo
          !
-         ! Note that res_PL is always positive as f_PL>0
+         ! Note that res_LU is always positive as f_LU>0
          !
          res_LU=Z_*dot_product(P_weighted,P_weighted)*BS_T_grp(i_T_g)%f_LU(:,i_T)
        endif
@@ -251,6 +253,13 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
    call PP_redux_wait( A_drude(1) ,COMM=PAR_COM_Xk_ibz_INDEX%COMM )
    call PP_redux_wait( A_drude(1) ,COMM=PAR_COM_eh_INDEX%COMM )
 #endif
+#if defined _PL
+   if (l_lum) then
+     call PP_redux_wait(LU(:,3)        ,COMM=PAR_COM_Xk_ibz_INDEX%COMM )
+     call PP_redux_wait(LU(:,3)        ,COMM=PAR_COM_eh_INDEX%COMM )
+   endif
+#endif
+
    !
    ! DOS
    !=====
@@ -310,6 +319,10 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
    if(l_kerr) deallocate(Epsilon_ij)
 #endif
    !
+#if defined _LU
+   if(allocated(LU)) deallocate(LU)
+#endif
+   !
  endif
  !
 1 continue
@@ -318,6 +331,33 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
  call timing('T_space IP',OPR='stop')
 #endif
  !
+#if defined _LU
+ !
+ contains
    !
+   subroutine GET_the_rotated_P( )
+     !
+     use D_lattice,      ONLY:i_time_rev,dl_sop,sop_inv,nsym
+     use parallel_m,     ONLY:PAR_DIPk_ibz_index
+     !
+     integer :: ik,is,ik_mem
+     logical :: t_rev
+     !
+     ik=Xk%sstar(ik_bz,1)
+     is=Xk%sstar(ik_bz,2)
+     !
+     if ( is<= nsym/(i_time_rev+1) ) t_rev=.false.
+     if ( is > nsym/(i_time_rev+1) ) t_rev=.true.
+     !
+     is = sop_inv( is )
+     !      
+     ik_mem    = PAR_DIPk_ibz_index(ik)
+     rotated_P = matmul( dl_sop(:,:,is) , DIP_P(:,ic,iv,ik_mem,i_sp_pol) )
+     !
+     if (t_rev) rotated_P = conjg( rotated_P )
+     !
+   end subroutine
+   !
+#endif
    !
 end subroutine
