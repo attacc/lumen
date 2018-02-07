@@ -211,7 +211,6 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
          ! Note that res_LU is always positive as f_LU>0
          !
          res_LU=Z_*dot_product(P_weighted,P_weighted)*BS_T_grp(i_T_g)%f_LU(:,i_T)
-         !
        endif
 #endif
        !

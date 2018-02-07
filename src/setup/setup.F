@@ -319,5 +319,4 @@ subroutine setup(en,Xen,Ken,k,Xk)
  !
  call E_duplicate(Xen,Ken)
  !
- !
 end subroutine
