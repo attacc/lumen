@@ -41,6 +41,8 @@ subroutine K_stored_in_a_BIG_matrix(iq)
  use BS,             ONLY:BS_K_dim,BS_nT_grps,BS_blk,n_BS_blks,BS_T_grp,BS_K_coupling
 #if defined _LU
  use lum_m,          ONLY:BSS_LU_alloc
+ use drivers,        ONLY:l_lum
+ use lum_m,          ONLY:BSS_dipoles_LU,BSS_LU_alloc,BSS_LU_f,LU_weights
 #endif
  !
  !
@@ -94,6 +96,14 @@ subroutine K_stored_in_a_BIG_matrix(iq)
      BSS_dipoles(H_pos(1))=BS_T_grp(i_g)%dipoles_R(i_c)
      if (BS_K_coupling) BSS_dipoles(H_pos(1)+BS_K_dim)=BS_T_grp(i_g)%dipoles_A(i_c)
      !
+#if defined _LU
+     if (l_lum) then
+       BSS_LU_f(:,H_pos(1))=BS_T_grp(i_g)%f_LU(:,i_c)
+       BSS_dipoles_LU(H_pos(1),:)=BS_T_grp(i_g)%dipoles_R_LU(i_c,:)*LU_weights(:)
+       if (BS_K_coupling) BSS_dipoles_LU(H_pos(1)+BS_K_dim,:)=BS_T_grp(i_g)%dipoles_A_LU(i_c,:)*LU_weights(:)
+       endif
+#endif
+
      !
    enddo
  enddo
