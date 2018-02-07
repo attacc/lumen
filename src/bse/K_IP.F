@@ -64,7 +64,7 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
  !
  ! Work space
  !
- integer           ::ik_bz,iv,ic,i_sp_pol,i_T_g,i_T,ik_bz_mem,n_SOC,i_pert_SOC
+ integer           ::ik_bz,iv,ic,i_sp_pol,i_T_g,i_T,ik_bz_mem,n_SOC,i_pert_SOC,i_c
  real(SP)          ::conjg_fac,Z_
  complex(SP)       ::drude_GreenF(W_bss%n_freqs),res,E_plus_W0,E_plus_W(2/n_sp_pol),diam_term,diam_term0
 #if defined _LU
@@ -153,6 +153,7 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
    !
    if (l_rpa_IP) call live_timing('IP absorption',PAR_BS_nT_col_grps)
    !
+   write(*,*)
    do i_T_g=1,BS_nT_grps
      !
      if (.not.PAR_IND_T_groups%element_1D(i_T_g)) cycle
@@ -176,6 +177,8 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
        ! *velocity* : DIP_projected(c,v,k) is q_ver*<v|p|c> while I need q_ver*<c|r|v> =  conjg(q_ver*<v|r|c>)
        !              see definition of conjg_fac few lines before for the -1
        !
+       BS_T_grp(i_T_g)%dipoles_R(i_T)=conjg_fac*conjg(DIP_projected(ic,iv,ik_bz_mem,i_sp_pol))
+       if (BS_K_coupling) BS_T_grp(i_T_g)%dipoles_A(i_T)=DIP_projected(ic,iv,ik_bz_mem,i_sp_pol)
 #if defined _LU
        if (l_lum) then
          !
@@ -189,9 +192,6 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
        endif
 #endif
        !
-       BS_T_grp(i_T_g)%dipoles_R(i_T)=conjg_fac*conjg(DIP_projected(ic,iv,ik_bz_mem,i_sp_pol))
-       if (BS_K_coupling) BS_T_grp(i_T_g)%dipoles_A(i_T)=DIP_projected(ic,iv,ik_bz_mem,i_sp_pol)
-       !
        if ( abs(real(E_plus_W0)) < Dipole_Energy_treshold ) cycle
        !
        ! Residuals DIP_cv * DIP_vc
@@ -204,16 +204,16 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
        !
 #if defined _LU
        if (l_lum) then
-         do ic=1,3
-           P_weighted(ic)=BS_T_grp(i_T_g)%dipoles_R_LU(i_T,ic)*LU_weights(ic)
+         do i_c=1,3
+           P_weighted(i_c)=BS_T_grp(i_T_g)%dipoles_R_LU(i_T,i_c)*LU_weights(i_c)
          enddo
          !
          ! Note that res_LU is always positive as f_LU>0
          !
          res_LU=Z_*dot_product(P_weighted,P_weighted)*BS_T_grp(i_T_g)%f_LU(:,i_T)
+         !
        endif
 #endif
-       
        !
        do i_pert_SOC=1,n_SOC
          !

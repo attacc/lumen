@@ -102,7 +102,7 @@ subroutine K_output_file(iq,mode)
  !
  call of_open_close(eps_file_name,title_mode)
 #if defined _LU
- call of_open_close(lu_file_name,title_mode)
+ if(l_lum) call of_open_close(lu_file_name,title_mode)
 #endif
 
  if (eval_reflectivity) call of_open_close(refl_file_name,title_mode)
