@@ -95,7 +95,7 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
 #if defined _TIMING
  use timing_m,    ONLY:timing_allocate,nclockx
 #endif
-#if defined _PL
+#if defined _LU
  use lum_m,       ONLY:LU_weights
 #endif
 
@@ -526,7 +526,7 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  Efield(1)%ef_name="SOFTSIN"
  l_use_collisions=.FALSE.
  !
-#if defined _PL
+#if defined _LU
  LU_weights=(/1._SP,1._SP,1._SP/)
 #endif
  !
