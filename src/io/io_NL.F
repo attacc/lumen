@@ -63,7 +63,7 @@ integer function io_NL(ID)
  !
  if (any((/io_sec(ID,:)==1/))) then
    !
-   io_NL=io_header(ID,R_LATT=.true.,WF=.true.,IMPOSE_SN=.true.,GAUGE=.true.)
+   io_NL=io_header(ID,R_LATT=.true.,WF=.true.,IMPOSE_SN=.true.,GAUGE=.true.,CUTOFF=.true.)
    if (io_NL/=0) goto 1
    !
    io_NL=variables_NL(ID,local_description)

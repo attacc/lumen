@@ -1,5 +1,6 @@
 #if defined _LU
 LU_objects  = LU_diago_residual.o
+#endif
 #if defined _KERR
 KERR_objects = K_kerr_IP.o K_diago_kerr_residual.o
 #endif

@@ -1,7 +1,7 @@
-New in 1.2 version:
+News in 1.2 version:
   * Real-time Bethe-Salpeter equation implemented in terms collisions
 
-New in 1.1 version:
+News in 1.1 version:
 
   * Improved OpenMP parallelization
   * Oscillators calculation parallelized on bands
