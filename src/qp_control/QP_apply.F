@@ -123,7 +123,12 @@ subroutine QP_apply(band_range,en,k,object,msg_fmt,qp_impose,QP_ctl_impose)
    call parser(what//'fnQPdb',is_def(4))
    call parser(what//'fnQP_Wv',W_def(1))
    call parser(what//'fnQP_Wc',W_def(2))
-   if (.not.any((/is_def,W_def/))) return
+   if (.not.any((/is_def,W_def/))) then
+#if defined _LU
+     call OCCUPATIONS_Quasi_Fermi(en,k,1)
+#endif
+     return
+   endif
  endif
  !
  ! Allocation of qp_done table to keep track of the corrections

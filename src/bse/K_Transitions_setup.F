@@ -189,7 +189,9 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
              BS_T_grp(i_T_group_now)%f(i_T_in_the_grp) =f_eh
              !
 #if defined _LU
-             if (l_lum) BS_T_grp(i_T_group_now)%f_LU(:,i_T_in_the_grp) =f_eh_LU
+             if (l_lum) then
+                BS_T_grp(i_T_group_now)%f_LU(:,i_T_in_the_grp) =f_eh_LU
+             endif
 #endif
              !
              BS_T_grp(i_T_group_now)%f_RES(i_T_in_the_grp)=f_eh_RES
@@ -280,12 +282,16 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
      ! f_eh=0 transitions give no contribution to absorption and are not considered
      if ( f_eh_REF<=0._SP ) T_is_ok=.FALSE.
      !
-     !
-     !
+#if defined _LU
+     if(.not.l_lum) then
+#endif
        ! If I've included in valence states that are almost empty
        ! or in conduction states that are almost full, those are neglected
        if ( (f_e<=filled_tresh) .or. (f_h<=filled_tresh) ) T_is_ok=.FALSE.
        !
+#if defined _LU
+     endif
+#endif
      !
      if (any((/abs(E_eh)<BS_eh_en(1).and.BS_eh_en(1)>0._SP,&
 &              abs(E_eh)>BS_eh_en(2).and.BS_eh_en(2)>0._SP/))) T_is_ok=.FALSE.

@@ -222,10 +222,10 @@ subroutine NL_linear_response(en)
      !
      call set_real_printed_length(f_length=15,g_length=15)
      !
-     eps_file_name  ="YPP-eps_along_E"
+     eps_file_name  ="YPP-eps"
      short_eps=eps_file_name
      !
-     eels_file_name ="YPP-eels_along_E"
+     eels_file_name ="YPP-eels"
      short_eels=eels_file_name
      !
      efield_file_name="YPP-efield_along_E"

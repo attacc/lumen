@@ -153,7 +153,6 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
    !
    if (l_rpa_IP) call live_timing('IP absorption',PAR_BS_nT_col_grps)
    !
-   write(*,*)
    do i_T_g=1,BS_nT_grps
      !
      if (.not.PAR_IND_T_groups%element_1D(i_T_g)) cycle
@@ -226,9 +225,9 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
 #if defined _LU
          if (l_lum) then
            LU(:,3)=LU(:,3)  +res_LU(1)*aimag(-1._SP/(W_bss%p(:)-E_plus_W(i_pert_SOC)))/pi
-           if (BSS_add_antiresonant.or.BS_K_coupling) then
-             LU(:,3)=LU(:,3)+res_LU(2)*aimag(-1._SP/(W_bss%p(:)+conjg(E_plus_W(i_pert_SOC))))/pi
-           endif
+           !if (BSS_add_antiresonant.or.BS_K_coupling) then
+           !  LU(:,3)=LU(:,3)+res_LU(2)*aimag(-1._SP/(W_bss%p(:)+conjg(E_plus_W(i_pert_SOC))))/pi
+           !endif
          endif
 #endif
          !
