@@ -52,14 +52,22 @@ subroutine NL_current(k,E,G_input,A_input)
  !
  complex(SP)   :: RT_P_tmp(3)
  !
- ! A : Current
- !
- call RT_average_operator(V_VALUE=RT_ind_J, V_MATRIX=-DIP_P,G=G_input,k=k,en=E,TRANS=.TRUE.,nK_mem=PAR_Xk_nibz)
- !
- ! Velocity gauge I must use the correct definition of the J operator
- !
- if(trim(global_gauge)=='velocity') RT_ind_J(:)=RT_ind_J(:)+A_input%vecpot(:)*real(nel,SP)/(2._SP*SPEED_OF_LIGHT)
- !
- RT_ind_J=RT_ind_J/DL_vol
+ if(trim(global_gauge)=='velocity') then
+   !
+   ! A : Current
+   !
+   call RT_average_operator(V_VALUE=RT_ind_J, V_MATRIX=-DIP_P,G=G_input,k=k,en=E,TRANS=.TRUE.,nK_mem=PAR_Xk_nibz)
+   !
+   ! Velocity gauge I must use the correct definition of the J operator
+   !
+   if(trim(global_gauge)=='velocity') RT_ind_J(:)=RT_ind_J(:)+A_input%vecpot(:)*real(nel,SP)/(2._SP*SPEED_OF_LIGHT)
+   !
+   RT_ind_J=RT_ind_J/DL_vol
+   !
+ else
+   !
+   RT_ind_J=0._SP
+   !
+ endif
  !
 end subroutine NL_current
