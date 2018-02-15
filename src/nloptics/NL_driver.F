@@ -289,6 +289,10 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
      !
      call NL_Hamiltonian(E,k,q,X,Time,NL_i_time,V_bands)
      !
+     ! Evaluate current
+     !
+     call NL_current(k,E,V_bands)
+     !
      ! Store Variables
      !
      NL_P_t (NL_i_time,:)=real(NL_P,SP)

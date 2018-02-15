@@ -28,7 +28,7 @@ subroutine NL_output(i_time,i_run)
  use fields,       ONLY:A_vecpot,A_ext
  use com,          ONLY:msg,of_open_close
  use stderr,       ONLY:intc
- use nl_optics,    ONLY:NL_er,NL_estep,NL_steps,NL_step,NL_P,VER_LOW,NL_verbosity,EF_parms
+ use nl_optics,    ONLY:NL_er,NL_estep,NL_steps,NL_step,NL_P,VER_LOW,NL_verbosity,EF_parms,NL_J
  use stderr,       ONLY:set_real_printed_length
  !
  implicit none
@@ -37,10 +37,10 @@ subroutine NL_output(i_time,i_run)
  !
  ! Working space
  !
- character(schlen)  :: file_name(3),short_file_name(3)
- character(schlen)  :: headings(3,10)
- real(SP)           :: data_to_dump(3,11)
- integer            :: n_files,n_headings(3),i_file,i_f,i_i
+ character(schlen)  :: file_name(4),short_file_name(4)
+ character(schlen)  :: headings(4,10)
+ real(SP)           :: data_to_dump(4,11)
+ integer            :: n_files,n_headings(4),i_file,i_f,i_i
  !
  if(NL_verbosity==VER_LOW) return
  !
@@ -49,16 +49,19 @@ subroutine NL_output(i_time,i_run)
  file_name(1)='external_potential_F'//intc(i_run)
  file_name(2)='polarization_F'//intc(i_run)
  file_name(3)='e_total_F'//intc(i_run)
+ file_name(4)='current'//intc(i_run)
  !
  short_file_name(1)='external_potential'
  short_file_name(2)='polarization'
  short_file_name(3)='e_total'
+ short_file_name(4)='current'
  !
  n_files=2
  !
  n_headings(1)=10
  n_headings(2)=4
  n_headings(3)=4
+ n_headings(4)=4
  !
  i_f=EF_parms(i_run)%indexes(1)
  i_i=EF_parms(i_run)%indexes(2)
@@ -76,6 +79,7 @@ subroutine NL_output(i_time,i_run)
    headings(2, 2:4)=(/"Pol_x","Pol_y","Pol_z"/)
    !
    headings(3, 2:4)=(/"Etot_x","Etot_y","Etot_z"/)
+   headings(4, 2:4)=(/"Curr_x","Curr_y","Curr_z"/)
    !
    do i_file=1,n_files
      call of_open_close(trim(file_name(i_file)),'ot')
@@ -100,6 +104,8 @@ subroutine NL_output(i_time,i_run)
  data_to_dump(2,2:4) =real(NL_P(1:3))
  !
  data_to_dump(3,2:4) =-real(A_vecpot%vecpot_vel(:))/SPEED_OF_LIGHT
+ !
+ data_to_dump(4,2:4) =real(NL_J(1:3))
  !
  do i_file=1,n_files
    call msg('o '//trim(file_name(i_file)),'',data_to_dump(i_file,1:n_headings(i_file)),USE_TABS=.TRUE.)

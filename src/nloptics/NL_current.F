@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !                  
-subroutine NL_current(k,E,G_input,A_input)
+subroutine NL_current(k,E,V_input)
  !
  ! Evalute current 
  ! The current includes the diamagnetic contribution only in the velocity gauge.
@@ -33,40 +33,35 @@ subroutine NL_current(k,E,G_input,A_input)
  use units,          ONLY:SPEED_OF_LIGHT
  use R_lattice,      ONLY:bz_samp
  use D_lattice,      ONLY:DL_vol
- use electrons,      ONLY:nel,levels,n_spin
- use real_time,      ONLY:l_NE_dynamics,RT_ind_J,RT_ind_J_prev,RT_bands,&
-&                         RT_P,RT_magn,RT_P_prev,RT_nk
- use fields,         ONLY:gauge_field
- use X_m,            ONLY:DIP_iR,DIP_P,DIP_spin,global_gauge
- use parallel_m,     ONLY:PAR_Xk_nibz
- use RT_interfaces,  ONLY:RT_average_operator
+ use electrons,      ONLY:nel,levels,n_spin,n_sp_pol
+ use fields,         ONLY:A_ext
+ use X_m,            ONLY:global_gauge
+ use nl_optics,      ONLY:NL_J,NL_bands
+ use QP_m,           ONLY:QP_nk
  !
  implicit none          
  ! 
  type(bz_samp),     intent(in) :: k
  type(levels),      intent(in) :: E
- complex(SP),       intent(in) :: G_input(RT_bands(1):RT_bands(2),RT_bands(1):RT_bands(2),RT_nk)
- type(gauge_field), intent(in) :: A_input
+ complex(SP),       intent(in) :: V_input(NL_bands(2),E%nbf,QP_nk,n_sp_pol) 
  !
  ! Work Space
- !
- complex(SP)   :: RT_P_tmp(3)
  !
  if(trim(global_gauge)=='velocity') then
    !
    ! A : Current
    !
-   call RT_average_operator(V_VALUE=RT_ind_J, V_MATRIX=-DIP_P,G=G_input,k=k,en=E,TRANS=.TRUE.,nK_mem=PAR_Xk_nibz)
+!   call RT_average_operator(V_VALUE=RT_ind_J, V_MATRIX=-DIP_P,G=G_input,k=k,en=E,TRANS=.TRUE.,nK_mem=PAR_Xk_nibz)
    !
    ! Velocity gauge I must use the correct definition of the J operator
    !
-   if(trim(global_gauge)=='velocity') RT_ind_J(:)=RT_ind_J(:)+A_input%vecpot(:)*real(nel,SP)/(2._SP*SPEED_OF_LIGHT)
+   NL_J(:)=NL_J(:)+A_ext%vecpot(:)*real(nel,SP)/(2._SP*SPEED_OF_LIGHT)
    !
-   RT_ind_J=RT_ind_J/DL_vol
+   NL_J=NL_J/DL_vol
    !
  else
    !
-   RT_ind_J=0._SP
+   NL_J=0._SP
    !
  endif
  !

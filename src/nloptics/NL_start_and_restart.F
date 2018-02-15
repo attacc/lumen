@@ -44,7 +44,7 @@ subroutine NL_start_and_restart(E,k,X)
  use parallel_m,     ONLY:master_cpu,PAR_IND_Xk_ibz,PAR_Xk_ibz_index
  use nl_optics,      ONLY:Correlation,IPA,E_full,full_rho,V_bands,TDDFT,n_runs_todo,NL_LRC_alpha,Alpha_ED,NL_bands,  &
 &                         V_xc_0,NL_initial_P,l_use_DIPOLES,n_runs,runs_done,JGM,E_xc_0,I_relax,l_use_DIPOLES,&
-&                         NL_P,E_full,E_bare,Hk,rho_n,full_rho,rho_reference,V_hartree_ne,V_xc_ne,VAL_BANDS
+&                         NL_P,E_full,E_bare,Hk,rho_n,full_rho,rho_reference,V_hartree_ne,V_xc_ne,VAL_BANDS,NL_J
  use IO_m,           ONLY:OP_RD_CL,io_control,NONE,file_is_present,VERIFY
  use parallel_m,     ONLY:PAR_IND_runs,PP_redux_wait
  use stderr,         ONLY:intc
@@ -77,6 +77,8 @@ subroutine NL_start_and_restart(E,k,X)
  V_bands           =cZERO
  Hk                =cZERO
  I_relax           =cZERO
+ NL_P              =cZERO
+ NL_J              =cZERO
  !
  forall(i1=1:E%nbf) V_bands(i1,i1,:,:)=cONE
  !

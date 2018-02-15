@@ -54,6 +54,10 @@ module nl_optics
  !
  complex(SP)    :: NL_P(3)
  !
+ ! Current
+ ! 
+ complex(SP)    :: NL_J(3)
+ !
  ! Diagonal (QP) and off-diagonal (Phase) relaxation time
  !
  real(SP)    :: NL_damping
