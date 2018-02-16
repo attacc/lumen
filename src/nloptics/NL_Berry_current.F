@@ -1,0 +1,114 @@
+!
+!        Copyright (C) 2000-2018 the LUMEN team
+!              http://www.attaccalite.com/lumen/ 
+!
+! Authors (see AUTHORS file for details): CA
+! 
+! This file is distributed under the terms of the GNU 
+! General Public License. You can redistribute it and/or 
+! modify it under the terms of the GNU General Public 
+! License as published by the Free Software Foundation; 
+! either version 2, or (at your option) any later version.
+!
+! This program is distributed in the hope that it will 
+! be useful, but WITHOUT ANY WARRANTY; without even the 
+! implied warranty of MERCHANTABILITY or FITNESS FOR A 
+! PARTICULAR PURPOSE.  See the GNU General Public License 
+! for more details.
+!
+! You should have received a copy of the GNU General Public 
+! License along with this program; if not, write to the Free 
+! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
+! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
+!                  
+subroutine NL_Berry_current(en,Xk,k_map,V_bands,NL_J)
+ !
+ ! Evalute current using Eq. D1 of Souza et al. 
+ ! PRB 69, 085106 (2004) 
+ !
+ use pars,           ONLY:DP,SP,cI,cZERO,pi,cONE
+ use electrons,      ONLY:n_sp_pol,levels,spin_occ,n_spin
+ use R_lattice,      ONLY:bz_samp,bz_map,nXkbz
+ use D_lattice,      ONLY:a,DL_vol
+ use vec_operate,    ONLY:get_id_perpendicular
+ use electric,       ONLY:Sm1_plus,Sm1_minus,E_mat
+ use parallel_m,     ONLY:PP_redux_wait,PAR_IND_Xk_bz,PAR_COM_Xk_ibz_INDEX
+ use QP_m,           ONLY:QP_nk
+ use nl_optics,      ONLY:NL_bands
+ use wrapper_omp,    ONLY:V_dot_V_omp
+ !
+ implicit none           
+ !
+ type(levels),  intent(in)  :: en
+ type(bz_samp), intent(in)  :: Xk
+ type(bz_map),  intent(in)  :: k_map
+ complex(SP),   intent(out) :: NL_J(3)
+ complex(SP),   intent(in)  :: V_bands(NL_bands(2),en%nbf,QP_nk,n_sp_pol)
+ !
+ ! Work Space
+ !
+ integer       :: id_in,id2,id3,Nperpend,i1,i2,i3,idx(3),ikbz,id,id_red
+ integer       :: ik_bz,iv
+ complex(SP)   :: NL_J_red(3)
+ !
+ ! Build the E_mat
+ !
+ E_mat=cZERO
+ !
+ do ik_bz=1,nXkbz
+   !
+   if(.not.PAR_IND_Xk_bz%element_1D(ik_bz)) cycle
+   !
+   call Build_E_matrix(en,Xk,ik_bz,V_bands,E_mat(:,:,:,ik_bz,1))
+   !
+ enddo
+ !
+ call PP_redux_wait( E_mat(:,:,:,:,1),COMM=PAR_COM_Xk_ibz_INDEX%COMM)
+ !
+ NL_J     = cZERO
+ NL_J_red = cZERO
+ !
+ do id_in=1,3
+   !
+   call get_id_perpendicular(id_in,id2,id3)
+   !
+   Nperpend=k_map%max_kdir(id2)*k_map%max_kdir(id3)
+   !
+   do i2=1,k_map%max_kdir(id2)
+     do i3=1,k_map%max_kdir(id3)
+       !
+       idx(id2)=i2
+       idx(id3)=i3
+       !
+       ! Loop on the string
+       !
+       do i1=1,k_map%max_kdir(id_in)
+         !
+         idx(id_in)=i1
+         ikbz=k_map%k_map_dir(idx(1),idx(2),idx(3))
+         !
+         do iv=1,en%nbf
+           NL_J_red(id_in)=NL_J_red(id_in)+V_dot_V_omp(en%nbf,Sm1_plus (iv,:,id,ikbz,1),E_mat(:,iv,id  ,ikbz,1)) &
+&                                         -V_dot_V_omp(en%nbf,Sm1_minus(iv,:,id,ikbz,1),E_mat(:,iv,id+3,ikbz,1))
+         enddo
+         !
+       enddo
+       !
+     enddo
+   enddo
+   !
+   NL_J_red(id_in)=2._SP*real(NL_J_red(id_in),SP)/real(Nperpend,SP)   
+   !
+ enddo
+ !
+ ! Transform in cartesian coordinates
+ ! 
+ NL_J=cZERO
+ !
+ do id=1,3
+   do id_red=1,3
+     NL_J(id)=NL_J_red(id)+NL_J_red(id_red)*a(id_red,id)/DL_Vol
+   enddo
+ enddo
+ !
+end subroutine NL_Berry_current
