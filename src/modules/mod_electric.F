@@ -34,6 +34,10 @@ module electric
  complex(SP), allocatable :: Sm1_plus(:,:,:,:,:)
  complex(SP), allocatable :: Sm1_minus(:,:,:,:,:)
  !
+ ! Matrix to build current
+ !
+ complex(SP), allocatable :: E_mat(:,:,:,:,:)
+ !
  ! Electric Field operator used in SC
  !
  complex(SP), allocatable :: W_electric(:,:,:,:)
@@ -59,6 +63,8 @@ module electric
      call mem_est("Sm1_plus",(/size(Sm1_plus)/))
      allocate(Sm1_minus(en%nbf,en%nbf,6,nXkbz,n_sp_pol))
      call mem_est("Sm1_minus",(/size(Sm1_minus)/))
+     allocate(E_mat(en%nbf,en%nbf,6,nXkbz,n_sp_pol))
+     call mem_est("E_mat",(/size(E_mat)/))
      !
    end subroutine ELECTRIC_alloc
    
@@ -68,8 +74,8 @@ module electric
      !
      implicit none
      !
-     deallocate(All_S_det,Sm1_plus,Sm1_minus)
-     call mem_est("All_S_det Sm1_plus Sm1_minus")
+     deallocate(All_S_det,Sm1_plus,Sm1_minus,E_mat)
+     call mem_est("All_S_det Sm1_plus Sm1_minus E_mat")
      !
    end subroutine ELECTRIC_free
    !

@@ -25,6 +25,14 @@ subroutine Build_overlaps_det_NEQ(en,Xk,i_sp,ikbz,V_bands,Sm1_plus,Sm1_minus,S_d
  !
  ! Build overlaps determinants between valence bands
  !
+ ! Inverse overlaps matrices
+ ! ===================== 
+ ! Inverse overlaps matrix between k -> k  +dk   Sm1_plus(1:nv,1:nv,1:nk,1:3)
+ ! Inverse overlaps matrix between k -> k+2*dk   Sm1_plus(1:nv,1:nv,1:nk,4:6)
+ !
+ ! Inverse overlaps matrix between k -> k  -dk   Sm1_minus(1:nv,1:nv,1:nk,1:3)
+ ! Inverse overlaps matrix between k -> k-2*dk   Sm1_minus(1:nv,1:nv,1:nk,4:6)
+ !
  use pars,           ONLY:SP,cZERO,cONE
  use electrons,      ONLY:levels,n_sp_pol
  use R_lattice,      ONLY:k_map,bz_samp
