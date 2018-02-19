@@ -36,7 +36,8 @@ module electric
  !
  ! Matrix to build current
  !
- complex(SP), allocatable :: E_mat(:,:,:,:,:)
+ complex(SP), allocatable :: E_plus(:,:,:,:,:)
+ complex(SP), allocatable :: E_minus(:,:,:,:,:)
  !
  ! Electric Field operator used in SC
  !
@@ -63,8 +64,10 @@ module electric
      call mem_est("Sm1_plus",(/size(Sm1_plus)/))
      allocate(Sm1_minus(en%nbf,en%nbf,6,nXkbz,n_sp_pol))
      call mem_est("Sm1_minus",(/size(Sm1_minus)/))
-     allocate(E_mat(en%nbf,en%nbf,6,nXkbz,n_sp_pol))
-     call mem_est("E_mat",(/size(E_mat)/))
+     allocate(E_minus(en%nbf,en%nbf,3,nXkbz,n_sp_pol))
+     call mem_est("E_minus",(/size(E_minus)/))
+     allocate(E_plus(en%nbf,en%nbf,3,nXkbz,n_sp_pol))
+     call mem_est("E_plus",(/size(E_plus)/))
      !
    end subroutine ELECTRIC_alloc
    
@@ -74,8 +77,8 @@ module electric
      !
      implicit none
      !
-     deallocate(All_S_det,Sm1_plus,Sm1_minus,E_mat)
-     call mem_est("All_S_det Sm1_plus Sm1_minus E_mat")
+     deallocate(All_S_det,Sm1_plus,Sm1_minus,E_plus,E_minus)
+     call mem_est("All_S_det Sm1_plus Sm1_minus E_plus E_minus")
      !
    end subroutine ELECTRIC_free
    !

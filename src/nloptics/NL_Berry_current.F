@@ -31,7 +31,7 @@ subroutine NL_Berry_current(en,Xk,k_map,V_bands,NL_J)
  use R_lattice,      ONLY:bz_samp,bz_map,nXkbz
  use D_lattice,      ONLY:a,DL_vol
  use vec_operate,    ONLY:get_id_perpendicular
- use electric,       ONLY:Sm1_plus,Sm1_minus,E_mat
+ use electric,       ONLY:Sm1_plus,Sm1_minus,E_minus,E_plus
  use parallel_m,     ONLY:PP_redux_wait,PAR_IND_Xk_bz,PAR_COM_Xk_ibz_INDEX
  use QP_m,           ONLY:QP_nk
  use nl_optics,      ONLY:NL_bands
@@ -51,19 +51,21 @@ subroutine NL_Berry_current(en,Xk,k_map,V_bands,NL_J)
  integer       :: ik_bz,iv
  complex(SP)   :: NL_J_red(3)
  !
- ! Build the E_mat
+ ! Build the E_minus and E_plus
  !
- E_mat=cZERO
+ E_minus=cZERO
+ E_plus =cZERO
  !
  do ik_bz=1,nXkbz
    !
    if(.not.PAR_IND_Xk_bz%element_1D(ik_bz)) cycle
    !
-   call Build_E_matrix(en,Xk,ik_bz,V_bands,E_mat(:,:,:,ik_bz,1))
+   call Build_E_matrix(en,Xk,ik_bz,V_bands,E_minus(:,:,:,ik_bz,1),E_plus(:,:,:,ik_bz,1))
    !
  enddo
  !
- call PP_redux_wait( E_mat(:,:,:,:,1),COMM=PAR_COM_Xk_ibz_INDEX%COMM)
+ call PP_redux_wait( E_minus(:,:,:,:,1),COMM=PAR_COM_Xk_ibz_INDEX%COMM)
+ call PP_redux_wait( E_plus (:,:,:,:,1),COMM=PAR_COM_Xk_ibz_INDEX%COMM)
  !
  NL_J     = cZERO
  NL_J_red = cZERO
@@ -88,8 +90,8 @@ subroutine NL_Berry_current(en,Xk,k_map,V_bands,NL_J)
          ikbz=k_map%k_map_dir(idx(1),idx(2),idx(3))
          !
          do iv=1,en%nbf
-           NL_J_red(id_in)=NL_J_red(id_in)+V_dot_V_omp(en%nbf,Sm1_plus (iv,:,id,ikbz,1),E_mat(:,iv,id+3  ,ikbz,1)) &
-&                                         -V_dot_V_omp(en%nbf,Sm1_minus(iv,:,id,ikbz,1),E_mat(:,iv,id,ikbz,1))
+           NL_J_red(id_in)=NL_J_red(id_in)+V_dot_V_omp(en%nbf,Sm1_plus (iv,:,id,ikbz,1),E_plus (:,iv,id,ikbz,1)) &
+&                                         -V_dot_V_omp(en%nbf,Sm1_minus(iv,:,id,ikbz,1),E_minus(:,iv,id,ikbz,1))
          enddo
          !
        enddo

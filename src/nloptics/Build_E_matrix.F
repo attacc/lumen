@@ -21,7 +21,7 @@
 ! Software Foundation, Inc., 59 Temple Place - Suite 330,Boston, 
 ! MA 02111-1307, USA or visit http://www.gnu.org/copyleft/gpl.txt.
 !
-subroutine Build_E_matrix(en,Xk,ikbz,V_bands,E_mat)
+subroutine Build_E_matrix(en,Xk,ikbz,V_bands,E_minus,E_plus)
  !
  ! Build energy-overlaps matrices
  !
@@ -44,7 +44,8 @@ subroutine Build_E_matrix(en,Xk,ikbz,V_bands,E_mat)
  type(levels), intent(in) :: en
  type(bz_samp),intent(in) :: Xk
  complex(SP),  intent(in) :: V_bands(NL_bands(2),en%nbf,QP_nk,n_sp_pol)
- complex(SP), intent(out) :: E_mat(en%nbf,en%nbf,6)
+ complex(SP), intent(out) :: E_minus(en%nbf,en%nbf,3)
+ complex(SP), intent(out) :: E_plus (en%nbf,en%nbf,3)
  !
  ! Work Space
  !
@@ -55,7 +56,8 @@ subroutine Build_E_matrix(en,Xk,ikbz,V_bands,E_mat)
  !
  i_sp=1 ! only for unpolarized systems
  !
- E_mat=cZERO
+ E_minus=cZERO
+ E_plus =cZERO
  !
  do id=1,3
    !
@@ -82,7 +84,7 @@ subroutine Build_E_matrix(en,Xk,ikbz,V_bands,E_mat)
 &                         NL_bands(2),V_bands(:,:,ikm_ibz,i_sp),NL_bands(2),cZERO,V_tmp,NL_bands(2))
      !
      call M_by_M_omp('C','N',en%nbf,en%nbf,NL_bands(2),cONE,V_dot_E,&
-&                    NL_bands(2),V_tmp,NL_bands(2),cZERO,E_mat(:,:,id),en%nbf)
+&                    NL_bands(2),V_tmp,NL_bands(2),cZERO,E_minus(:,:,id),en%nbf)
      !
      !
      idx=k_map%k_map_inv(ikbz,:)
@@ -98,7 +100,7 @@ subroutine Build_E_matrix(en,Xk,ikbz,V_bands,E_mat)
 &                NL_bands(2),V_bands(:,:,ikp_ibz,i_sp),NL_bands(2),cZERO,V_tmp(:,:),NL_bands(2))
      !
      call M_by_M_omp('C','N',en%nbf,en%nbf,NL_bands(2),cONE,V_dot_E,&
-&                    NL_bands(2),V_tmp,NL_bands(2),cZERO,E_mat(:,:,id+3),en%nbf)
+&                    NL_bands(2),V_tmp,NL_bands(2),cZERO,E_plus(:,:,id+3),en%nbf)
      !
    endif
    !
