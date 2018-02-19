@@ -47,7 +47,7 @@ subroutine NL_Berry_current(en,Xk,k_map,V_bands,NL_J)
  !
  ! Work Space
  !
- integer       :: id_in,id2,id3,Nperpend,i1,i2,i3,idx(3),ikbz,id,id_red
+ integer       :: id2,id3,Nperpend,i1,i2,i3,idx(3),ikbz,id,id_red
  integer       :: ik_bz,iv
  complex(SP)   :: NL_J_red(3)
  !
@@ -70,9 +70,9 @@ subroutine NL_Berry_current(en,Xk,k_map,V_bands,NL_J)
  NL_J     = cZERO
  NL_J_red = cZERO
  !
- do id_in=1,3
+ do id=1,3
    !
-   call get_id_perpendicular(id_in,id2,id3)
+   call get_id_perpendicular(id,id2,id3)
    !
    Nperpend=k_map%max_kdir(id2)*k_map%max_kdir(id3)
    !
@@ -84,14 +84,14 @@ subroutine NL_Berry_current(en,Xk,k_map,V_bands,NL_J)
        !
        ! Loop on the string
        !
-       do i1=1,k_map%max_kdir(id_in)
+       do i1=1,k_map%max_kdir(id)
          !
-         idx(id_in)=i1
+         idx(id)=i1
          ikbz=k_map%k_map_dir(idx(1),idx(2),idx(3))
          !
          do iv=1,en%nbf
-           NL_J_red(id_in)=NL_J_red(id_in)+V_dot_V_omp(en%nbf,Sm1_plus (iv,:,id,ikbz,1),E_plus (:,iv,id,ikbz,1)) &
-&                                         -V_dot_V_omp(en%nbf,Sm1_minus(iv,:,id,ikbz,1),E_minus(:,iv,id,ikbz,1))
+           NL_J_red(id)=NL_J_red(id)+V_dot_V_omp(en%nbf,Sm1_plus (iv,:,id,ikbz,1),E_plus (:,iv,id,ikbz,1)) &
+&                                   -V_dot_V_omp(en%nbf,Sm1_minus(iv,:,id,ikbz,1),E_minus(:,iv,id,ikbz,1))
          enddo
          !
        enddo
@@ -99,7 +99,7 @@ subroutine NL_Berry_current(en,Xk,k_map,V_bands,NL_J)
      enddo
    enddo
    !
-   NL_J_red(id_in)=2._SP*real(NL_J_red(id_in),SP)/real(Nperpend,SP)   
+   NL_J_red(id)=2._SP*real(NL_J_red(id),SP)/real(Nperpend,SP)   
    !
  enddo
  !
