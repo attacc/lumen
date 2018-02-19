@@ -34,6 +34,7 @@ subroutine Build_E_matrix(en,Xk,ikbz,V_bands,E_mat)
  use linear_algebra, ONLY:INV,USE_LK,LINEAR_ALGEBRA_driver
  use matrix_operate, ONLY:hermitian
  use QP_m,           ONLY:QP_nk
+ use units,          ONLY:HA2EV
  use electric,       ONLY:l_force_SndOrd
  use nl_optics,      ONLY:NL_bands
  !
@@ -93,7 +94,7 @@ subroutine Build_E_matrix(en,Xk,ikbz,V_bands,E_mat)
      !
      ikp_ibz=Xk%sstar(ikp,1)
      !
-     call M_by_M_omp('N','N',NL_bands(2),en%nbf,NL_bands(2),cONE,DIP_S(:,:,id+3,ikbz,i_sp),&
+     call M_by_M_omp('N','N',NL_bands(2),en%nbf,NL_bands(2),cONE,DIP_S(:,:,id,ikbz,i_sp),&
 &                NL_bands(2),V_bands(:,:,ikp_ibz,i_sp),NL_bands(2),cZERO,V_tmp(:,:),NL_bands(2))
      !
      call M_by_M_omp('C','N',en%nbf,en%nbf,NL_bands(2),cONE,V_dot_E,&
@@ -102,5 +103,15 @@ subroutine Build_E_matrix(en,Xk,ikbz,V_bands,E_mat)
    endif
    !
  enddo
+ !
+! write(*,*)
+! write(*,*) ikbz,E_mat(:,1,1)*HA2EV
+! write(*,*)
+! write(*,*) ikbz,E_mat(:,2,1)*HA2EV
+! write(*,*)
+! write(*,*) ikbz,E_mat(:,3,1)*HA2EV
+! write(*,*)
+! write(*,*) ikbz,E_mat(:,4,1)*HA2EV
+! stop
  !
 end subroutine Build_E_matrix
