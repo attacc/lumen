@@ -61,7 +61,7 @@ subroutine NL_current(k,E,V_input)
    !
  else
    !
-   call NL_Berry_current(NL_J)
+   call NL_Berry_current(E,k,k_map,V_input,NL_J)
    !
  endif
  !

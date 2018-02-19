@@ -49,14 +49,14 @@ subroutine NL_output(i_time,i_run)
  file_name(1)='external_potential_F'//intc(i_run)
  file_name(2)='polarization_F'//intc(i_run)
  file_name(3)='e_total_F'//intc(i_run)
- file_name(4)='current'//intc(i_run)
+ file_name(4)='current_F'//intc(i_run)
  !
  short_file_name(1)='external_potential'
  short_file_name(2)='polarization'
  short_file_name(3)='e_total'
  short_file_name(4)='current'
  !
- n_files=2
+ n_files=4
  !
  n_headings(1)=10
  n_headings(2)=4
