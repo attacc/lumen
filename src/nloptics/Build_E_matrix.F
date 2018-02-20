@@ -100,7 +100,7 @@ subroutine Build_E_matrix(en,Xk,ikbz,V_bands,E_minus,E_plus)
 &                NL_bands(2),V_bands(:,:,ikp_ibz,i_sp),NL_bands(2),cZERO,V_tmp(:,:),NL_bands(2))
      !
      call M_by_M_omp('C','N',en%nbf,en%nbf,NL_bands(2),cONE,V_dot_E,&
-&                    NL_bands(2),V_tmp,NL_bands(2),cZERO,E_plus(:,:,id+3),en%nbf)
+&                    NL_bands(2),V_tmp,NL_bands(2),cZERO,E_plus(:,:,id),en%nbf)
      !
    endif
    !
