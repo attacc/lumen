@@ -106,14 +106,4 @@ subroutine Build_E_matrix(en,Xk,ikbz,V_bands,E_minus,E_plus)
    !
  enddo
  !
-! write(*,*)
-! write(*,*) ikbz,E_mat(:,1,1)*HA2EV
-! write(*,*)
-! write(*,*) ikbz,E_mat(:,2,1)*HA2EV
-! write(*,*)
-! write(*,*) ikbz,E_mat(:,3,1)*HA2EV
-! write(*,*)
-! write(*,*) ikbz,E_mat(:,4,1)*HA2EV
-! stop
- !
 end subroutine Build_E_matrix
