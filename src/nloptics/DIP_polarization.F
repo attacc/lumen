@@ -47,7 +47,7 @@ subroutine DIP_polarization(Xen,Xk,V_bands,Polarization)
  ! p(r,t) = \sum_ijk e/(2m) \psi^*_i(k) r \psi_j(k)
  !
  do id=1,3
-     call NL_average_operator(Xen,Xk,V_bands, &
+     call NL_average_operator_old(Xen,Xk,V_bands, &
  &      cI*DIP_bz(id,1:NL_bands(2),1:NL_bands(2),1:nXkbz,1:n_sp_pol),.true.,Polarization(id))  
  enddo
  !

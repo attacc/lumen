@@ -40,7 +40,7 @@ subroutine NL_average_operator(O_VALUE,V_VALUE,O_REAL,O_MATRIX,&
  !
  type(bz_samp), intent(in) :: k
  type(levels),  intent(in) :: en
- complex(SP),   intent(in) :: V_bands(NL_bands(1):NL_bands(2),en%nbf,QP_nk, n_sp_pol)
+ complex(SP),   intent(in) :: V_bands(NL_bands(2),en%nbf,QP_nk, n_sp_pol)
  integer,       intent(in) :: nK_mem
  !
  ! Optionals
