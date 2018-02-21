@@ -36,7 +36,7 @@ subroutine NL_current(k,E,V_input)
  use electrons,      ONLY:nel,levels,n_spin,n_sp_pol
  use fields,         ONLY:A_ext
  use X_m,            ONLY:global_gauge
- use nl_optics,      ONLY:NL_J,NL_bands
+ use nl_optics,      ONLY:NL_J,NL_bands,l_use_DIPOLES
  use QP_m,           ONLY:QP_nk
  !
  implicit none          
@@ -61,8 +61,10 @@ subroutine NL_current(k,E,V_input)
    !
  else
    !
-   call NL_Berry_current(E,k,k_map,V_input,NL_J)
-!   write(*,*) 'passo qui ',NL_J
+   if(l_use_DIPOLES) then
+   else
+     call NL_Berry_current(E,k,k_map,V_input,NL_J)
+   endif
    !
  endif
  !
