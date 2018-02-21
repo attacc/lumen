@@ -20,6 +20,10 @@ print("\n * * * Calculate Current from the Polarization * * * \n\n")
 
 args = parser.parse_args()
 
+if args.polname == None:
+    print('type "current.py --help" for help ',)
+    exit(0)
+
 data=np.genfromtxt(args.polname,comments="#")
 
 f1 = InterpolatedUnivariateSpline(data[0], data[1], k=3)
