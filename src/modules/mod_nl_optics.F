@@ -154,7 +154,6 @@ module nl_optics
  ! Other
  !
  logical  :: l_use_DIPOLES   ! Use standard dipoles (valid only for linear response)
- complex(SP), allocatable :: DIP_bz(:,:,:,:,:)
  !
  ! IO variables
  !
@@ -261,10 +260,7 @@ module nl_optics
        call mem_est("W",(/size(W)/),(/2*SP/))
      endif          
      !
-     if(l_use_DIPOLES) then
-       allocate(DIP_bz(3,NL_bands(2),NL_bands(2),nXkbz,n_sp_pol))
-       call mem_est("DIP_bz",(/size(DIP_bz)/))
-     else
+     if(.not.l_use_DIPOLES) then
        call  ELECTRIC_alloc(en)
      endif
      !
@@ -398,10 +394,7 @@ module nl_optics
        call mem_est("V_hartree_ne")
      endif
      !
-     if(l_use_DIPOLES) then
-       deallocate(DIP_bz)
-       call mem_est("DIP_bz")
-     else
+     if(.not.l_use_DIPOLES) then
        call ELECTRIC_free()
      endif
      !
