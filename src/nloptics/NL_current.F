@@ -51,7 +51,7 @@ subroutine NL_current(k,E,V_input)
    !
    ! A : Current
    !
-!   call RT_average_operator(V_VALUE=RT_ind_J, V_MATRIX=-DIP_P,G=G_input,k=k,en=E,TRANS=.TRUE.,nK_mem=PAR_Xk_nibz)
+   call RT_average_operator(V_VALUE=RT_ind_J, V_MATRIX=-DIP_P,V_bands=V_bands,k=k,en=E,TRANS=.TRUE.,nK_mem=PAR_Xk_nibz)
    !
    ! Velocity gauge I must use the correct definition of the J operator
    !
