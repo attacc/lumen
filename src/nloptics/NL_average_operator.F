@@ -59,7 +59,8 @@ subroutine NL_average_operator(O_VALUE,V_VALUE,O_REAL,O_MATRIX,&
  complex(SP) :: Hk(3,NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2)),VALUE_tmp(3), &
 &               Hk_tmp(NL_bands(2),NL_bands(2)),                                    &
 &               Hk_vec_tmp(3,NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2))
- complex(SP)  :: V_tmp(NL_bands(2))
+ complex(SP)  :: V_tmp(NL_nbands)
+ character(1) :: op
  !
  OUTPUT_dim=0
  if(present(O_MATRIX).or.present(O_real)) OUTPUT_dim=1
@@ -71,6 +72,9 @@ subroutine NL_average_operator(O_VALUE,V_VALUE,O_REAL,O_MATRIX,&
  NL_bands2=NL_nbands**2
  if (OUTPUT_dim==1) O_VALUE=cZERO
  if (OUTPUT_dim==3) V_VALUE=cZERO
+ !
+ op='N'
+ if(TRANS.eqv..true.) op='T'
  !
  do i_sp_pol=1,n_sp_pol
  !
@@ -89,9 +93,9 @@ subroutine NL_average_operator(O_VALUE,V_VALUE,O_REAL,O_MATRIX,&
      if(OUTPUT_dim==3) Hk(i_dir,:,:)=Hk_vec_tmp(i_dir,:,:)
      !
      do iv=1,en%nbf
-       call M_by_V_omp('N',NL_bands(2),NL_bands(2),cONE,Hk(i_dir,:,:),NL_bands(2),V_bands(:,iv,ik_ibz,i_sp_pol) &
+       call M_by_V_omp(op,NL_nbands,NL_nbands,cONE,Hk(i_dir,:,:),NL_nbands,V_bands(NL_bands(1):,iv,ik_ibz,i_sp_pol) &
 &               ,1,cZERO,V_tmp,1)
-       VALUE_tmp(i_dir)=VALUE_tmp(i_dir)+spin_occ*Vstar_dot_V_omp(NL_bands(2),V_bands(:,iv,ik,i_sp_pol),V_tmp) 
+       VALUE_tmp(i_dir)=VALUE_tmp(i_dir)+spin_occ*Vstar_dot_V_omp(NL_nbands,V_bands(NL_bands(1):,iv,ik_ibz,i_sp_pol),V_tmp) 
      enddo
      !
      if(OUTPUT_dim==1) O_VALUE       =O_VALUE       +VALUE_tmp(i_dir)*k%weights(ik_ibz)
@@ -143,13 +147,9 @@ subroutine NL_average_operator(O_VALUE,V_VALUE,O_REAL,O_MATRIX,&
      integer     :: ik_mem,i_star,is
      real(SP)    :: R_s(3,3)
      complex(SP) :: V3(3)
-     logical     :: l_transpose
      !
      ik_mem=ik
      if (k%nibz/=nK_mem) ik_mem=PAR_Xk_ibz_index(ik)
-     !
-     l_transpose=.false.
-     if(present(TRANS)) l_transpose=TRANS
      !
      ! A: Average of a scalar
      !========================
@@ -158,14 +158,8 @@ subroutine NL_average_operator(O_VALUE,V_VALUE,O_REAL,O_MATRIX,&
        Hk_tmp=cZERO
        !
        if (present(O_MATRIX)) then
-         do ib=NL_bands(1),NL_bands(2)
-           do ibp=NL_bands(1),NL_bands(2)
-             !
-             if (     l_transpose) Hk_tmp(ibp,ib)=O_MATRIX(ib,ibp,ik_mem,i_sp_pol) 
-             if (.not.l_transpose) Hk_tmp(ib,ibp)=O_MATRIX(ib,ibp,ik_mem,i_sp_pol) 
-             !
-           enddo
-         enddo
+              Hk_tmp(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2))= &
+            O_MATRIX(NL_bands(1):NL_bands(2),NL_bands(1):NL_bands(2),ik_mem,i_sp_pol) 
        endif
        !
        ! Warning: for nspinor=2 the Vxc countribution could be wrong
@@ -205,8 +199,7 @@ subroutine NL_average_operator(O_VALUE,V_VALUE,O_REAL,O_MATRIX,&
                 !
              enddo
              !
-             if (     l_transpose) Hk_vec_tmp(:,ibp,ib )=V3(:)/real(k%nstar(ik),SP)
-             if (.not.l_transpose) Hk_vec_tmp(:,ib ,ibp)=V3(:)/real(k%nstar(ik),SP)
+             Hk_vec_tmp(:,ib ,ibp)=V3(:)/real(k%nstar(ik),SP)
              !
          enddo
        enddo

@@ -173,10 +173,6 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
    !
  endif
  !
- ! Generate DIPOLES in all the BZ if required
- !===================
- if(l_use_DIPOLES) call Build_DIP_bz(k,E,X)
- !
  ! Non_Linear parallization
  ! ===================================
  call setup_NL_parallelization() 

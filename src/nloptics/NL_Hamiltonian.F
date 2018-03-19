@@ -148,7 +148,6 @@ subroutine NL_Hamiltonian(E,k,q,X,Time,i_time,V_bands)
    call COLLISIONS_compose_nl(dG)
  endif
  !
- !
  ! Build the Hamiltonian
  ! =====================
  !
