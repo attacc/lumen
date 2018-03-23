@@ -30,7 +30,7 @@ subroutine REPORT_Energies(E,k,Xk,n_bands_,k_range,what,header)
  use stderr,         ONLY:intc,real2ch
  use wave_func,      ONLY:wf_nc_k
  use com,            ONLY:msg
- use vec_operate,    ONLY:c2a
+ use vec_operate,    ONLY:c2a,rlu_k2bz
  !
  implicit none
  !
@@ -54,12 +54,13 @@ subroutine REPORT_Energies(E,k,Xk,n_bands_,k_range,what,header)
    !
    call c2a(v_in=k%pt(ik,:),v_out=k_al,mode='ki2a')
    call c2a(v_in=k%pt(ik,:),v_out=k_cc,mode='ki2c')
+   call rlu_k2bz(k_al,k_al)
    ! 
    dumb_ch1='K ['//trim(intc(ik))//'] :'//trim(real2ch(k_cc(1)))//' '//&
 &          trim(real2ch(k_cc(2)))//' '//trim(real2ch(k_cc(3)))//&
 &          ' ( cc) * Comp.s '//trim(intc(wf_nc_k(ik)))
-   dumb_ch2='       '//trim(real2ch(k%pt(ik,1)))//' '//&
-&          trim(real2ch(k%pt(ik,2)))//' '//trim(real2ch(k%pt(ik,3)))//&
+   dumb_ch2='       '//trim(real2ch(k_al(1)))//' '//&
+&          trim(real2ch(k_al(2)))//' '//trim(real2ch(k_al(3)))//&
 &          ' (rlu) '
    if(ik>  9) dumb_ch2=' '//trim(dumb_ch2)
    if(ik> 99) dumb_ch2=' '//trim(dumb_ch2)
