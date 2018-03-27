@@ -23,7 +23,7 @@
 !
 subroutine NL_ext_fields(A,time)
  !
- ! The external and total fields in Yambo are defined and organized as follow:
+ ! The external and total fields in Lumen are defined and organized as follow:
  !
  ! The general vector potential is defined as
  !

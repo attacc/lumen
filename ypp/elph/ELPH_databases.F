@@ -60,7 +60,7 @@ integer function ELPH_databases(k,E,q)
  integer            ::iq,elph_nk,iq_db(q%nbz),iq_bz,iq_s,i1
  complex(DP), allocatable :: grad_at_gamma(:,:,:,:,:)
  !
- call section("*","== Electron-Phonon Interface: PW->Yambo Databases ==")
+ call section("*","== Electron-Phonon Interface: PW->Lumen Databases ==")
  !
  call k_ibz2bz(k,'i',.false.)
  !
