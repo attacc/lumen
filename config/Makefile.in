@@ -63,7 +63,7 @@ BASIC_LIBS   = external_c modules linear_algebra parallel parser xc_functionals 
                interface stop_and_restart wf_and_fft 
 
 MAIN_LIBS    = $(BASIC_LIBS) coulomb bz_ops qp_control setup \
-               tddft pol_function qp bse collisions nloptics
+               tddft pol_function qp bse collisions hamiltonians nloptics
 #
 # Interfaces
 #
@@ -74,7 +74,7 @@ MAIN_LIBS    = $(BASIC_LIBS) coulomb bz_ops qp_control setup \
 YPP_LIBS        = modules interpolate init qp plotting electrons excitons symmetries k-points bits nlresponse
 YPPPH_LIBS      = modules interpolate init qp plotting electrons elph excitons symmetries k-points bits nlresponse
 #
-YPP_MAIN_LIBS      = $(BASIC_LIBS) coulomb bz_ops qp_control setup interface tddft pol_function bse collisions nloptics
+YPP_MAIN_LIBS      = $(BASIC_LIBS) coulomb bz_ops qp_control setup interface tddft pol_function bse collisions hamiltonians nloptics
 #
 PROJECTS = lumen_ph lumen_lu ypp_ph
 EXE      = $(TARGETS) $(PROJECTS)
