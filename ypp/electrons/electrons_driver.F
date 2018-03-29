@@ -151,8 +151,6 @@ subroutine electrons_driver(Xk,Xen,Xq)
  !
  if(l_bands) then
    !
-   if ( i_time_rev==1 ) call error(' Bands interpolation does not work with T-rev symmetry')
-   !
    call electrons_bands(Xk,Xen,nb_to_load)
    !
    return
