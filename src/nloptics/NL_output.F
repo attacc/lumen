@@ -61,7 +61,7 @@ subroutine NL_output(i_time,i_run)
  n_headings(1)=10
  n_headings(2)=4
  n_headings(3)=4
- n_headings(4)=4
+ n_headings(4)=7
  !
  i_f=EF_parms(i_run)%indexes(1)
  i_i=EF_parms(i_run)%indexes(2)
@@ -80,6 +80,7 @@ subroutine NL_output(i_time,i_run)
    !
    headings(3, 2:4)=(/"Etot_x","Etot_y","Etot_z"/)
    headings(4, 2:4)=(/"Curr_x","Curr_y","Curr_z"/)
+   headings(4, 5:7)=(/"<v_x>","<v_y>","<v_z>"/)
    !
    do i_file=1,n_files
      call of_open_close(trim(file_name(i_file)),'ot')
@@ -106,6 +107,7 @@ subroutine NL_output(i_time,i_run)
  data_to_dump(3,2:4) =-real(A_vecpot%vecpot_vel(:))/SPEED_OF_LIGHT
  !
  data_to_dump(4,2:4) =real(NL_J(1:3))
+ data_to_dump(4,5:7) =real(NL_J(4:6))
  !
  do i_file=1,n_files
    call msg('o '//trim(file_name(i_file)),'',data_to_dump(i_file,1:n_headings(i_file)),USE_TABS=.TRUE.)
