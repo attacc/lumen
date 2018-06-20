@@ -46,6 +46,7 @@ subroutine LU_diago_residual(BS_V_left,BS_V_right,BS_R_LU,K_is_not_hermitian,BS_
  integer              ::i_l,i_c,i_K,i_lr,i_ll
  complex(SP)          ::P_x_fZ(2,BS_H_dim,3),Pi_x_R_x_adA_left(3),Pi_x_R_x_adA_right(3),adA_x_R_over_R_x_A(2),&
 &                       R_over_R_x_A(2,BS_H_dim),B(BS_H_dim)
+ real(SP)             :: B_occ
  !
  ! Parallel indexes
  !
@@ -151,7 +152,7 @@ subroutine LU_diago_residual(BS_V_left,BS_V_right,BS_R_LU,K_is_not_hermitian,BS_
      adA_x_R_over_R_x_A(1)=V_dot_V_omp(BS_K_dim,conjg(BS_V_right(:,i_l)),R_over_R_x_A(1,:))
      adA_x_R_over_R_x_A(2)=V_dot_V_omp(BS_K_dim,conjg(BS_V_right(:,i_l)),R_over_R_x_A(2,:))
      !
-     do i_c=1,3
+     do i_c=1,3 
        !                                   
        ! Pi_x_R_x_adA_right =   Pi sqrt(R)  A^l_i
        !
@@ -163,6 +164,8 @@ subroutine LU_diago_residual(BS_V_left,BS_V_right,BS_R_LU,K_is_not_hermitian,BS_
      ! that cancel out.
      !
      BS_R_LU(:,i_l)=dot_product(Pi_x_R_x_adA_right,Pi_x_R_x_adA_right)*adA_x_R_over_R_x_A(:)
+!     write(100,*) i_l,abs(adA_x_R_over_R_x_A(1))
+!     write(200,*) i_l,BSS_LU_f(1,i_l)
      !
      call live_timing(steps=1)
      !

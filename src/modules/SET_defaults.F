@@ -527,7 +527,7 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  l_use_collisions=.FALSE.
  !
 #if defined _LU
- LU_weights=(/1._SP,1._SP,1._SP/)
+ LU_weights=(/1._SP,1._SP,0._SP/)
 #endif
  !
 #if defined _ELPH 

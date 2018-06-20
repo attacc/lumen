@@ -186,6 +186,7 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
          BS_T_grp(i_T_g)%dipoles_R_LU(i_T,:)=conjg(rotated_P(:))
          if (BS_K_coupling) then
            BS_T_grp(i_T_g)%dipoles_A_LU(i_T,:)=rotated_P(:)
+!           BS_T_grp(i_T_g)%dipoles_A_LU(i_T,:)=BS_T_grp(i_T_g)%dipoles_R(i_T)
          endif
          !
        endif
@@ -224,10 +225,10 @@ subroutine K_IP(iq,Ken,Xk,X_oscillators,W_bss)
          !
 #if defined _LU
          if (l_lum) then
-           LU(:,3)=LU(:,3)  +res_LU(1)*aimag(-1._SP/(W_bss%p(:)-E_plus_W(i_pert_SOC)))/pi
-           !if (BSS_add_antiresonant.or.BS_K_coupling) then
-           !  LU(:,3)=LU(:,3)+res_LU(2)*aimag(-1._SP/(W_bss%p(:)+conjg(E_plus_W(i_pert_SOC))))/pi
-           !endif
+           LU(:,3)=LU(:,3)  -res_LU(1)*aimag(1._SP/(W_bss%p(:)-E_plus_W(i_pert_SOC)))
+!           if (BSS_add_antiresonant.or.BS_K_coupling) then
+!             LU(:,3)=LU(:,3)-res_LU(2)*aimag(1._SP/(W_bss%p(:)+conjg(E_plus_W(i_pert_SOC))))
+!           endif
          endif
 #endif
          !

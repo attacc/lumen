@@ -269,6 +269,7 @@ subroutine K_Transitions_setup(iq,Ken,Xk,FILL_the_groups)
      !
      ! Resonant
      f_eh_LU(1) = Ken%f(ic,ikp,i_sp)*(spin_occ-Ken%f(iv,ik ,i_sp))/spin_occ/spin_occ
+!     write(1000,*) iv,ic,ik,ikp,f_eh_LU(1)
      !
      ! Anti-Resonant
      f_eh_LU(2) = Ken%f(iv,ik ,i_sp)*(spin_occ-Ken%f(ic,ikp,i_sp))/spin_occ/spin_occ

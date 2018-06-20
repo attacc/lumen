@@ -106,6 +106,8 @@ subroutine K_diago_compute_epsilon(iq,W,BS_E,BS_R_left,BS_R_right,BS_E_SOC_corr,
 #if defined _LU
      if(l_lum) then
        LU(:,2)=LU(:,2)+BS_R_LU(1,i1)*aimag(-1._SP/(W%p(:)-EXC_E(i_pert_SOC)))/pi
+!       write(100,*) real(BS_E(i1))*HA2EV,BS_R_LU(1,i1)/BS_R_LU(1,1),real(BS_R_left(i1)*BS_R_right(i1)/ &
+!           (BS_R_left(1)*BS_R_right(1)))
 !       if (BSS_add_antiresonant) LU(:,2)=LU(:,2)+BS_R_LU(2,i1)*aimag(-1._SP/(W%p(:)+conjg(EXC_E(i_pert_SOC))))/pi
      endif
 #endif

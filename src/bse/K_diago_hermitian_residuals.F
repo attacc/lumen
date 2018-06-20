@@ -37,9 +37,6 @@ subroutine K_diago_hermitian_residuals(BS_E_real,BS_R_left,BS_R_right)
  use X_m,            ONLY:global_gauge
  use BS_solvers,     ONLY:BSS_dipoles,BSS_eh_E,BSS_eh_Z,BSS_eh_f,BS_mat,BSS_eh_f_RES
  use BS,             ONLY:BS_H_dim
-#if defined _LU
- use BS,             ONLY:l_BSE_lum
-#endif
  !
  implicit none
  !
