@@ -66,6 +66,10 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
 #if defined _SCALAPACK
  use SLK_m,                ONLY:SLK_test_H_dim
 #endif
+#if defined _LU
+ use lum_m,                ONLY:k_vertical_exc
+#endif
+ !
  !
  implicit none
  !
@@ -137,6 +141,7 @@ subroutine INIT_load(defs,en,q,k,X,Xw)
  ! Luminescence
  !
  call it(defs,'NelCond','Number of electrons in conduction',nel_cond)
+ call it(defs,'VerticalExc','k-point number for vertical excitation (default=0)',k_vertical_exc)
 #endif
  !
 #if defined _ELPH 

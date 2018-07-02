@@ -40,6 +40,8 @@ subroutine OCCUPATIONS_Quasi_Fermi(E,K,mode)
  use R_lattice,     ONLY:bz_samp
  use IO_m,          ONLY:IO_and_Messaging_switch
  use com,           ONLY:error,msg
+ use parser_m,      ONLY:parser
+ use lum_m,         ONLY:k_vertical_exc
  !
  implicit none
  !
@@ -53,10 +55,16 @@ subroutine OCCUPATIONS_Quasi_Fermi(E,K,mode)
  real(SP) :: nel_save
  integer  :: nbf_save,nbm_save
  integer  :: nval 
+ logical  :: l_gamma_exc
  !
  call  OCCUPATIONS_Fermi(E,K,mode)
  !
  if(nel_cond==0._SP) return
+ !
+ if(k_vertical_exc/=0) then
+   call Vertical_Occupation(E,K,mode,k_vertical_exc)
+   return
+ endif
  !
  nel_save=nel
  !

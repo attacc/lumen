@@ -96,7 +96,7 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  use timing_m,    ONLY:timing_allocate,nclockx
 #endif
 #if defined _LU
- use lum_m,       ONLY:LU_weights
+ use lum_m,       ONLY:LU_weights,k_vertical_exc
 #endif
 
  use openmp,      ONLY:OPENMP_initialize,OPENMP_update,master_thread,omp_is_off
@@ -231,6 +231,7 @@ subroutine SET_defaults(INSTR,IND,OD,JS,COM_DIR)
  ! Luminescence
  !
  nel_cond=0._SP
+ k_vertical_exc=0
  !
 #endif
  !

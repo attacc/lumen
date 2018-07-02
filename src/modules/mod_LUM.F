@@ -39,6 +39,8 @@ module lum_m
  complex(SP), allocatable :: BSS_dipoles_LU(:,:)
  complex(SP), allocatable :: BSS_LU_f(:,:)
  !
+ integer :: k_vertical_exc
+ !
  contains
    !
    subroutine LU_init( )

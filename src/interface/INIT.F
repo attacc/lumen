@@ -397,6 +397,7 @@ integer function INIT(en,q,k,X,Xw,instr,lnstr,CLOSE_Gs,FINALIZE)
  ! Luminescence
  !
  call initactivate(1,'NelCond')
+ call initactivate(1,'VerticalExc')
 #endif
  !
  !
