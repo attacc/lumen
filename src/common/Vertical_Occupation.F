@@ -39,15 +39,35 @@ subroutine Vertical_Occupation(E,K,mode,ik_exc)
  ! Work Space
  !
  real(SP)     :: E_range=0.026/HA2EV !eV = 300 Kelvin
+ real(SP)     :: n_remove,n_add
  integer :: n_bnd_hole,n_bnd_elect
  integer :: ib
  !
+ n_bnd_hole =0
+ n_bnd_elect=0
+ !
  do ib=1,E%nbf
-   write(*,*) ' Energy ',E%E(ib,ik_exc,1)*HA2EV
+   if(abs(E%E(ib,ik_exc,1)-E%E(E%nbf,ik_exc,1))<E_range)   n_bnd_hole=n_bnd_hole+1
  enddo
  do ib=E%nbf+1,E%nbf+10
-   write(*,*) ' Energy ',E%E(ib,ik_exc,1)*HA2EV
+   if(abs(E%E(ib,ik_exc,1)-E%E(E%nbf+1,ik_exc,1))<E_range) n_bnd_elect=n_bnd_elect+1
  enddo
- stop
+ !
+ if(n_bnd_elect==10) call error("Vertical Excitation: recompile with more bands in conduction!!")
+ !
+ n_remove=nel_cond/dble(n_bnd_hole)
+ n_add   =nel_cond/dble(n_bnd_elect)
+ !
+ do ib=1,E%nbf
+   if(abs(E%E(ib,ik_exc,1)-E%E(E%nbf,ik_exc,1))<E_range)  E%f(ib,ik_exc,1)=E%f(ib,ik_exc,1)-n_remove 
+ enddo
+ do ib=E%nbf+1,E%nbf+10
+   if(abs(E%E(ib,ik_exc,1)-E%E(E%nbf+1,ik_exc,1))<E_range) E%f(ib,ik_exc,1)=E%f(ib,ik_exc,1)+n_add
+ enddo
+ !
+ E%nbm=E%nbf+n_bnd_elect
+ E%nbf=E%nbf-n_bnd_hole
+ !
+ call REPORT_all_Occupations(E,k,'E')
  !
 end subroutine
