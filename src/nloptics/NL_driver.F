@@ -98,7 +98,8 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
    call DIPOLE_driver(E,k,X(1),X(1)%q0)
  else
    Dipole_approach='Covariant' 
-   if(load_Overlaps()/=0) call DIPOLE_driver(E,k,X(1),X(1)%q0)
+!   if(load_Overlaps()/=0) 
+   call DIPOLE_driver(E,k,X(1),X(1)%q0)
  endif
  !
  call check_non_periodic()
@@ -113,7 +114,6 @@ subroutine NL_driver(E,X,k,Xk,q,Xw)
    call X_alloc('DIP_S')
  else
    call X_alloc('DIP_R')
-   call X_alloc('DIP_P')
  endif
  !
  ! Allocation
