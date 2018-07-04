@@ -34,7 +34,7 @@ subroutine NL_Berry_current(en,Xk,k_map,V_bands,NL_J)
  use electric,       ONLY:Sm1_plus,Sm1_minus,E_minus,E_plus
  use parallel_m,     ONLY:PP_redux_wait,PAR_IND_Xk_bz,PAR_COM_Xk_ibz_INDEX
  use QP_m,           ONLY:QP_nk
- use nl_optics,      ONLY:NL_bands
+ use nl_optics,      ONLY:NL_bands,NL_initial_J
  use wrapper_omp,    ONLY:V_dot_V_omp
  !
  implicit none           
@@ -90,8 +90,9 @@ subroutine NL_Berry_current(en,Xk,k_map,V_bands,NL_J)
          ikbz=k_map%k_map_dir(idx(1),idx(2),idx(3))
          !
          do iv=1,en%nbf
-           NL_J_red(id)=NL_J_red(id)+V_dot_V_omp(en%nbf,Sm1_plus (iv,:,id,ikbz,1),E_plus (:,iv,id,ikbz,1))  &
-&                                   +conjg(V_dot_V_omp(en%nbf,Sm1_minus(iv,:,id,ikbz,1),E_minus(:,iv,id,ikbz,1)))
+!           NL_J_red(id)=NL_J_red(id)+V_dot_V_omp(en%nbf,Sm1_plus (iv,:,id,ikbz,1),E_plus (:,iv,id,ikbz,1))  !&
+           NL_J_red(id)=NL_J_red(id)+conjg(V_dot_V_omp(en%nbf,Sm1_minus(iv,:,id,ikbz,1),E_minus(:,iv,id,ikbz,1))) &
+                                          +V_dot_V_omp(en%nbf,Sm1_plus (iv,:,id,ikbz,1),E_plus (:,iv,id,ikbz,1))  
          enddo
          !
        enddo
@@ -99,18 +100,14 @@ subroutine NL_Berry_current(en,Xk,k_map,V_bands,NL_J)
      enddo
    enddo
    !
-   NL_J_red(id)=dble(NL_J_red(id))/dble(Nperpend)   
+   NL_J_red(id)=aimag(NL_J_red(id))/dble(Nperpend)   
    !
  enddo
  !
  ! Transform in cartesian coordinates
  ! 
- NL_J=cZERO
- !
  do id=1,3
-   do id_red=1,3
-     NL_J(id)=NL_J_red(id)+NL_J_red(id_red)*a(id_red,id)/DL_Vol
-   enddo
+   NL_J(id)=sum(NL_J_red(:)*a(:,id))/DL_Vol
  enddo
  !
  NL_J=-NL_J/(4.0*pi)

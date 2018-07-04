@@ -170,6 +170,8 @@ subroutine NL_start_and_restart(E,k,X)
      & TRANS=.TRUE.,nK_mem=k%nibz)
  if(.not.l_use_DIPOLES) then
    call NL_Berry_current(E,k,k_map,V_bands,NL_initial_J(1:3))
+ else
+   NL_J(1:3)=NL_J(4:6)
  endif
  !
  call msg('r ',' Initial Polarization :',real(NL_initial_P))
