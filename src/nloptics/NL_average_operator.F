@@ -62,7 +62,6 @@ subroutine NL_average_operator(O_VALUE,V_VALUE,O_REAL,O_MATRIX,&
  complex(SP)  :: V_tmp(NL_nbands)
  character(1) :: op
  !
- return
  OUTPUT_dim=0
  if(present(O_MATRIX).or.present(O_real)) OUTPUT_dim=1
  !

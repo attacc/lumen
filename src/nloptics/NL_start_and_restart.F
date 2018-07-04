@@ -34,8 +34,7 @@ subroutine NL_start_and_restart(E,k,X)
  use com,            ONLY:msg
  use electrons,      ONLY:levels,n_sp_pol
  use R_lattice,      ONLY:bz_samp,k_map
- use X_m,            ONLY:X_t
- use X_m,            ONLY:X_t 
+ use X_m,            ONLY:X_t,DIP_P 
  use xc_functionals, ONLY:V_xc,XC_potential_driver
  use QP_m,           ONLY:QP_nk
  use memory_m,       ONLY:mem_est
@@ -44,11 +43,13 @@ subroutine NL_start_and_restart(E,k,X)
  use parallel_m,     ONLY:master_cpu,PAR_IND_Xk_ibz,PAR_Xk_ibz_index
  use nl_optics,      ONLY:Correlation,IPA,E_full,full_rho,V_bands,TDDFT,n_runs_todo,NL_LRC_alpha,Alpha_ED,NL_bands,  &
 &                         V_xc_0,NL_initial_P,l_use_DIPOLES,n_runs,runs_done,JGM,E_xc_0,I_relax,l_use_DIPOLES,&
-&                         NL_P,E_full,E_bare,Hk,rho_n,full_rho,rho_reference,V_hartree_ne,V_xc_ne,VAL_BANDS,NL_J
+&                         NL_P,E_full,E_bare,Hk,rho_n,full_rho,rho_reference,V_hartree_ne,V_xc_ne,VAL_BANDS,NL_J, &
+&                         NL_initial_J
  use IO_m,           ONLY:OP_RD_CL,io_control,NONE,file_is_present,VERIFY
  use parallel_m,     ONLY:PAR_IND_runs,PP_redux_wait
  use stderr,         ONLY:intc
  use IO_m,           ONLY:IO_and_Messaging_switch
+ use interfaces,     ONLY:NL_average_operator
  !
  implicit none
  !
@@ -165,7 +166,14 @@ subroutine NL_start_and_restart(E,k,X)
    !
  endif
  !
+ call NL_average_operator(V_VALUE=NL_initial_J(4:6),V_MATRIX=-DIP_P,V_bands=V_bands,k=k,en=E, &
+     & TRANS=.TRUE.,nK_mem=k%nibz)
+ if(.not.l_use_DIPOLES) then
+   call NL_Berry_current(E,k,k_map,V_bands,NL_initial_J(1:3))
+ endif
+ !
  call msg('r ',' Initial Polarization :',real(NL_initial_P))
+ call msg('r ',' Initial Current      :',real(NL_initial_J))
  !
  ! Restart
  ! ====================================
