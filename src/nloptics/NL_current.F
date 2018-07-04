@@ -53,23 +53,23 @@ subroutine NL_current(k,E,V_input)
  call NL_average_operator(V_VALUE=NL_J(4:6), V_MATRIX=-DIP_P,V_bands=V_input,k=k,en=E,TRANS=.TRUE.,nK_mem=k%nibz)
  !
  if(trim(global_gauge)=='velocity') then
-   !
-   ! Velocity gauge I must use the correct definition of the J operator
-   !
-   NL_J(4:6)=NL_J(4:6)+A_ext%vecpot(:)*real(nel,SP)/(2._SP*SPEED_OF_LIGHT)
-   !
-   NL_J(1:3)=NL_J(4:6)
-   !
-   NL_J=NL_J/DL_vol
+!   !
+!   ! Velocity gauge I must use the correct definition of the J operator
+!   !
+!   NL_J(4:6)=NL_J(4:6)+A_ext%vecpot(:)*real(nel,SP)/(2._SP*SPEED_OF_LIGHT)
+!   !
+!   NL_J(1:3)=NL_J(4:6)
+!   !
+!   NL_J=NL_J/DL_vol
    !
  else
    !
-   if(l_use_DIPOLES) then
-     NL_J(1:3)=NL_J(4:6)
-   else
-     call NL_Berry_current(E,k,k_map,V_input,NL_J(1:3))
-   endif
-   !
+!   if(l_use_DIPOLES) then
+!     NL_J(1:3)=NL_J(4:6)
+!   else
+!     call NL_Berry_current(E,k,k_map,V_input,NL_J(1:3))
+!   endif
+!   !
  endif
  !
 end subroutine NL_current
