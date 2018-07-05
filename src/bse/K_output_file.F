@@ -34,6 +34,7 @@ subroutine K_output_file(iq,mode)
  use X_output,  ONLY:headers,X_setup_headers,X_setup_file_names,eps_file_name,jdos_file_name,&
 &                    eel_file_name,alpha_file_name,refl_file_name,X_write_descriptions,&
 &                    X_write_messages_before_headers,X_write_q_plus_g
+ use stderr,       ONLY:set_real_printed_length
 #if defined _KERR
  use pars,      ONLY:cI
  use electrons, ONLY:spin_occ
@@ -72,6 +73,8 @@ subroutine K_output_file(iq,mode)
  l_Diago     = index(mode,"Diago")/=0
  l_Inversion = index(mode,"Inversion")/=0
  l_IP        = index(mode,"IP")/=0
+ !
+ call set_real_printed_length(f_length=18,g_length=18)
  !
  ! File Names 
  !
