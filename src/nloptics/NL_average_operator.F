@@ -74,7 +74,7 @@ subroutine NL_average_operator(O_VALUE,V_VALUE,O_REAL,O_MATRIX,&
  if (OUTPUT_dim==3) V_VALUE=cZERO
  !
  op='N'
- if(TRANS.eqv..true.) op='T'
+ if(present(TRANS)) op='T'
  !
  do i_sp_pol=1,n_sp_pol
  !

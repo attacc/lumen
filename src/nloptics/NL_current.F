@@ -36,7 +36,7 @@ subroutine NL_current(k,E,V_input)
  use electrons,      ONLY:nel,levels,n_spin,n_sp_pol
  use fields,         ONLY:A_ext
  use X_m,            ONLY:global_gauge,DIP_P
- use nl_optics,      ONLY:NL_J,NL_bands,l_use_DIPOLES
+ use nl_optics,      ONLY:NL_J,NL_initial_J,NL_bands,l_use_DIPOLES
  use QP_m,           ONLY:QP_nk
  use interfaces,     ONLY:NL_average_operator
  !
@@ -71,5 +71,7 @@ subroutine NL_current(k,E,V_input)
    endif
    !
  endif
+ !
+ NL_J=NL_J-NL_initial_J
  !
 end subroutine NL_current
