@@ -52,7 +52,8 @@ subroutine excitons_sort_and_report(E,BS_R,BS_E,BS_E_SOC_corr,S_z,S_sq)
  !
  ! Excitonc amplitude
  !
- character(3), parameter:: R_normalize="yes"
+! character(3), parameter:: R_normalize="yes"
+ character(3), parameter:: R_normalize="no"
  !
  write_spin    = present(S_sq)
  write_widths  = any(abs(aimag(BS_E))>1.E-5)
