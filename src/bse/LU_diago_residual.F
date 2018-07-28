@@ -27,7 +27,7 @@ subroutine LU_diago_residual(BS_V_left,BS_V_right,BS_R_LU,K_is_not_hermitian,BS_
  !
  use pars,           ONLY:SP,rZERO,cZERO,cI
  use wrapper_omp,    ONLY:V_dot_V_omp,Vstar_dot_V_omp
- use parallel_m,     ONLY:PP_redux_wait,PP_indexes,myid,PP_indexes_reset
+ use parallel_m,     ONLY:PP_redux_wait,PP_indexes,myid,PP_indexes_reset,master_cpu
  use interfaces,     ONLY:PARALLEL_index
  use LIVE_t,         ONLY:live_timing
  use BS,             ONLY:BS_H_dim,BS_K_dim
@@ -46,6 +46,7 @@ subroutine LU_diago_residual(BS_V_left,BS_V_right,BS_R_LU,K_is_not_hermitian,BS_
  integer              ::i_l,i_c,i_K,i_lr,i_ll
  complex(SP)          ::P_x_fZ(2,BS_H_dim,3),Pi_x_R_x_adA_left(3),Pi_x_R_x_adA_right(3),adA_x_R_over_R_x_A(2),&
 &                       R_over_R_x_A(2,BS_H_dim),B(BS_H_dim)
+ complex(SP)          :: OCC_tmp(2,BS_H_dim),OCC_exc(2)
  real(SP)             :: B_occ
  !
  ! Parallel indexes
@@ -134,6 +135,8 @@ subroutine LU_diago_residual(BS_V_left,BS_V_right,BS_R_LU,K_is_not_hermitian,BS_
    ! Hermitian residual
    !====================
    !
+   if(master_cpu) open(unit=100,file='exc_occupations')
+   !
    do i_c=1,3
      P_x_fZ(1,:,i_c)=BSS_dipoles_LU(:,i_c)*sqrt(BSS_eh_f(:))
    enddo
@@ -146,11 +149,16 @@ subroutine LU_diago_residual(BS_V_left,BS_V_right,BS_R_LU,K_is_not_hermitian,BS_
      !
      R_over_R_x_A(1,:) =  BSS_LU_f(1,:)*BS_V_right(:,i_l)/BSS_eh_f(:)
      R_over_R_x_A(2,:) =  BSS_LU_f(2,:)*BS_V_right(:,i_l)/BSS_eh_f(:)
+     OCC_tmp(1,:)      = BSS_LU_f(1,:)*BS_V_right(:,i_l)
+     OCC_tmp(2,:)      = BSS_LU_f(2,:)*BS_V_right(:,i_l)
      !
      ! adA_x_R_over_R_x_A = (A^l_j)* R<_j/R_j A^l_j
      !
      adA_x_R_over_R_x_A(1)=V_dot_V_omp(BS_K_dim,conjg(BS_V_right(:,i_l)),R_over_R_x_A(1,:))
      adA_x_R_over_R_x_A(2)=V_dot_V_omp(BS_K_dim,conjg(BS_V_right(:,i_l)),R_over_R_x_A(2,:))
+     !
+     OCC_exc(1)=V_dot_V_omp(BS_K_dim,conjg(BS_V_right(:,i_l)),OCC_tmp(1,:))
+     OCC_exc(2)=V_dot_V_omp(BS_K_dim,conjg(BS_V_right(:,i_l)),OCC_tmp(2,:))
      !
      do i_c=1,3 
        !                                   
@@ -164,12 +172,13 @@ subroutine LU_diago_residual(BS_V_left,BS_V_right,BS_R_LU,K_is_not_hermitian,BS_
      ! that cancel out.
      !
      BS_R_LU(:,i_l)=dot_product(Pi_x_R_x_adA_right,Pi_x_R_x_adA_right)*adA_x_R_over_R_x_A(:)
-!     write(100,*) i_l,abs(adA_x_R_over_R_x_A(1))
-!     write(200,*) i_l,BSS_LU_f(1,i_l)
+     if(master_cpu) write(100,*) i_l,real(OCC_exc(1))
      !
      call live_timing(steps=1)
      !
    enddo
+   !
+   if(master_cpu) close(unit=100)
    !
  endif
  !
