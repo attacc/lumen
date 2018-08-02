@@ -53,6 +53,7 @@ subroutine NL_driver(en)
  logical  :: Probe_consistency_error
  type(ext_field)   :: Efield_probe
  real(SP) :: NL_tot_time
+ logical, allocatable :: runs_ok(:)
  !
  call section("*",'NL Post Processing')
  !
@@ -65,15 +66,26 @@ subroutine NL_driver(en)
  n_runs=n_frequencies*n_intensities
  !
  allocate(NL_P(NL_steps,n_runs,3),Probe_frequency(n_runs),Freqs(n_frequencies))
+ NL_P=0._SP
+ Probe_frequency=0._SP
+ Freqs=-1._SP
  !
  ! Reads the polarization from dbs containing simulation at different frequencies 
  !
  Probe_consistency_error=.FALSE.
  i_Probe=1
  !
+ allocate(runs_ok(n_runs))
+ runs_ok=.true.
+ !
  do i_r=1,n_runs
    call io_control(ACTION=OP_RD_CL,COM=NONE,SEC=(/1+i_r/),MODE=DUMP,ID=ID)
    io_Nonlinear=io_NL(ID)
+   !
+   if(io_Nonlinear/=0) then
+     runs_ok(i_r)=.false.
+     cycle
+   endif
    !
    Efield(i_Probe)%amplitude=Efield_strength(Efield(i_Probe)%intensity,'AU')
    !
@@ -95,6 +107,7 @@ subroutine NL_driver(en)
  Efield_probe%ef_name=trim(Efield_probe%ef_name)
  !
  if (Probe_consistency_error) call error('Not all probes have consistent parameters')
+ if (any(runs_ok.eqv..false.)) call warning(' Incomplete runs')
  !
  NL_tot_time    =real(NL_steps,SP)*NL_step
  !
@@ -176,6 +189,8 @@ subroutine NL_driver(en)
      !
      do i_r = 1, n_runs
        !
+       if(.not.runs_ok(i_r)) cycle
+       !
        T_period=T_range(1,i_r)
        !
        do i_d = 1,3
@@ -198,6 +213,8 @@ subroutine NL_driver(en)
        !
        do i_r=1,n_runs
          !
+         if(.not.runs_ok(i_r)) cycle
+         !
          Efield(i_Probe)%amplitude=EF_parms(i_r)%amplitude
          Efield(i_Probe)%intensity=EF_parms(i_r)%intensity
          Efield(i_Probe)%frequency=EF_parms(i_r)%frequency
@@ -212,6 +229,8 @@ subroutine NL_driver(en)
      !
      do i_r=1,n_runs
        !
+       if(.not.runs_ok(i_r)) cycle
+       !  
        i_f=EF_parms(i_r)%indexes(1)
        i_i=EF_parms(i_r)%indexes(2)
        !

@@ -94,6 +94,8 @@ subroutine NL_plot_x_effective(Susc,Freqs,extra_idx)
    !
    do i_f=1,n_frequencies
      !
+     if(Freqs(i_f)==-1._SP) cycle
+     !
      Unit_of_Measure = 1._SP
      !
      if (i_order==0) Unit_of_Measure =  SVCMm12VMm1/AU2VMm1
