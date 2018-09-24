@@ -7,7 +7,7 @@ from scipy.interpolate import InterpolatedUnivariateSpline
 
 """
 Calculate current using finite differences from the polarization
-Author:  C. Attaccalite 
+Author:  C. Attaccalite
 """
 #
 # parse command line
@@ -25,10 +25,9 @@ if args.polname == None:
     exit(0)
 
 data=np.genfromtxt(args.polname,comments="#")
-
-f1 = InterpolatedUnivariateSpline(data[0], data[1], k=3)
-f2 = InterpolatedUnivariateSpline(data[0], data[2], k=3)
-f3 = InterpolatedUnivariateSpline(data[0], data[3], k=3)
+f1 = InterpolatedUnivariateSpline(data[:,0], data[:,1], k=3)
+f2 = InterpolatedUnivariateSpline(data[:,0], data[:,2], k=3)
+f3 = InterpolatedUnivariateSpline(data[:,0], data[:,3], k=3)
 
 df1 = f1.derivative()
 df2 = f2.derivative()
