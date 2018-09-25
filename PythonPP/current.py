@@ -4,6 +4,7 @@ import numpy as np
 import re
 import sys
 from scipy.interpolate import InterpolatedUnivariateSpline
+import matplotlib.pyplot as plt
 
 """
 Calculate current using finite differences from the polarization
@@ -24,20 +25,34 @@ if args.polname == None:
     print('type "current.py --help" for help ',)
     exit(0)
 
-data=np.genfromtxt(args.polname,comments="#")
-f1 = InterpolatedUnivariateSpline(data[:,0], data[:,1], k=3)
-f2 = InterpolatedUnivariateSpline(data[:,0], data[:,2], k=3)
-f3 = InterpolatedUnivariateSpline(data[:,0], data[:,3], k=3)
 
-df1 = f1.derivative()
-df2 = f2.derivative()
-df3 = f3.derivative()
+fs2aut=41.341373336561361  # convertion femptosecond to atomic units of time
+
+data=np.genfromtxt(args.polname,comments="#")
 
 data_der=np.empty_like(data)
 
-data_der[0]=data[0]
-data_der[1]=df1(data[0])
-data_der[2]=df2(data[0])
-data_der[3]=df3(data[0])
+delta  =(data[1,0]-data[0,0])*fs2aut
+npoints=len(data[:,0])
+ndata  =len(data[0,:])-1
+print("Number of points: %d " % npoints)
+print("Number of column: %d " % ndata)
+print("DeltaT          : %f " % delta)
 
-np.savetxt('der_polarization.dat',data,fmt='%2.15e')
+
+for ip in range(1,npoints-1):
+    for idt in range(1,ndata):
+        data_der[ip,idt]=(data[ip+1,idt]-data[ip-1,idt])/(2.0*delta)
+
+for idt in range(1,ndata):
+    data_der[0,idt]        =(data[1,idt]-data[0,idt])/(delta)
+    data_der[npoints-1,idt]=(data[npoints-1,idt]-data[npoints-2,idt])/(delta)
+
+data_der[:,0]=data[:,0]
+
+#for idt in range(1,ndata):
+# interp= InterpolatedUnivariateSpline(data[:,0], data[:,idt], k=3)
+# derf = interp.derivative()
+# data_der[idt]=derf(data[0])
+
+np.savetxt('der_polarization.dat',data_der,fmt='%2.15e')
