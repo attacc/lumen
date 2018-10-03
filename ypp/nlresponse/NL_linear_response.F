@@ -289,7 +289,7 @@ subroutine NL_linear_response(en)
        do i_t = NL_response%i_T_range(1),NL_response%i_T_range(2)
          outdata(1)=(i_t-1.0)*NL_step*AUT2FS
          outdata(2:4)=(/ NL_P_t(i_t,1), NL_P_t(i_t,2),NL_P_t(i_t,3) /)
-         call msg('o '//trim(short_pol),'',outdata(1:7),USE_TABS=.TRUE.)
+         call msg('o '//trim(short_pol),'',outdata(1:4),USE_TABS=.TRUE.)
        enddo
        !
        call of_open_close(short_pol)
